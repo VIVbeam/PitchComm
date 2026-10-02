@@ -59,6 +59,14 @@
 _Static_assert(sizeof(PC_TEAM_NETWORK_NAME) <= 17, "PC_TEAM_NETWORK_NAME is longer than 16 bytes");
 #endif
 
+/*
+ * The wire carries one nibble per unit (pc::kMaxUnits in pc/protocol.h is the
+ * same bound). PC_TEAM_UNIT_COUNT is the coach plus the enrolled units, so the
+ * addresses, the setup loop and the on-air bounds cover any enrolled roster.
+ */
+_Static_assert(PC_TEAM_UNIT_COUNT >= 1 && PC_TEAM_UNIT_COUNT <= 16,
+	       "team unit count must fit the wire unit index");
+
 /* Drain/attach cadence of the radio thread, and its stack size. */
 #define PC_LINK_POLL_MS 2
 #define PC_LINK_RADIO_STACK 2048
@@ -88,7 +96,7 @@ static atomic_t tx_errors = ATOMIC_INIT(0);
 static otInstance *ot_instance;
 static int sock_fd = -1;
 static int scope_id;
-static uint8_t peer_address[PC_LINK_ROLES][16];
+static uint8_t peer_address[PC_TEAM_UNIT_COUNT][16];
 static K_THREAD_STACK_DEFINE(radio_stack, PC_LINK_RADIO_STACK);
 static struct k_thread radio_thread_data;
 
@@ -116,7 +124,7 @@ static int link_bring_up(void)
 		return -ENODEV;
 	}
 
-	for (unsigned i = 0; i < PC_LINK_ROLES; ++i) {
+	for (unsigned i = 0; i < PC_TEAM_UNIT_COUNT; ++i) {
 		pc_link_local_from_eui(team_eui64[i], peer_address[i]);
 	}
 
@@ -237,7 +245,7 @@ static int link_bring_up(void)
 
 static void link_tx_frame(const struct pc_link_frame *frame)
 {
-	if (sock_fd < 0 || frame->target >= PC_LINK_ROLES) {
+	if (sock_fd < 0 || frame->target >= PC_TEAM_UNIT_COUNT) {
 		atomic_inc(&tx_errors);
 		return;
 	}
@@ -274,7 +282,7 @@ static void link_rx_one(void)
 		return;
 	}
 
-	for (unsigned i = 0; i < PC_LINK_ROLES; ++i) {
+	for (unsigned i = 0; i < PC_TEAM_UNIT_COUNT; ++i) {
 		if (i == local_role) {
 			continue;
 		}
@@ -285,7 +293,7 @@ static void link_rx_one(void)
 			return;
 		}
 	}
-	/* Datagram from an address that is not one of the five team EUI-64s. */
+	/* Datagram from an address that is not one of the team EUI-64s. */
 	atomic_inc(&rx_dropped);
 }
 
@@ -320,7 +328,7 @@ static void radio_thread(void *arg1, void *arg2, void *arg3)
 
 int pc_link_start(uint8_t role, pc_link_rx_fn rx_cb)
 {
-	if (role >= PC_LINK_ROLES || link_started) {
+	if (role >= PC_TEAM_UNIT_COUNT || link_started) {
 		return -EINVAL;
 	}
 
@@ -412,7 +420,7 @@ const char *pc_link_state(void)
 
 bool pc_link_send(uint8_t target_role, const uint8_t *bytes, size_t len)
 {
-	if (target_role >= PC_LINK_ROLES || target_role == local_role || bytes == NULL ||
+	if (target_role >= PC_TEAM_UNIT_COUNT || target_role == local_role || bytes == NULL ||
 	    len != PC_LINK_PACKET_BYTES || !link_started || link_error) {
 		atomic_inc(&tx_dropped);
 		return false;

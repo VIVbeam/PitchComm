@@ -18,25 +18,21 @@ extern "C" {
 /* One encoded pc::Packet, no application-layer wrapper. */
 #define PC_LINK_PACKET_BYTES 56
 
-/* Role indices match pc::Role in firmware/include/pc/protocol.h. */
-#define PC_LINK_ROLE_COACH 0
-#define PC_LINK_ROLE_CATCHER 1
-#define PC_LINK_ROLE_PITCHER 2
-#define PC_LINK_ROLE_SHORTSTOP 3
-#define PC_LINK_ROLE_CENTERFIELD 4
-#define PC_LINK_ROLES 5
-
 /*
  * Receive callback, invoked on the radio thread for each decoded datagram from
- * a known role. It must copy the payload and return without blocking; the
+ * a known unit. It must copy the payload and return without blocking; the
  * engine inbox is a k_msgq.
  */
-typedef void (*pc_link_rx_fn)(uint8_t source_role, const uint8_t *bytes, size_t len);
+typedef void (*pc_link_rx_fn)(uint8_t source_unit, const uint8_t *bytes, size_t len);
 
 /*
- * Start OpenThread and the radio thread. role is the unit's own PC_LINK_ROLE_*.
- * Returns 0 when the stack started, negative errno otherwise. A unit without
- * provisioned team credentials starts in a not-ready state instead of failing.
+ * Start OpenThread and the radio thread. role is this unit's index from the
+ * generated catalog: unit 0 is the coach and units 1..PC_TEAM_UNIT_COUNT-1 are
+ * the enrolled field units (see catalog.h and the PC_UNIT_<key> selectors).
+ * The count comes from PC_TEAM_UNIT_COUNT in app/team_config.h, which
+ * tools/provision.py writes as coach plus the enrolled units. Returns 0 when
+ * the stack started, negative errno otherwise. A unit without provisioned team
+ * credentials starts in a not-ready state instead of failing.
  */
 int pc_link_start(uint8_t role, pc_link_rx_fn rx_cb);
 
