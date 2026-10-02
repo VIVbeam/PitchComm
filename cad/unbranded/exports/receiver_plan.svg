@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="286">
+<rect width="200" height="286" fill="#ffffff"/>
+<rect x="16" y="16" width="168.0" height="254.0" rx="24.0" fill="#edf2f7" stroke="#1a202c"/>
+<rect x="60.4" y="24.0" width="71.2" height="84.0" rx="2" fill="#2b6cb0" fill-opacity="0.75" stroke="#1a202c"/><text x="96.0" y="66.0" font-size="10" text-anchor="middle" fill="#1a202c" font-family="monospace">xiao_nrf54l15</text>
+<rect x="60.4" y="108.0" width="71.2" height="40.0" rx="2" fill="#f6ad55" fill-opacity="0.4" stroke="#1a202c" stroke-dasharray="5,3"/><text x="96.0" y="128.0" font-size="10" text-anchor="middle" fill="#1a202c" font-family="monospace">xiao_antenna_k</text>
+<rect x="27.0" y="26.4" width="138.0" height="180.0" rx="2" fill="#d69e2e" fill-opacity="0.75" stroke="#1a202c"/><text x="96.0" y="116.4" font-size="10" text-anchor="middle" fill="#1a202c" font-family="monospace">protected_850m</text>
+<rect x="25.6" y="28.0" width="144.8" height="180.0" rx="2" fill="#2b6cb0" fill-opacity="0.75" stroke="#1a202c"/><text x="98.0" y="118.0" font-size="10" text-anchor="middle" fill="#1a202c" font-family="monospace">deck_plate</text>
+<rect x="76.0" y="211.2" width="48.0" height="48.0" rx="2" fill="#38a169" fill-opacity="0.75" stroke="#1a202c"/><text x="100.0" y="235.2" font-size="10" text-anchor="middle" fill="#1a202c" font-family="monospace">switch_recall</text>
+<rect x="76.0" y="16.0" width="40.0" height="8.0" rx="2" fill="#2b6cb0" fill-opacity="0.75" stroke="#1a202c"/><text x="96.0" y="20.0" font-size="10" text-anchor="middle" fill="#1a202c" font-family="monospace">charge_opening</text>
+<circle cx="36.0" cy="250.0" r="13.2" fill="none" stroke="#1a202c"/>
+<circle cx="164.0" cy="250.0" r="13.2" fill="none" stroke="#1a202c"/>
+<circle cx="36.0" cy="36.0" r="13.2" fill="none" stroke="#1a202c"/>
+<circle cx="164.0" cy="36.0" r="13.2" fill="none" stroke="#1a202c"/>
+<circle cx="100.0" cy="235.2" r="9*s" fill="none" stroke="#e53e3e"/>
+<text x="10" y="282" font-size="11" font-family="monospace">receiver (pitcher) 42 x 63.5 mm, flat lid 14.7 mm</text>
+</svg>

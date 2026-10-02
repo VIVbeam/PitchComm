@@ -1,0 +1,435 @@
+{
+  "revision": "v4-flat-tray-dashboard",
+  "colors": {
+    "cyan": "#74D7EE",
+    "pink": "#FFAFC8",
+    "white": "#FFFFFF"
+  },
+  "stl_color_support": false,
+  "assemblies": {
+    "receiver": {
+      "file": "receiver_colored.3mf",
+      "lid_print_file": "receiver_lid_colored.3mf",
+      "parts": [
+        {
+          "file": "receiver_body_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.0,
+            63.5,
+            12.85
+          ],
+          "components": 1
+        },
+        {
+          "file": "receiver_lid_color.stl",
+          "color": "#FFAFC8",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.0,
+            63.5,
+            9.15
+          ],
+          "components": 1
+        },
+        {
+          "file": "receiver_deck_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            38.2,
+            45.7,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "receiver_charge_cap_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            9.4,
+            3.1
+          ],
+          "components": 1
+        },
+        {
+          "file": "receiver_belt_carrier_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.0,
+            63.5,
+            5.3
+          ],
+          "components": 1
+        },
+        {
+          "file": "receiver_plunger_1_color.stl",
+          "color": "#FFFFFF",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            12.0,
+            12.0,
+            2.5
+          ],
+          "components": 1
+        }
+      ],
+      "stl_color_support": false
+    },
+    "wrist": {
+      "file": "wrist_colored.3mf",
+      "lid_print_file": "wrist_lid_colored.3mf",
+      "parts": [
+        {
+          "file": "wrist_body_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            12.5
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_lid_color.stl",
+          "color": "#FFAFC8",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            14.7608
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_deck_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.2,
+            38.5,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_charge_cap_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            9.4,
+            3.1
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_wrist_carrier_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            5.3
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_belt_carrier_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            5.3
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_plunger_1_color.stl",
+          "color": "#FFFFFF",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            12.0,
+            12.0,
+            4.5
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_display_bezel_color.stl",
+          "color": "#FFAFC8",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            31.1,
+            12.7,
+            1.6
+          ],
+          "components": 1
+        },
+        {
+          "file": "wrist_window_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            27.3,
+            8.9,
+            1.5
+          ],
+          "components": 1
+        }
+      ],
+      "stl_color_support": false
+    },
+    "keypad": {
+      "file": "keypad_colored.3mf",
+      "lid_print_file": "keypad_lid_colored.3mf",
+      "parts": [
+        {
+          "file": "keypad_body_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            48.0,
+            80.0,
+            15.0
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_lid_color.stl",
+          "color": "#FFAFC8",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            48.0,
+            80.0,
+            16.2608
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_deck_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            44.2,
+            48.5,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_charge_cap_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            9.4,
+            3.1
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_guard_carrier_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            48.0,
+            80.0,
+            5.3
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_plunger_call_1_color.stl",
+          "color": "#FFFFFF",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_label_call_1_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_plunger_call_2_color.stl",
+          "color": "#FFFFFF",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_label_call_2_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_plunger_call_3_color.stl",
+          "color": "#FFFFFF",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_label_call_3_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_plunger_call_4_color.stl",
+          "color": "#FFFFFF",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_label_call_4_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_plunger_back_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            7.0,
+            7.0,
+            2.7
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_display_bezel_color.stl",
+          "color": "#FFAFC8",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            31.1,
+            12.7,
+            1.6
+          ],
+          "components": 1
+        },
+        {
+          "file": "keypad_window_color.stl",
+          "color": "#74D7EE",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            27.3,
+            8.9,
+            1.5
+          ],
+          "components": 1
+        }
+      ],
+      "stl_color_support": false
+    }
+  }
+}

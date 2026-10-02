@@ -1,0 +1,45 @@
+<#
+.SYNOPSIS
+Writes the LittleFS audio image to one audio unit (pitcher or catcher).
+
+.DESCRIPTION
+This is a data image, not a firmware ELF, so west flash does not apply. It is
+programmed with nRF Util at the raw slot address recorded in the Intel HEX:
+
+  nrfutil device program --firmware firmware/build/audio/littlefs.hex `
+    --options chip_erase_mode=ERASE_RANGES,verify=VERIFY_READ
+
+Run this once per audio unit after flashing its firmware with
+tools\flash_firmware.ps1. nrfutil (nRF Util) and its device command must be on
+PATH; install with `nrfutil install device` if needed. Use -Serial to pick a
+probe when several are attached.
+
+.EXAMPLE
+tools\flash_audio.ps1
+Programs the default image onto the single attached board.
+
+.EXAMPLE
+tools\flash_audio.ps1 -Serial 000000000000
+Programs the image onto the probe with that serial number.
+#>
+param(
+    [string]$Image = '',
+    [string]$Serial = ''
+)
+$ErrorActionPreference = 'Stop'
+$root = Split-Path -Parent $PSScriptRoot
+if (-not $Image) { $Image = Join-Path $root 'firmware/build/audio/littlefs.hex' }
+if (-not (Test-Path -LiteralPath $Image)) {
+    throw "Audio image not found: $Image. Run tools\build_audio_fs.py first."
+}
+$nrfutil = (Get-Command nrfutil -ErrorAction SilentlyContinue).Source
+if (-not $nrfutil) {
+    throw 'nrfutil was not found on PATH. Install nRF Util (and `nrfutil install device`) before flashing the audio image.'
+}
+$arguments = @('device', 'program', '--firmware', $Image,
+    '--options', 'chip_erase_mode=ERASE_RANGES,verify=VERIFY_READ')
+if ($Serial) { $arguments += @('--serial-number', $Serial) }
+Write-Host "==> nrfutil $($arguments -join ' ')"
+& $nrfutil @arguments
+if ($LASTEXITCODE -ne 0) { throw "Audio image flashing failed (exit $LASTEXITCODE)" }
+Write-Host "Flashed $Image."

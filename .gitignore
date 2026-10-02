@@ -1,0 +1,15 @@
+# Tooling and build
+.tools/
+.pio/
+build/
+__pycache__/
+
+# V1 (previous two-board build)
+v1/
+
+# Personal / team assets
+team/
+config/team.local.json
+firmware/include/app/team_config.h
+firmware/build/
+firmware/audio/

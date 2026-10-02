@@ -1,0 +1,60 @@
+# PitchComm firmware application Kconfig.
+# Role is selected per build; the build script passes the matching fragment.
+
+mainmenu "PitchComm firmware"
+
+choice PITCHCOMM_ROLE
+	prompt "Unit role"
+	default PITCHCOMM_ROLE_COACH
+	help
+	  Selects which unit this image is built for.
+
+config PITCHCOMM_ROLE_COACH
+	bool "Coach console"
+
+config PITCHCOMM_ROLE_CATCHER
+	bool "Catcher"
+
+config PITCHCOMM_ROLE_PITCHER
+	bool "Pitcher"
+
+config PITCHCOMM_ROLE_SHORTSTOP
+	bool "Shortstop"
+
+config PITCHCOMM_ROLE_CENTERFIELD
+	bool "Center field"
+
+config PITCHCOMM_ROLE_AUDIO_PROOF
+	bool "LE Audio bench proof (no call link)"
+
+endchoice
+
+config PITCHCOMM_AUDIO
+	bool "LE Audio earbud output"
+	default y if PITCHCOMM_ROLE_CATCHER || PITCHCOMM_ROLE_PITCHER || \
+		     PITCHCOMM_ROLE_AUDIO_PROOF
+
+config PITCHCOMM_DISPLAY
+	bool "128x32 OLED output"
+	default y if PITCHCOMM_ROLE_CATCHER || PITCHCOMM_ROLE_SHORTSTOP || \
+		     PITCHCOMM_ROLE_CENTERFIELD
+
+config PITCHCOMM_CATCHER_MENU
+	bool "Catcher five-button pitch menu"
+	default y if PITCHCOMM_ROLE_CATCHER
+
+config PITCHCOMM_CONSOLE
+	bool "Line console over the debugger UART"
+	default y
+
+config PITCHCOMM_BATTERY
+	bool "Internal VBAT sense"
+	default y if PITCHCOMM_ROLE_CATCHER || PITCHCOMM_ROLE_PITCHER || \
+		     PITCHCOMM_ROLE_SHORTSTOP || PITCHCOMM_ROLE_CENTERFIELD
+
+config PITCHCOMM_FIELD_BUTTON
+	bool "Pitcher / fielder recall button"
+	default y if PITCHCOMM_ROLE_PITCHER || PITCHCOMM_ROLE_SHORTSTOP || \
+		     PITCHCOMM_ROLE_CENTERFIELD
+
+source "Kconfig.zephyr"

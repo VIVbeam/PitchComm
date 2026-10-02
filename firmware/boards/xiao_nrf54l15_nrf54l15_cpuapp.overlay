@@ -1,0 +1,56 @@
+/*
+ * XIAO nRF54L15 devicetree overlay (target xiao_nrf54l15/nrf54l15/cpuapp).
+ *
+ * Adds the parts the board DTS leaves to the application:
+ *
+ *   - the 128x32 SSD1306 OLED on i2c22 (SDA = P1.10 / D4, SCL = P1.11 / D5),
+ *     used by the catcher / shortstop / center-field roles;
+ *   - the internal VBAT sense channel (AIN7 = P1.14, through the P1.15
+ *     load-switched divider).
+ *
+ * Nothing already present in the board DTS is removed or redefined. The board
+ * file already enables i2c22, the adc node and the vbat_pwr regulator
+ * (P1.15, active high). The console (uart20) and the 802.15.4 node
+ * (chosen zephyr,ieee802154) are deliberately untouched.
+ *
+ * Required Kconfig for a role that uses the panel (belongs in the role
+ * fragments, not here): CONFIG_DISPLAY=y and CONFIG_SSD1306=y.
+ */
+
+/ {
+	chosen {
+		/* Binds the in-tree SSD1306 display driver to this node. */
+		zephyr,display = &ssd1306;
+	};
+
+	zephyr,user {
+		/* io-channel index 7 = AIN7 = P1.14. Read by board::Battery. */
+		io-channels = <&adc 7>;
+	};
+};
+
+&i2c22 {
+	status = "okay";
+	/* The OLED module carries its own 4.7k pull-ups and 400 kHz is safe at
+	 * 3.3 V (docs/wiring.md); the default would be 100 kHz. */
+	clock-frequency = <400000>;
+
+	ssd1306: ssd1306@3c {
+		compatible = "solomon,ssd1306";
+		reg = <0x3c>;
+		status = "okay";
+		width = <128>;
+		height = <32>;
+		segment-remap;
+		com-invdir;
+		com-sequential;
+		/* VERIFY: the upstream solomon,ssd1306-common.yaml marks these
+		 * four properties as required; the values are the documented
+		 * 128x32 SSD1306 defaults. */
+		segment-offset = <0>;
+		page-offset = <0>;
+		display-offset = <0>;
+		multiplex-ratio = <0x1f>; /* 32 rows - 1 */
+		prechargep = <0xf1>;
+	};
+};

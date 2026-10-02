@@ -1,0 +1,2100 @@
+{
+  "revision": "v4-flat-tray-dashboard",
+  "units": "mm",
+  "generator": "cad/unbranded/generate_cases.py",
+  "engine": "manifold",
+  "trimesh_version": "5.0.0",
+  "hardware_measured": false,
+  "parts": {
+    "receiver_body": {
+      "file": "receiver_body.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        42.0,
+        63.5,
+        12.85
+      ],
+      "size_mm": [
+        42.0,
+        63.5,
+        12.85
+      ],
+      "volume_mm3": 9479.135,
+      "triangles": 3612,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "receiver_lid": {
+      "file": "receiver_lid.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        42.0,
+        63.5,
+        9.15
+      ],
+      "size_mm": [
+        42.0,
+        63.5,
+        9.15
+      ],
+      "volume_mm3": 4904.878,
+      "triangles": 5576,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "receiver_deck": {
+      "file": "receiver_deck.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        38.2,
+        45.7,
+        0.7
+      ],
+      "size_mm": [
+        38.2,
+        45.7,
+        0.7
+      ],
+      "volume_mm3": 935.317,
+      "triangles": 1322,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "receiver_charge_cap": {
+      "file": "receiver_charge_cap.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        16.0,
+        9.4,
+        3.1
+      ],
+      "size_mm": [
+        16.0,
+        9.4,
+        3.1
+      ],
+      "volume_mm3": 222.201,
+      "triangles": 1442,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "receiver_belt_carrier": {
+      "file": "receiver_belt_carrier.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        42.0,
+        63.5,
+        5.3
+      ],
+      "size_mm": [
+        42.0,
+        63.5,
+        5.3
+      ],
+      "volume_mm3": 5625.475,
+      "triangles": 2196,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "receiver_plunger_1": {
+      "file": "receiver_plunger_1.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        12.0,
+        12.0,
+        2.5
+      ],
+      "size_mm": [
+        12.0,
+        12.0,
+        2.5
+      ],
+      "volume_mm3": 159.878,
+      "triangles": 768,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_body": {
+      "file": "wrist_body.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        46.0,
+        56.0,
+        12.5
+      ],
+      "size_mm": [
+        46.0,
+        56.0,
+        12.5
+      ],
+      "volume_mm3": 9073.561,
+      "triangles": 3706,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_lid": {
+      "file": "wrist_lid.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        46.0,
+        56.0,
+        14.7608
+      ],
+      "size_mm": [
+        46.0,
+        56.0,
+        14.7608
+      ],
+      "volume_mm3": 5564.546,
+      "triangles": 6244,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_deck": {
+      "file": "wrist_deck.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        42.2,
+        38.5,
+        0.7
+      ],
+      "size_mm": [
+        42.2,
+        38.5,
+        0.7
+      ],
+      "volume_mm3": 833.472,
+      "triangles": 1452,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_charge_cap": {
+      "file": "wrist_charge_cap.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        16.0,
+        9.4,
+        3.1
+      ],
+      "size_mm": [
+        16.0,
+        9.4,
+        3.1
+      ],
+      "volume_mm3": 222.201,
+      "triangles": 1442,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_wrist_carrier": {
+      "file": "wrist_wrist_carrier.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        46.0,
+        56.0,
+        5.3
+      ],
+      "size_mm": [
+        46.0,
+        56.0,
+        5.3
+      ],
+      "volume_mm3": 7041.685,
+      "triangles": 2196,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_belt_carrier": {
+      "file": "wrist_belt_carrier.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        46.0,
+        56.0,
+        5.3
+      ],
+      "size_mm": [
+        46.0,
+        56.0,
+        5.3
+      ],
+      "volume_mm3": 5481.809,
+      "triangles": 2196,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_plunger_1": {
+      "file": "wrist_plunger_1.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        12.0,
+        12.0,
+        4.5
+      ],
+      "size_mm": [
+        12.0,
+        12.0,
+        4.5
+      ],
+      "volume_mm3": 175.917,
+      "triangles": 768,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_display_bezel": {
+      "file": "wrist_display_bezel.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        31.1,
+        12.7,
+        1.6
+      ],
+      "size_mm": [
+        31.1,
+        12.7,
+        1.6
+      ],
+      "volume_mm3": 210.941,
+      "triangles": 1070,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "wrist_window": {
+      "file": "wrist_window.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        27.3,
+        8.9,
+        1.5
+      ],
+      "size_mm": [
+        27.3,
+        8.9,
+        1.5
+      ],
+      "volume_mm3": 358.03,
+      "triangles": 754,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_body": {
+      "file": "keypad_body.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        48.0,
+        80.0,
+        15.0
+      ],
+      "size_mm": [
+        48.0,
+        80.0,
+        15.0
+      ],
+      "volume_mm3": 12642.707,
+      "triangles": 2842,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_lid": {
+      "file": "keypad_lid.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        48.0,
+        80.0,
+        16.2608
+      ],
+      "size_mm": [
+        48.0,
+        80.0,
+        16.2608
+      ],
+      "volume_mm3": 9767.459,
+      "triangles": 9832,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_deck": {
+      "file": "keypad_deck.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        44.2,
+        48.5,
+        0.7
+      ],
+      "size_mm": [
+        44.2,
+        48.5,
+        0.7
+      ],
+      "volume_mm3": 869.288,
+      "triangles": 1398,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_charge_cap": {
+      "file": "keypad_charge_cap.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        16.0,
+        9.4,
+        3.1
+      ],
+      "size_mm": [
+        16.0,
+        9.4,
+        3.1
+      ],
+      "volume_mm3": 222.201,
+      "triangles": 1442,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_guard_carrier": {
+      "file": "keypad_guard_carrier.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        48.0,
+        80.0,
+        5.3
+      ],
+      "size_mm": [
+        48.0,
+        80.0,
+        5.3
+      ],
+      "volume_mm3": 9201.97,
+      "triangles": 2196,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_plunger_call_1": {
+      "file": "keypad_plunger_call_1.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        10.5,
+        10.5,
+        4.0
+      ],
+      "size_mm": [
+        10.5,
+        10.5,
+        4.0
+      ],
+      "volume_mm3": 137.648,
+      "triangles": 894,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_label_call_1": {
+      "file": "keypad_label_call_1.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        3.15,
+        5.25,
+        0.7
+      ],
+      "size_mm": [
+        3.15,
+        5.25,
+        0.7
+      ],
+      "volume_mm3": 5.067,
+      "triangles": 140,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_plunger_call_2": {
+      "file": "keypad_plunger_call_2.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        10.5,
+        10.5,
+        4.0
+      ],
+      "size_mm": [
+        10.5,
+        10.5,
+        4.0
+      ],
+      "volume_mm3": 136.696,
+      "triangles": 942,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_label_call_2": {
+      "file": "keypad_label_call_2.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        3.15,
+        5.25,
+        0.7
+      ],
+      "size_mm": [
+        3.15,
+        5.25,
+        0.7
+      ],
+      "volume_mm3": 5.603,
+      "triangles": 188,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_plunger_call_3": {
+      "file": "keypad_plunger_call_3.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        10.5,
+        10.5,
+        4.0
+      ],
+      "size_mm": [
+        10.5,
+        10.5,
+        4.0
+      ],
+      "volume_mm3": 136.696,
+      "triangles": 942,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_label_call_3": {
+      "file": "keypad_label_call_3.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        3.15,
+        5.25,
+        0.7
+      ],
+      "size_mm": [
+        3.15,
+        5.25,
+        0.7
+      ],
+      "volume_mm3": 5.603,
+      "triangles": 188,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_plunger_call_4": {
+      "file": "keypad_plunger_call_4.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        10.5,
+        10.5,
+        4.0
+      ],
+      "size_mm": [
+        10.5,
+        10.5,
+        4.0
+      ],
+      "volume_mm3": 137.331,
+      "triangles": 910,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_label_call_4": {
+      "file": "keypad_label_call_4.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        3.15,
+        5.25,
+        0.7
+      ],
+      "size_mm": [
+        3.15,
+        5.25,
+        0.7
+      ],
+      "volume_mm3": 5.246,
+      "triangles": 156,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_plunger_back": {
+      "file": "keypad_plunger_back.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        7.0,
+        7.0,
+        2.7
+      ],
+      "size_mm": [
+        7.0,
+        7.0,
+        2.7
+      ],
+      "volume_mm3": 72.201,
+      "triangles": 768,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_display_bezel": {
+      "file": "keypad_display_bezel.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        31.1,
+        12.7,
+        1.6
+      ],
+      "size_mm": [
+        31.1,
+        12.7,
+        1.6
+      ],
+      "volume_mm3": 210.941,
+      "triangles": 1070,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    },
+    "keypad_window": {
+      "file": "keypad_window.stl",
+      "bounds_mm": [
+        0.0,
+        0.0,
+        0.0,
+        27.3,
+        8.9,
+        1.5
+      ],
+      "size_mm": [
+        27.3,
+        8.9,
+        1.5
+      ],
+      "volume_mm3": 358.03,
+      "triangles": 754,
+      "watertight": true,
+      "winding_consistent": true,
+      "components": 1,
+      "on_bed": true,
+      "negative_z": false
+    }
+  },
+  "styles": {
+    "receiver": {
+      "style": "receiver",
+      "role": "pitcher",
+      "outer_mm": [
+        42.0,
+        63.5,
+        14.65
+      ],
+      "flat_case_mm": 14.65,
+      "dashboard_tilt_deg": null,
+      "parts": {
+        "receiver_body": {
+          "file": "receiver_body.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.0,
+            63.5,
+            12.85
+          ],
+          "size_mm": [
+            42.0,
+            63.5,
+            12.85
+          ],
+          "volume_mm3": 9479.135,
+          "triangles": 3612,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "receiver_lid": {
+          "file": "receiver_lid.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.0,
+            63.5,
+            9.15
+          ],
+          "size_mm": [
+            42.0,
+            63.5,
+            9.15
+          ],
+          "volume_mm3": 4904.878,
+          "triangles": 5576,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "receiver_deck": {
+          "file": "receiver_deck.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            38.2,
+            45.7,
+            0.7
+          ],
+          "size_mm": [
+            38.2,
+            45.7,
+            0.7
+          ],
+          "volume_mm3": 935.317,
+          "triangles": 1322,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "receiver_charge_cap": {
+          "file": "receiver_charge_cap.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            9.4,
+            3.1
+          ],
+          "size_mm": [
+            16.0,
+            9.4,
+            3.1
+          ],
+          "volume_mm3": 222.201,
+          "triangles": 1442,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "receiver_belt_carrier": {
+          "file": "receiver_belt_carrier.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.0,
+            63.5,
+            5.3
+          ],
+          "size_mm": [
+            42.0,
+            63.5,
+            5.3
+          ],
+          "volume_mm3": 5625.475,
+          "triangles": 2196,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "receiver_plunger_1": {
+          "file": "receiver_plunger_1.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            12.0,
+            12.0,
+            2.5
+          ],
+          "size_mm": [
+            12.0,
+            12.0,
+            2.5
+          ],
+          "volume_mm3": 159.878,
+          "triangles": 768,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        }
+      },
+      "reserved_component_spaces": {
+        "xiao_nrf54l15": {
+          "bounds_mm": [
+            11.9,
+            41.3,
+            8.9,
+            28.1,
+            60.7,
+            12.5
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "xiao_usb_shell": {
+          "bounds_mm": [
+            16.0,
+            57.5,
+            10.65,
+            24.0,
+            61.0,
+            13.85
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": "USB-C shell allowance near the port"
+        },
+        "xiao_antenna_keepout": {
+          "bounds_mm": [
+            11.1,
+            30.5,
+            8.2,
+            28.9,
+            40.5,
+            12.85
+          ],
+          "note": "metal-free band between the deck top and the lid, in front of the board antenna end",
+          "hardware_measured": false
+        },
+        "protected_cell": {
+          "bounds_mm": [
+            2.75,
+            15.9,
+            1.6,
+            37.25,
+            60.9,
+            7.8
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_recall": {
+          "bounds_mm": [
+            14.9,
+            2.6,
+            5.45,
+            27.1,
+            14.8,
+            12.35
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        }
+      },
+      "checks": {
+        "plunger_recall_collision_mm3": 0.0,
+        "keepout_metal_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_protected_cell_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_recall_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_protected_cell_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_recall_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_recall_mm3": 0.0,
+        "usb_opening_ray_hits": 0,
+        "button_recall_ray_hits": 0,
+        "pilot_5_5_z": [
+          0.0,
+          1.4,
+          1.6,
+          6.75
+        ],
+        "pilot_37_5_z": [
+          0.0,
+          1.4,
+          1.6,
+          6.75
+        ],
+        "pilot_5_58.5_z": [
+          0.0,
+          1.4,
+          7.25,
+          8.25
+        ],
+        "pilot_37_58.5_z": [
+          0.0,
+          1.4,
+          7.25,
+          8.25
+        ],
+        "lid_body_collision_mm3": 0.0,
+        "failures": [],
+        "warnings": [],
+        "all_passed": true
+      },
+      "ergonomics": {
+        "layout": "flat tray + raised control deck, only the deck tilted",
+        "dashboard_tilt_deg": null,
+        "flat_case_height_mm": 14.65,
+        "max_height_mm": 14.65,
+        "screen_recess_acrylic_mm": null,
+        "screen_recess_glass_mm": null,
+        "bezel_height_mm": null,
+        "hood_height_mm": null,
+        "mount_back_flatness_mm": 0.0,
+        "button_surface_mm": {
+          "recall": 14.65
+        },
+        "plunger_top_vs_surface_mm": {
+          "recall": -0.2
+        },
+        "assumed_eye_above_pod_mm": 450.0,
+        "assumed_eye_outboard_mm": 350.0,
+        "sight_line_note": "Lowest-profile belt pod, flat lid, no display. One recessed recall button in a 13.6 mm well at the hand end; the cell and board fill the rest.",
+        "switch_menu_keys": {
+          "recall": "throw / recall (D1)"
+        },
+        "operating_hand": {
+          "recall": "either, sized for a glove"
+        }
+      },
+      "mounts": [
+        {
+          "name": "belt",
+          "strap_width_mm": 45.0,
+          "layout": "in_line_x",
+          "loop_count": 2
+        }
+      ],
+      "max_height_mm": 14.65
+    },
+    "wrist": {
+      "style": "wrist",
+      "role": "fielder",
+      "outer_mm": [
+        46.0,
+        56.0,
+        14.3
+      ],
+      "flat_case_mm": 14.3,
+      "dashboard_tilt_deg": 18.0,
+      "parts": {
+        "wrist_body": {
+          "file": "wrist_body.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            12.5
+          ],
+          "size_mm": [
+            46.0,
+            56.0,
+            12.5
+          ],
+          "volume_mm3": 9073.561,
+          "triangles": 3706,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_lid": {
+          "file": "wrist_lid.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            14.7608
+          ],
+          "size_mm": [
+            46.0,
+            56.0,
+            14.7608
+          ],
+          "volume_mm3": 5564.546,
+          "triangles": 6244,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_deck": {
+          "file": "wrist_deck.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            42.2,
+            38.5,
+            0.7
+          ],
+          "size_mm": [
+            42.2,
+            38.5,
+            0.7
+          ],
+          "volume_mm3": 833.472,
+          "triangles": 1452,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_charge_cap": {
+          "file": "wrist_charge_cap.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            9.4,
+            3.1
+          ],
+          "size_mm": [
+            16.0,
+            9.4,
+            3.1
+          ],
+          "volume_mm3": 222.201,
+          "triangles": 1442,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_wrist_carrier": {
+          "file": "wrist_wrist_carrier.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            5.3
+          ],
+          "size_mm": [
+            46.0,
+            56.0,
+            5.3
+          ],
+          "volume_mm3": 7041.685,
+          "triangles": 2196,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_belt_carrier": {
+          "file": "wrist_belt_carrier.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            46.0,
+            56.0,
+            5.3
+          ],
+          "size_mm": [
+            46.0,
+            56.0,
+            5.3
+          ],
+          "volume_mm3": 5481.809,
+          "triangles": 2196,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_plunger_1": {
+          "file": "wrist_plunger_1.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            12.0,
+            12.0,
+            4.5
+          ],
+          "size_mm": [
+            12.0,
+            12.0,
+            4.5
+          ],
+          "volume_mm3": 175.917,
+          "triangles": 768,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_display_bezel": {
+          "file": "wrist_display_bezel.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            31.1,
+            12.7,
+            1.6
+          ],
+          "size_mm": [
+            31.1,
+            12.7,
+            1.6
+          ],
+          "volume_mm3": 210.941,
+          "triangles": 1070,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "wrist_window": {
+          "file": "wrist_window.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            27.3,
+            8.9,
+            1.5
+          ],
+          "size_mm": [
+            27.3,
+            8.9,
+            1.5
+          ],
+          "volume_mm3": 358.03,
+          "triangles": 754,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        }
+      },
+      "reserved_component_spaces": {
+        "xiao_nrf54l15": {
+          "bounds_mm": [
+            2.8,
+            17.3,
+            7.45,
+            22.2,
+            33.5,
+            11.05
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "xiao_usb_shell": {
+          "bounds_mm": [
+            2.5,
+            21.4,
+            9.2,
+            6.0,
+            29.4,
+            12.4
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": "USB-C shell allowance near the port"
+        },
+        "xiao_antenna_keepout": {
+          "bounds_mm": [
+            23.0,
+            16.5,
+            6.75,
+            33.0,
+            34.3,
+            12.5
+          ],
+          "note": "metal-free band between the deck top and the lid, in front of the board antenna end",
+          "hardware_measured": false
+        },
+        "protected_cell": {
+          "bounds_mm": [
+            6.5,
+            16.1,
+            1.6,
+            35.5,
+            52.1,
+            6.35
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "oled_display": {
+          "bounds_mm": [
+            5.0,
+            36.035,
+            6.959,
+            41.0,
+            49.465,
+            16.216
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_recall": {
+          "bounds_mm": [
+            23.7,
+            3.65,
+            5.1,
+            35.9,
+            15.85,
+            12.0
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        }
+      },
+      "checks": {
+        "plunger_recall_collision_mm3": 0.0,
+        "keepout_metal_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_protected_cell_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_oled_display_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_recall_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_protected_cell_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_oled_display_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_recall_mm3": 0.0,
+        "mutual_protected_cell_vs_oled_display_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_recall_mm3": 0.0,
+        "mutual_oled_display_vs_switch_recall_mm3": 0.0,
+        "usb_opening_ray_hits": 0,
+        "window_ray_hits": 0,
+        "button_recall_ray_hits": 0,
+        "pilot_5_5_z": [
+          0.0,
+          1.4,
+          1.6,
+          6.4
+        ],
+        "pilot_41_5_z": [
+          0.0,
+          1.4,
+          1.6,
+          6.4
+        ],
+        "pilot_5_51_z": [
+          0.0,
+          1.4,
+          6.85,
+          7.85
+        ],
+        "pilot_41_51_z": [
+          0.0,
+          1.4,
+          6.85,
+          7.85
+        ],
+        "lid_body_collision_mm3": 0.0,
+        "failures": [],
+        "warnings": [],
+        "all_passed": true
+      },
+      "ergonomics": {
+        "layout": "flat tray + raised control deck, only the deck tilted",
+        "dashboard_tilt_deg": 18.0,
+        "flat_case_height_mm": 14.3,
+        "max_height_mm": 19.9,
+        "screen_recess_acrylic_mm": 0.9,
+        "screen_recess_glass_mm": 4.1,
+        "bezel_height_mm": 1.6,
+        "hood_height_mm": 0.4,
+        "mount_back_flatness_mm": 0.0,
+        "button_surface_mm": {
+          "recall": 16.3
+        },
+        "plunger_top_vs_surface_mm": {
+          "recall": -0.2
+        },
+        "assumed_eye_above_pod_mm": 350.0,
+        "assumed_eye_outboard_mm": 400.0,
+        "sight_line_note": "Wrist or belt pod. The sloped display head holds the OLED at the hand end; the recall button sits on a low flat pad beside the head so it stays reachable at glove speed without raising the height.",
+        "switch_menu_keys": {
+          "recall": "recall / volume (D1)"
+        },
+        "operating_hand": {
+          "recall": "bare hand or glove heel"
+        }
+      },
+      "mounts": [
+        {
+          "name": "wrist",
+          "strap_width_mm": 25.0,
+          "layout": "in_line_y",
+          "loop_count": 2
+        },
+        {
+          "name": "belt",
+          "strap_width_mm": 45.0,
+          "layout": "in_line_x",
+          "loop_count": 2
+        }
+      ],
+      "max_height_mm": 19.9
+    },
+    "keypad": {
+      "style": "keypad",
+      "role": "catcher",
+      "outer_mm": [
+        48.0,
+        80.0,
+        16.8
+      ],
+      "flat_case_mm": 16.8,
+      "dashboard_tilt_deg": 18.0,
+      "parts": {
+        "keypad_body": {
+          "file": "keypad_body.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            48.0,
+            80.0,
+            15.0
+          ],
+          "size_mm": [
+            48.0,
+            80.0,
+            15.0
+          ],
+          "volume_mm3": 12642.707,
+          "triangles": 2842,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_lid": {
+          "file": "keypad_lid.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            48.0,
+            80.0,
+            16.2608
+          ],
+          "size_mm": [
+            48.0,
+            80.0,
+            16.2608
+          ],
+          "volume_mm3": 9767.459,
+          "triangles": 9832,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_deck": {
+          "file": "keypad_deck.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            44.2,
+            48.5,
+            0.7
+          ],
+          "size_mm": [
+            44.2,
+            48.5,
+            0.7
+          ],
+          "volume_mm3": 869.288,
+          "triangles": 1398,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_charge_cap": {
+          "file": "keypad_charge_cap.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            9.4,
+            3.1
+          ],
+          "size_mm": [
+            16.0,
+            9.4,
+            3.1
+          ],
+          "volume_mm3": 222.201,
+          "triangles": 1442,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_guard_carrier": {
+          "file": "keypad_guard_carrier.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            48.0,
+            80.0,
+            5.3
+          ],
+          "size_mm": [
+            48.0,
+            80.0,
+            5.3
+          ],
+          "volume_mm3": 9201.97,
+          "triangles": 2196,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_plunger_call_1": {
+          "file": "keypad_plunger_call_1.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "size_mm": [
+            10.5,
+            10.5,
+            4.0
+          ],
+          "volume_mm3": 137.648,
+          "triangles": 894,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_label_call_1": {
+          "file": "keypad_label_call_1.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "size_mm": [
+            3.15,
+            5.25,
+            0.7
+          ],
+          "volume_mm3": 5.067,
+          "triangles": 140,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_plunger_call_2": {
+          "file": "keypad_plunger_call_2.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "size_mm": [
+            10.5,
+            10.5,
+            4.0
+          ],
+          "volume_mm3": 136.696,
+          "triangles": 942,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_label_call_2": {
+          "file": "keypad_label_call_2.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "size_mm": [
+            3.15,
+            5.25,
+            0.7
+          ],
+          "volume_mm3": 5.603,
+          "triangles": 188,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_plunger_call_3": {
+          "file": "keypad_plunger_call_3.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "size_mm": [
+            10.5,
+            10.5,
+            4.0
+          ],
+          "volume_mm3": 136.696,
+          "triangles": 942,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_label_call_3": {
+          "file": "keypad_label_call_3.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "size_mm": [
+            3.15,
+            5.25,
+            0.7
+          ],
+          "volume_mm3": 5.603,
+          "triangles": 188,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_plunger_call_4": {
+          "file": "keypad_plunger_call_4.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            10.5,
+            10.5,
+            4.0
+          ],
+          "size_mm": [
+            10.5,
+            10.5,
+            4.0
+          ],
+          "volume_mm3": 137.331,
+          "triangles": 910,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_label_call_4": {
+          "file": "keypad_label_call_4.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            3.15,
+            5.25,
+            0.7
+          ],
+          "size_mm": [
+            3.15,
+            5.25,
+            0.7
+          ],
+          "volume_mm3": 5.246,
+          "triangles": 156,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_plunger_back": {
+          "file": "keypad_plunger_back.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            7.0,
+            7.0,
+            2.7
+          ],
+          "size_mm": [
+            7.0,
+            7.0,
+            2.7
+          ],
+          "volume_mm3": 72.201,
+          "triangles": 768,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_display_bezel": {
+          "file": "keypad_display_bezel.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            31.1,
+            12.7,
+            1.6
+          ],
+          "size_mm": [
+            31.1,
+            12.7,
+            1.6
+          ],
+          "volume_mm3": 210.941,
+          "triangles": 1070,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        },
+        "keypad_window": {
+          "file": "keypad_window.stl",
+          "bounds_mm": [
+            0.0,
+            0.0,
+            0.0,
+            27.3,
+            8.9,
+            1.5
+          ],
+          "size_mm": [
+            27.3,
+            8.9,
+            1.5
+          ],
+          "volume_mm3": 358.03,
+          "triangles": 754,
+          "watertight": true,
+          "winding_consistent": true,
+          "components": 1,
+          "on_bed": true,
+          "negative_z": false
+        }
+      },
+      "reserved_component_spaces": {
+        "xiao_nrf54l15": {
+          "bounds_mm": [
+            2.8,
+            2.8,
+            8.9,
+            19.0,
+            22.2,
+            12.5
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "xiao_usb_shell": {
+          "bounds_mm": [
+            6.9,
+            2.5,
+            10.65,
+            14.9,
+            6.0,
+            13.85
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": "USB-C shell allowance near the port"
+        },
+        "xiao_antenna_keepout": {
+          "bounds_mm": [
+            2.0,
+            23.0,
+            8.2,
+            19.8,
+            33.0,
+            15.0
+          ],
+          "note": "metal-free band between the deck top and the lid, in front of the board antenna end",
+          "hardware_measured": false
+        },
+        "protected_cell": {
+          "bounds_mm": [
+            6.75,
+            8.0,
+            1.6,
+            41.25,
+            53.0,
+            7.8
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "oled_display": {
+          "bounds_mm": [
+            6.0,
+            59.735,
+            10.796,
+            42.0,
+            73.165,
+            20.053
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_call_1": {
+          "bounds_mm": [
+            24.4,
+            3.0,
+            7.6,
+            36.6,
+            15.2,
+            14.5
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_call_2": {
+          "bounds_mm": [
+            24.4,
+            17.0,
+            7.6,
+            36.6,
+            29.2,
+            14.5
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_call_3": {
+          "bounds_mm": [
+            24.4,
+            31.0,
+            7.6,
+            36.6,
+            43.2,
+            14.5
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_call_4": {
+          "bounds_mm": [
+            24.4,
+            45.0,
+            7.6,
+            36.6,
+            57.2,
+            14.5
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        },
+        "switch_back": {
+          "bounds_mm": [
+            18.0,
+            72.0,
+            3.0,
+            30.0,
+            78.5,
+            15.0
+          ],
+          "enclosure_collision_mm3": 0.0,
+          "max_penetration_mm": 0.0,
+          "sample_hits": 0,
+          "hardware_measured": false,
+          "note": ""
+        }
+      },
+      "checks": {
+        "plunger_call_1_collision_mm3": 0.0,
+        "plunger_call_2_collision_mm3": 0.0,
+        "plunger_call_3_collision_mm3": 0.0,
+        "plunger_call_4_collision_mm3": 0.0,
+        "plunger_back_collision_mm3": 0.0,
+        "keepout_metal_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_protected_cell_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_oled_display_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_call_1_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_call_2_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_call_3_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_call_4_mm3": 0.0,
+        "mutual_xiao_nrf54l15_vs_switch_back_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_protected_cell_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_oled_display_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_call_1_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_call_2_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_call_3_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_call_4_mm3": 0.0,
+        "mutual_xiao_usb_shell_vs_switch_back_mm3": 0.0,
+        "mutual_protected_cell_vs_oled_display_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_call_1_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_call_2_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_call_3_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_call_4_mm3": 0.0,
+        "mutual_protected_cell_vs_switch_back_mm3": 0.0,
+        "mutual_oled_display_vs_switch_call_1_mm3": 0.0,
+        "mutual_oled_display_vs_switch_call_2_mm3": 0.0,
+        "mutual_oled_display_vs_switch_call_3_mm3": 0.0,
+        "mutual_oled_display_vs_switch_call_4_mm3": 0.0,
+        "mutual_oled_display_vs_switch_back_mm3": 0.0,
+        "mutual_switch_call_1_vs_switch_call_2_mm3": 0.0,
+        "mutual_switch_call_1_vs_switch_call_3_mm3": 0.0,
+        "mutual_switch_call_1_vs_switch_call_4_mm3": 0.0,
+        "mutual_switch_call_1_vs_switch_back_mm3": 0.0,
+        "mutual_switch_call_2_vs_switch_call_3_mm3": 0.0,
+        "mutual_switch_call_2_vs_switch_call_4_mm3": 0.0,
+        "mutual_switch_call_2_vs_switch_back_mm3": 0.0,
+        "mutual_switch_call_3_vs_switch_call_4_mm3": 0.0,
+        "mutual_switch_call_3_vs_switch_back_mm3": 0.0,
+        "mutual_switch_call_4_vs_switch_back_mm3": 0.0,
+        "usb_opening_ray_hits": 0,
+        "window_ray_hits": 0,
+        "button_call_1_ray_hits": 0,
+        "button_call_2_ray_hits": 0,
+        "button_call_3_ray_hits": 0,
+        "button_call_4_ray_hits": 0,
+        "pilot_43_5_z": [
+          0.0,
+          1.4,
+          8.3,
+          9.3
+        ],
+        "pilot_5_75_z": [
+          0.0,
+          1.4,
+          1.6,
+          8.9
+        ],
+        "pilot_43_75_z": [
+          0.0,
+          1.4,
+          1.6,
+          8.9
+        ],
+        "lid_body_collision_mm3": 0.0,
+        "failures": [],
+        "warnings": [],
+        "all_passed": true
+      },
+      "ergonomics": {
+        "layout": "flat tray + raised control deck, only the deck tilted",
+        "dashboard_tilt_deg": 18.0,
+        "flat_case_height_mm": 16.8,
+        "max_height_mm": 23.9,
+        "screen_recess_acrylic_mm": 0.9,
+        "screen_recess_glass_mm": 4.1,
+        "bezel_height_mm": 1.6,
+        "hood_height_mm": 0.4,
+        "mount_back_flatness_mm": 0.0,
+        "button_surface_mm": {
+          "call_1": 18.3,
+          "call_2": 18.3,
+          "call_3": 18.3,
+          "call_4": 18.3
+        },
+        "plunger_top_vs_surface_mm": {
+          "call_1": -0.2,
+          "call_2": -0.2,
+          "call_3": -0.2,
+          "call_4": -0.2,
+          "back": -0.2
+        },
+        "assumed_eye_above_pod_mm": 500.0,
+        "assumed_eye_outboard_mm": 450.0,
+        "sight_line_note": "Leg-guard pod on the outer throwing-side knee, long axis along the shin, 48 mm across the shin. Calls run in a 14 mm column along the length, Back at the bare-hand end, OLED on the sloped head beyond them.",
+        "switch_menu_keys": {
+          "call_1": "call 1 (D0)",
+          "call_2": "call 2 (D1)",
+          "call_3": "call 3 (D2)",
+          "call_4": "call 4 (D3)",
+          "back": "back (D13)"
+        },
+        "operating_hand": {
+          "call_1": "bare hand",
+          "call_2": "bare hand",
+          "call_3": "bare hand",
+          "call_4": "bare hand"
+        }
+      },
+      "mounts": [
+        {
+          "name": "guard",
+          "strap_width_mm": 25.0,
+          "layout": "in_line_y",
+          "loop_count": 2
+        }
+      ],
+      "max_height_mm": 23.9
+    }
+  },
+  "fit_coupon": {
+    "file": "fit_coupon.stl",
+    "bounds_mm": [
+      0.0,
+      0.0,
+      0.0,
+      64.0,
+      72.0,
+      3.0
+    ],
+    "size_mm": [
+      64.0,
+      72.0,
+      3.0
+    ],
+    "volume_mm3": 13112.066,
+    "triangles": 2100,
+    "watertight": true,
+    "winding_consistent": true,
+    "components": 1,
+    "on_bed": true,
+    "negative_z": false
+  },
+  "previews": {},
+  "validation": {
+    "all_parts_watertight": true,
+    "all_parts_on_bed": true,
+    "all_parts_single_shell": true,
+    "all_volumes_positive": true,
+    "failures": [],
+    "checks_passed": true
+  }
+}

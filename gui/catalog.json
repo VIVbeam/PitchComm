@@ -1,0 +1,116 @@
+{
+  "dictionary": "7d8e943c",
+  "pitches": [
+    {
+      "key": 1,
+      "label": "FASTBALL",
+      "speech": "Fastball"
+    },
+    {
+      "key": 2,
+      "label": "CHANGEUP",
+      "speech": "Changeup"
+    },
+    {
+      "key": 3,
+      "label": "CURVEBALL",
+      "speech": "Curveball"
+    },
+    {
+      "key": 4,
+      "label": "SLIDER",
+      "speech": "Slider"
+    },
+    {
+      "key": 5,
+      "label": "SINKER",
+      "speech": "Sinker"
+    },
+    {
+      "key": 6,
+      "label": "CUTTER",
+      "speech": "Cutter"
+    },
+    {
+      "key": 7,
+      "label": "SPLITTER",
+      "speech": "Splitter"
+    },
+    {
+      "key": 8,
+      "label": "KNUCKLE",
+      "speech": "Knuckleball"
+    },
+    {
+      "key": 9,
+      "label": "PITCH OUT",
+      "speech": "Pitch out"
+    }
+  ],
+  "plays": [
+    {
+      "key": 1,
+      "label": "NORMAL",
+      "shortstop": "NORMAL",
+      "centerfield": "NORMAL"
+    },
+    {
+      "key": 2,
+      "label": "DOUBLE PLAY",
+      "shortstop": "DP DEPTH",
+      "centerfield": "NORMAL"
+    },
+    {
+      "key": 3,
+      "label": "INFIELD IN",
+      "shortstop": "INFIELD IN",
+      "centerfield": "NORMAL"
+    },
+    {
+      "key": 4,
+      "label": "PLAY DEEP",
+      "shortstop": "NORMAL",
+      "centerfield": "PLAY DEEP"
+    },
+    {
+      "key": 5,
+      "label": "PLAY SHALLOW",
+      "shortstop": "NORMAL",
+      "centerfield": "SHALLOW"
+    },
+    {
+      "key": 6,
+      "label": "SHADE LEFT",
+      "shortstop": "SHADE LEFT",
+      "centerfield": "SHADE LEFT"
+    },
+    {
+      "key": 7,
+      "label": "SHADE RIGHT",
+      "shortstop": "SHADE RIGHT",
+      "centerfield": "SHADE RIGHT"
+    },
+    {
+      "key": 8,
+      "label": "NO DOUBLES",
+      "shortstop": "NORMAL",
+      "centerfield": "NO DOUBLES"
+    },
+    {
+      "key": 9,
+      "label": "BUNT DEFENSE",
+      "shortstop": "BUNT COVER",
+      "centerfield": "NORMAL"
+    }
+  ],
+  "heights": [
+    "UP",
+    "MIDDLE",
+    "DOWN"
+  ],
+  "sides": [
+    "INSIDE",
+    "MIDDLE",
+    "AWAY"
+  ]
+}
