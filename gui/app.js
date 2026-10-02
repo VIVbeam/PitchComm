@@ -28,7 +28,7 @@ function saveReport() {
 function pickButton(label, key, onClick, small = '') {
   const button = document.createElement('button');
   button.className = 'choice'; button.dataset.key = key; button.setAttribute('aria-pressed', 'false');
-  if (small) { const hint = document.createElement('small'); hint.textContent = small; button.append(hint); }
+  if (small) { const hint = document.createElement('small'); hint.className = 'key-hint'; hint.textContent = small; button.append(hint); }
   button.append(document.createTextNode(label)); button.addEventListener('click', onClick); return button;
 }
 function buildZoneShortcuts() {
@@ -41,7 +41,7 @@ function buildZoneShortcuts() {
   return shortcuts;
 }
 function buildControls() {
-  for (const pitch of catalog.pitches) $('pitchTypes').append(pickButton(pitch.speech, pitch.key, () => { type = pitch.key; render(); }, String(pitch.key).padStart(2, '0')));
+  for (const pitch of catalog.pitches) $('pitchTypes').append(pickButton(pitch.speech, pitch.key, () => { type = pitch.key; render(); }, String(pitch.key)));
   const columns = document.querySelector('.zone-columns');
   columns.style.gridTemplateColumns = `repeat(${catalog.cols.length}, 1fr)`;
   columns.replaceChildren(...catalog.cols.map(column => {
@@ -90,6 +90,7 @@ function render() {
   $('connect').firstChild.textContent = closing ? 'Closing radio… ' : connecting ? 'Connecting… ' : connection ? 'Disconnect radio ' : 'Connect coach radio ';
   $('connectionStatus').textContent = closing ? 'Closing USB connection' : connection ? fresh ? compatible ? 'Coach USB connected' : 'Check coach unit' : 'Waiting for coach' : 'USB disconnected';
   $('connectionStatus').classList.toggle('live', Boolean(compatible && state.radio && state.configured));
+  $('panelState').textContent = connecting || closing ? 'WORKING' : !connection ? 'NOT CONNECTED' : !fresh ? 'WAITING FOR COACH' : !compatible ? 'CHECK COACH UNIT' : pending ? 'SENDING' : 'READY';
   $('pitchTab').setAttribute('aria-selected', String(category === 1)); $('playTab').setAttribute('aria-selected', String(category === 2));
   $('pitchPanel').hidden = category !== 1; $('playPanel').hidden = category !== 2;
   document.querySelectorAll('#pitchTypes button').forEach(b => setSelected(b, +b.dataset.key === type));
