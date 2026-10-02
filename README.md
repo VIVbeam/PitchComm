@@ -4,11 +4,11 @@ Baseball pitch-call system: a coach console sends pitch and defensive-play calls
 
 ## Get started
 
-1. **Download** this repository — firmware, docs, coach interface, and case files.
-2. **Buy the parts** — [parts list](docs/bom.md).
-3. **Print the cases** — [print guide](cad/unbranded/README.md).
-4. **Wire the units** — [wiring reference](docs/wiring.md).
-5. **Build, flash, and provision** — [firmware guide](firmware/README.md).
+1. **Download** this repository.
+2. **Buy the parts** [parts list](docs/bom.md).
+3. **Print the cases**  [print guide](cad/unbranded/README.md).
+4. **Wire the units**  [wiring reference](docs/wiring.md).
+5. **Build, flash, and provision**  [firmware guide](firmware/README.md).
 
 ## Units
 
@@ -18,8 +18,6 @@ Baseball pitch-call system: a coach console sends pitch and defensive-play calls
 | Catcher | XIAO nRF54L15, OLED, five buttons, 850 mAh cell | JY300 earpiece + OLED |
 | Pitcher | XIAO nRF54L15, recall button, 850 mAh cell | JY300 earpiece |
 | Shortstop / center field | XIAO nRF54L15, OLED, recall button, 500 mAh cell | OLED |
-
-The coach and four field units form one closed network. After provisioning, no router, phone, or internet connection is used. Calls travel over 802.15.4 (Thread); speech travels over Bluetooth LE Audio (LC3) to one earpiece per audio unit.
 
 ## Vocabulary
 
