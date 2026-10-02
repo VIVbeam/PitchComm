@@ -20,6 +20,52 @@ export function pitchCode(type, row, col, rows, cols) {
       type < 1 || row < 1 || row > rows || col < 1 || col > cols) return 0;
   return (type - 1) * rows * cols + (row - 1) * cols + col;
 }
+export function decodePitch(code, rows, cols) {
+  if (!Number.isInteger(code) || code < 1 || !Number.isInteger(rows) || rows < 1 || !Number.isInteger(cols) || cols < 1) return null;
+  const size = rows * cols;
+  return {
+    type: Math.floor((code - 1) / size) + 1,
+    row: Math.floor(((code - 1) % size) / cols) + 1,
+    col: (code - 1) % cols + 1,
+  };
+}
+// Keyboard flow. The zone letters follow the visual 3x3 layout; each letter is
+// only live when the loaded catalog actually has that row and column.
+const ZONE_ROWS = ['qwe', 'asd', 'zxc'];
+export function keyAction(key, category, {rows = 0, cols = 0, pitchTypes = 0, maxPlay = 0} = {}) {
+  if (typeof key !== 'string') return null;
+  if (key === 'Enter') return {kind: 'send'};
+  if (key === 'Escape') return {kind: 'clear'};
+  if (key === 'r' || key === 'R') return {kind: 'resend'};
+  if (category === 1 && /^[1-9]$/.test(key)) {
+    const value = Number(key);
+    return value <= pitchTypes ? {kind: 'type', value} : null;
+  }
+  if (category === 2 && /^[1-9]$/.test(key)) {
+    const value = Number(key);
+    return value <= maxPlay ? {kind: 'play', value} : null;
+  }
+  if (category === 1) {
+    const lower = key.toLowerCase();
+    if (lower.length === 1) {
+      for (let index = 0; index < ZONE_ROWS.length; index++) {
+        const col = ZONE_ROWS[index].indexOf(lower);
+        if (col >= 0) return index + 1 <= rows && col + 1 <= cols ? {kind: 'zone', row: index + 1, col: col + 1} : null;
+      }
+    }
+  }
+  return null;
+}
+export function formatClock(atMs) {
+  if (!Number.isFinite(atMs)) return '';
+  const at = new Date(atMs);
+  const pad = value => String(value).padStart(2, '0');
+  return `${pad(at.getHours())}:${pad(at.getMinutes())}:${pad(at.getSeconds())}`;
+}
+export function formatLatency(ms) {
+  if (!Number.isFinite(ms)) return '';
+  return ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`;
+}
 export function describe(catalog, category, code) {
   if (category === 1) {
     const rows = catalog?.rows?.length ?? 0;

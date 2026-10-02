@@ -1,11 +1,13 @@
-import { deliveryLabels, unitAt, unitIndexOf, pitchCode, describe, command, validState, validResult, blockReason, LineFramer } from './core.js';
+import { deliveryLabels, unitAt, unitIndexOf, pitchCode, describe, command, validState, validResult, blockReason, LineFramer, keyAction, formatClock, formatLatency } from './core.js';
 import { SessionReport } from './report.js';
 
 const $ = id => document.getElementById(id);
+// Delivery value 2 is the firmware Delivered outcome, shown as Output accepted.
+const DELIVERED = 2;
 let catalog, report, connection = null, closing = null, state = null, lastState = 0, pending = null;
 let category = 1, type = 0, row = 0, col = 0, play = 0;
 let limits = {rows: 3, cols: 3, maxPitch: 81, maxPlay: 21, unitCount: 5};
-let nextId = 1, history = [], connecting = false;
+let nextId = 1, history = [], connecting = false, lastSent = null;
 let client = '';
 let seenFailures = new Set();
 const encoder = new TextEncoder();
@@ -29,6 +31,15 @@ function pickButton(label, key, onClick, small = '') {
   if (small) { const hint = document.createElement('small'); hint.textContent = small; button.append(hint); }
   button.append(document.createTextNode(label)); button.addEventListener('click', onClick); return button;
 }
+function buildZoneShortcuts() {
+  const shortcuts = new Map();
+  if (catalog.rows.length > 3 || catalog.cols.length > 3) return shortcuts;
+  for (const key of ['q', 'w', 'e', 'a', 's', 'd', 'z', 'x', 'c']) {
+    const action = keyAction(key, 1, {rows: catalog.rows.length, cols: catalog.cols.length, pitchTypes: catalog.pitches.length, maxPlay: catalog.plays.length});
+    if (action?.kind === 'zone') shortcuts.set(`${action.row},${action.col}`, key);
+  }
+  return shortcuts;
+}
 function buildControls() {
   for (const pitch of catalog.pitches) $('pitchTypes').append(pickButton(pitch.speech, pitch.key, () => { type = pitch.key; render(); }, String(pitch.key).padStart(2, '0')));
   const columns = document.querySelector('.zone-columns');
@@ -37,6 +48,7 @@ function buildControls() {
     const label = document.createElement('span'); label.textContent = column.label; return label;
   }));
   $('zone').style.gridTemplateColumns = `repeat(${catalog.cols.length}, 1fr)`;
+  const zoneShortcuts = buildZoneShortcuts();
   for (const zoneRow of catalog.rows) for (const zoneCol of catalog.cols) {
     const location = catalog.locations.find(candidate => candidate.row === zoneRow.key && candidate.col === zoneCol.key);
     const button = document.createElement('button'); button.className = 'zone-button';
@@ -44,10 +56,12 @@ function buildControls() {
     button.setAttribute('aria-label', location?.speech ?? `${zoneRow.label}, ${zoneCol.label}`); button.setAttribute('aria-pressed', 'false');
     const heading = document.createElement('strong'); heading.textContent = location?.speech ?? `${zoneRow.label} · ${zoneCol.label}`;
     button.append(heading);
+    const shortcut = zoneShortcuts.get(`${zoneRow.key},${zoneCol.key}`);
+    if (shortcut) { const hint = document.createElement('span'); hint.className = 'key-hint'; hint.textContent = shortcut; button.append(hint); }
     button.addEventListener('click', () => { row = zoneRow.key; col = zoneCol.key; render(); }); $('zone').append(button);
   }
   for (const p of catalog.plays) {
-    $('plays').append(pickButton(p.label, p.key, () => { play = p.key; render(); }));
+    $('plays').append(pickButton(p.label, p.key, () => { play = p.key; render(); }, p.key <= 9 ? String(p.key) : ''));
   }
   catalog.units.forEach((unit, index) => {
     const i = index + 1;
@@ -97,7 +111,9 @@ function render() {
   const complete = category === 1 ? Boolean(pitchCode(type, row, col, limits.rows, limits.cols) && type <= catalog.pitches.length) : Boolean(play);
   const reason = blockReason(state, lastState, catalog.dictionary, pending, performance.now(), client);
   report?.observeConnection($('connectionStatus').textContent, reason);
-  $('send').disabled = connecting || Boolean(closing) || !connection || !complete || Boolean(reason);
+  const blocked = connecting || Boolean(closing) || !connection || Boolean(reason);
+  $('send').disabled = blocked || !complete;
+  $('resend').disabled = blocked || !lastSent;
   $('send').firstChild.textContent = pending ? 'Sending… ' : category === 1 ? 'Send pitch ' : 'Send play ';
   const offline = compatible ? targetIndices.filter(i => !state.links[i]).map(i => unitAt(catalog, i).label) : [];
   $('sendHint').textContent = reason || (!complete ? 'Choose a complete call to send' : offline.length ? `${offline.join(' + ')} offline: delivery may be unconfirmed` : 'Ready to send');
@@ -121,9 +137,11 @@ function render() {
   if (!history.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'No calls yet.'; $('history').append(li); }
   for (const item of history) {
     const li = document.createElement('li'); const title = document.createElement('strong'); title.textContent = `${item.seq ? '#' + item.seq + ' · ' : ''}${item.label}`;
+    const timing = document.createElement('span'); timing.className = 'timing';
+    timing.textContent = [formatClock(item.at), item.latencyMs === undefined ? '' : formatLatency(item.latencyMs)].filter(Boolean).join(' · ');
     const result = document.createElement('span'); result.textContent = item.status;
     if (item.failed) result.className = 'failed';
-    li.append(title, result); $('history').append(li);
+    li.append(title, timing, result); $('history').append(li);
   }
 }
 function unknownPending(message) {
@@ -132,12 +150,18 @@ function unknownPending(message) {
   pending.item.status = 'Unconfirmed'; pending = null;
   notice(message + ' Check the latest field call before sending again.', true);
 }
+function acknowledge(item, record) {
+  if (item.latencyMs !== undefined || !item.audience?.some(index => record.delivery[index] === DELIVERED)) return;
+  item.latencyMs = Math.max(0, Math.round(performance.now() - item.sentAt));
+  report?.add('call_acknowledged', {client: item.client, id: item.id, boot: item.boot, seq: item.seq, category: item.category, latencyMs: item.latencyMs});
+}
 function updateReceipts(item) {
   if (!state || item.boot !== state.boot || !item.seq) return;
   const record = state.records.find(record => record.seq === item.seq && record.category === item.category);
   if (!record) return;
   item.status = record.delivery.map((d,i) => i === 0 ? '' : `${unitAt(catalog, i).label}: ${deliveryLabels[d]}`).filter(Boolean).join(' · ');
   item.failed = record.delivery.includes(4);
+  acknowledge(item, record);
 }
 function receive(message) {
   if (validState(message, limits)) {
@@ -148,6 +172,7 @@ function receive(message) {
       for (const item of history) if (item.boot === state.boot && item.seq === record.seq && item.category === record.category && item.seq) {
         item.status = record.delivery.map((d,i) => i === 0 ? '' : `${unitAt(catalog, i).label}: ${deliveryLabels[d]}`).filter(Boolean).join(' · ');
         item.failed = record.delivery.includes(4);
+        acknowledge(item, record);
       }
       if (state.role === 0 && state.client === client && state.dictionary === catalog.dictionary && record.seq) {
         const failed = [];
@@ -264,14 +289,26 @@ async function connect() {
     if (!closing) notice(e.name === 'NotFoundError' ? 'No USB port selected. Connect when you are ready.' : `Could not connect: ${e.message}`, e.name !== 'NotFoundError');
   } finally { connecting = false; render(); }
 }
-async function send() {
-  if ($('send').disabled) return;
+function currentSelection() {
+  return {category, type, row, col, play};
+}
+function selectionAudience(selection) {
+  if (selection.category === 1) return catalog.units.map((unit, index) => unit.pitches ? index + 1 : 0).filter(Boolean);
+  const selected = catalog.plays.find(candidate => candidate.key === selection.play);
+  return selected ? selected.audience.map(key => unitIndexOf(catalog, key)).filter(index => index > 0) : [];
+}
+async function send(selection = null) {
+  const call = selection ?? currentSelection();
+  if (!selection && $('send').disabled) return;
   const id = nextId; nextId = nextId === 0xffffffff ? 1 : nextId + 1;
-  const code = category === 1 ? pitchCode(type, row, col, limits.rows, limits.cols) : play;
-  const line = command(id, category, category === 1 ? type : play, row, col, state, limits);
-  const item = {id, client, category, seq: 0, boot: state.boot, label: describe(catalog, category, code), status: 'Awaiting coach'};
-  report?.add('call_requested', {client, id, boot: item.boot, category, code, label: item.label});
-  history.unshift(item); history = history.slice(0, 8); pending = {id, item, started: performance.now()}; render();
+  const code = call.category === 1 ? pitchCode(call.type, call.row, call.col, limits.rows, limits.cols) : call.play;
+  const line = command(id, call.category, call.category === 1 ? call.type : call.play, call.row, call.col, state, limits);
+  const sentAt = performance.now();
+  const item = {id, client, category: call.category, seq: 0, boot: state.boot, label: describe(catalog, call.category, code), status: 'Awaiting coach',
+    at: Date.now(), sentAt, audience: selectionAudience(call)};
+  lastSent = {category: call.category, type: call.type, row: call.row, col: call.col, play: call.play};
+  report?.add('call_requested', {client, id, boot: item.boot, category: call.category, code, label: item.label});
+  history.unshift(item); history = history.slice(0, 8); pending = {id, item, started: sentAt}; render();
   try { await write(line, () => {
     const ready = pending?.id === id && state?.boot === item.boot &&
       !blockReason(state, lastState, catalog.dictionary, null, performance.now(), client);
@@ -288,16 +325,46 @@ async function send() {
     await disconnect();
   }
 }
+function resend() {
+  if (!$('resend').disabled && lastSent) send({...lastSent});
+}
+function clearSelection() {
+  type = row = col = play = 0; render();
+}
+function applyKeyAction(action) {
+  if (action.kind === 'type') type = action.value;
+  else if (action.kind === 'zone') { row = action.row; col = action.col; }
+  else if (action.kind === 'play') play = action.value;
+  else if (action.kind === 'send') { send(); return; }
+  else if (action.kind === 'clear') { clearSelection(); return; }
+  else if (action.kind === 'resend') { resend(); return; }
+  else return;
+  render();
+}
+function handleKeydown(event) {
+  if (event.ctrlKey || event.altKey || event.metaKey) return;
+  const tag = event.target?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (event.key === 'Enter' && tag === 'BUTTON') return;
+  const action = keyAction(event.key, category, {rows: limits.rows, cols: limits.cols, pitchTypes: catalog.pitches.length, maxPlay: limits.maxPlay});
+  if (!action) return;
+  if (event.repeat && (action.kind === 'send' || action.kind === 'resend')) return;
+  event.preventDefault();
+  applyKeyAction(action);
+}
 async function start() {
   try { const response = await fetch('./catalog.json', {cache: 'no-store'}); if (!response.ok) throw new Error('Vocabulary could not be loaded'); catalog = await response.json();
     const rows = catalog.rows.length, cols = catalog.cols.length;
     limits = {rows, cols, maxPitch: catalog.pitches.length * rows * cols, maxPlay: catalog.plays.length, unitCount: catalog.units.length + 1};
     report = new SessionReport(catalog.dictionary); report.add('page_started'); buildControls(); }
   catch (e) { notice(e.message + '. Start tools/serve_gui.py and reload this page.', true); return; }
-  $('connect').addEventListener('click', connect); $('send').addEventListener('click', send);
+  $('connect').addEventListener('click', connect); $('send').addEventListener('click', () => send());
+  $('resend').addEventListener('click', resend);
   $('saveReport').addEventListener('click', saveReport);
   $('pitchTab').addEventListener('click', () => { category = 1; render(); }); $('playTab').addEventListener('click', () => { category = 2; render(); });
-  $('clear').addEventListener('click', () => { type = row = col = play = 0; render(); });
+  $('clear').addEventListener('click', clearSelection);
+  $('send').title = 'Enter'; $('clear').title = 'Escape';
+  window.addEventListener('keydown', handleKeydown);
   let polling = false;
   setInterval(() => {
     if (pending && performance.now() - pending.started > 2500) unknownPending('No coach response; delivery is unconfirmed.');

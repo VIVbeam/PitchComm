@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { coachUnit, unitAt, unitIndexOf, deliveryLabels, pitchCode, describe, command, validState, validResult, blockReason, LineFramer } from '../core.js';
+import { coachUnit, unitAt, unitIndexOf, deliveryLabels, pitchCode, decodePitch, keyAction, formatClock, formatLatency, describe, command, validState, validResult, blockReason, LineFramer } from '../core.js';
 
 const catalog = JSON.parse(readFileSync(new URL('../catalog.json', import.meta.url), 'utf8'));
 const DICTIONARY = '299314f6';
@@ -698,4 +698,119 @@ test('variant custom unit capabilities and short labels render through the desk 
   assert.equal(pitchIndices.map(index => unitAt(variant, index).label).join(' + '), 'Pitcher + Catcher + Bench');
   const audioIndices = variant.units.map((unit, index) => unit.audio ? index + 1 : 0).filter(Boolean);
   assert.deepEqual(audioIndices, [1, 6], 'the custom bench unit is the added audio receiver');
+});
+
+test('decodePitch inverts pitchCode across configured grids', () => {
+  for (let code = 1; code <= MAX_PITCH; code++) {
+    const decoded = decodePitch(code, ROWS, COLS);
+    assert.deepEqual(decoded, {
+      type: Math.floor((code - 1) / (ROWS * COLS)) + 1,
+      row: Math.floor(((code - 1) % (ROWS * COLS)) / COLS) + 1,
+      col: (code - 1) % COLS + 1,
+    }, `code ${code}`);
+    assert.equal(pitchCode(decoded.type, decoded.row, decoded.col, ROWS, COLS), code);
+  }
+  assert.deepEqual(decodePitch(1, 3, 3), {type: 1, row: 1, col: 1});
+  assert.deepEqual(decodePitch(81, 3, 3), {type: 9, row: 3, col: 3});
+  assert.deepEqual(decodePitch(32, 4, 5), {type: 2, row: 3, col: 2});
+  assert.deepEqual(decodePitch(20, 4, 5), {type: 1, row: 4, col: 5});
+  assert.deepEqual(decodePitch(9, 2, 2), {type: 3, row: 1, col: 1});
+});
+
+test('decodePitch returns null outside the valid range', () => {
+  const cases = [
+    [0, 3, 3], [-1, 3, 3], [1.5, 3, 3], ['1', 3, 3], [NaN, 3, 3], [Infinity, 3, 3], [undefined, 3, 3], [null, 3, 3],
+    [1, 0, 3], [1, 3, 0], [1, -1, 3], [1, 3, -1], [1, 1.5, 3], [1, 3, 1.5], [1, '3', 3], [1, 3, '3'], [1, null, 3],
+  ];
+  for (const bad of cases) assert.equal(decodePitch(...bad), null, JSON.stringify(bad));
+  assert.equal(decodePitch(), null);
+  assert.equal(decodePitch(1), null);
+  assert.equal(decodePitch(1, 3), null);
+});
+
+test('keyAction maps digits to types on the pitch tab and plays on the play tab', () => {
+  const arity = {rows: 3, cols: 3, pitchTypes: 9, maxPlay: 21};
+  for (let value = 1; value <= 9; value++) {
+    assert.deepEqual(keyAction(String(value), 1, arity), {kind: 'type', value});
+    assert.deepEqual(keyAction(String(value), 2, arity), {kind: 'play', value});
+  }
+  assert.equal(keyAction('0', 1, arity), null);
+  assert.equal(keyAction('0', 2, arity), null);
+  assert.equal(keyAction('10', 1, arity), null);
+  assert.equal(keyAction('10', 2, arity), null);
+  assert.deepEqual(keyAction('4', 1, {rows: 3, cols: 3, pitchTypes: 4, maxPlay: 21}), {kind: 'type', value: 4});
+  assert.equal(keyAction('5', 1, {rows: 3, cols: 3, pitchTypes: 4, maxPlay: 21}), null, 'past the pitch count');
+  assert.deepEqual(keyAction('9', 2, {rows: 3, cols: 3, pitchTypes: 9, maxPlay: 9}), {kind: 'play', value: 9});
+  assert.equal(keyAction('9', 2, {rows: 3, cols: 3, pitchTypes: 9, maxPlay: 8}), null, 'past the play count');
+  assert.equal(keyAction('1', 0, arity), null, 'no category');
+  assert.equal(keyAction('1', 3, arity), null, 'unknown category');
+});
+
+test('keyAction maps the 3x3 zone letters in visual order and case-insensitively', () => {
+  const arity = {rows: 3, cols: 3, pitchTypes: 9, maxPlay: 21};
+  const zones = {q: [1, 1], w: [1, 2], e: [1, 3], a: [2, 1], s: [2, 2], d: [2, 3], z: [3, 1], x: [3, 2], c: [3, 3]};
+  for (const [key, [row, col]] of Object.entries(zones)) {
+    assert.deepEqual(keyAction(key, 1, arity), {kind: 'zone', row, col});
+    assert.deepEqual(keyAction(key.toUpperCase(), 1, arity), {kind: 'zone', row, col});
+    assert.equal(keyAction(key, 2, arity), null, `${key} is pitch tab only`);
+  }
+});
+
+test('keyAction drops zone letters the current catalog does not have', () => {
+  const twoByTwo = {rows: 2, cols: 2, pitchTypes: 9, maxPlay: 21};
+  assert.deepEqual(keyAction('q', 1, twoByTwo), {kind: 'zone', row: 1, col: 1});
+  assert.deepEqual(keyAction('w', 1, twoByTwo), {kind: 'zone', row: 1, col: 2});
+  assert.deepEqual(keyAction('a', 1, twoByTwo), {kind: 'zone', row: 2, col: 1});
+  assert.deepEqual(keyAction('s', 1, twoByTwo), {kind: 'zone', row: 2, col: 2});
+  for (const key of ['e', 'd', 'z', 'x', 'c']) assert.equal(keyAction(key, 1, twoByTwo), null, `${key} needs a third row or column`);
+  const oneByOne = {rows: 1, cols: 1, pitchTypes: 9, maxPlay: 21};
+  assert.deepEqual(keyAction('q', 1, oneByOne), {kind: 'zone', row: 1, col: 1});
+  for (const key of ['w', 'a']) assert.equal(keyAction(key, 1, oneByOne), null);
+  const wide = {rows: 4, cols: 5, pitchTypes: 9, maxPlay: 21};
+  assert.deepEqual(keyAction('z', 1, wide), {kind: 'zone', row: 3, col: 1});
+  assert.deepEqual(keyAction('c', 1, wide), {kind: 'zone', row: 3, col: 3});
+  assert.equal(keyAction('q', 1, {rows: 0, cols: 0, pitchTypes: 9, maxPlay: 21}), null, 'no zone without a grid');
+});
+
+test('keyAction handles Enter, Escape, and resend and ignores everything else', () => {
+  const arity = {rows: 3, cols: 3, pitchTypes: 9, maxPlay: 21};
+  for (const category of [0, 1, 2]) {
+    assert.deepEqual(keyAction('Enter', category, arity), {kind: 'send'});
+    assert.deepEqual(keyAction('Escape', category, arity), {kind: 'clear'});
+    assert.deepEqual(keyAction('r', category, arity), {kind: 'resend'});
+    assert.deepEqual(keyAction('R', category, arity), {kind: 'resend'});
+  }
+  for (const key of ['k', 'm', ' ', '', 'Shift', 'Tab', 'F1', 'ArrowUp', '#', 'enter', 'Enter ']) {
+    assert.equal(keyAction(key, 1, arity), null, JSON.stringify(key));
+  }
+  assert.equal(keyAction(undefined, 1, arity), null);
+  assert.equal(keyAction(null, 1, arity), null);
+  assert.equal(keyAction(1, 1, arity), null);
+  assert.equal(keyAction({key: 'q'}, 1, arity), null);
+  assert.deepEqual(keyAction('Enter'), {kind: 'send'});
+  assert.equal(keyAction('1', 1), null, 'no pitch count means no digit action');
+  assert.equal(keyAction('q', 1), null, 'no grid means no zone action');
+});
+
+test('formatClock renders local wall time as HH:MM:SS', () => {
+  assert.equal(formatClock(new Date(2026, 0, 2, 3, 4, 5).getTime()), '03:04:05');
+  assert.equal(formatClock(new Date(2026, 0, 2, 23, 59, 7).getTime()), '23:59:07');
+  assert.equal(formatClock(new Date(2026, 0, 2, 0, 0, 0).getTime()), '00:00:00');
+  assert.equal(formatClock(new Date(2026, 0, 2, 12, 30, 40).getTime()), '12:30:40');
+  assert.equal(formatClock(NaN), '');
+  assert.equal(formatClock('later'), '');
+});
+
+test('formatLatency uses milliseconds under a second and one decimal second above', () => {
+  assert.equal(formatLatency(0), '0 ms');
+  assert.equal(formatLatency(240), '240 ms');
+  assert.equal(formatLatency(999), '999 ms');
+  assert.equal(formatLatency(240.4), '240 ms');
+  assert.equal(formatLatency(240.6), '241 ms');
+  assert.equal(formatLatency(1000), '1.0 s');
+  assert.equal(formatLatency(1200), '1.2 s');
+  assert.equal(formatLatency(1250), '1.3 s');
+  assert.equal(formatLatency(12345), '12.3 s');
+  assert.equal(formatLatency(NaN), '');
+  assert.equal(formatLatency('slow'), '');
 });
