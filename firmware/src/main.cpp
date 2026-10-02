@@ -8,7 +8,7 @@
  * Build (one enrolled unit; the key picks the generated unit index):
  *   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/pitcher -- \
  *     -DEXTRA_CPPFLAGS=-DPC_UNIT=PC_UNIT_pitcher \
- *     -DEXTRA_CONF_FILE="roles/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
+ *     -DEXTRA_CONF_FILE="firmware/build/unit-confs/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
  *
  * tools/build_firmware.ps1 derives the fragments and the unit define from
  * config/roster.json; this header only needs the -DPC_UNIT shape.

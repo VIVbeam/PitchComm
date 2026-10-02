@@ -10,7 +10,7 @@
  *     -DEXTRA_CONF_FILE=roles/coach.conf
  * Build (shortstop, Thread sleepy end device):
  *   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/shortstop -- \
- *     -DEXTRA_CONF_FILE="roles/shortstop.conf;roles/field-common.conf"
+ *     -DEXTRA_CONF_FILE="firmware/build/unit-confs/shortstop.conf;roles/field-common.conf"
  */
 
 #include <errno.h>

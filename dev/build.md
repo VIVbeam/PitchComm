@@ -13,41 +13,39 @@ Internal build/design notes for the Zephyr / nRF Connect SDK (NCS) application. 
 
 ## Application layout
 
-- `firmware/src/main.cpp`: role selection, hooks, engine thread, console, UI loop.
+- `firmware/src/main.cpp`: unit selection, hooks, engine thread, console, UI loop.
 - `firmware/src/thread_link.c`: OpenThread + UDP transport.
 - `firmware/src/audio_source.c`, `storage.c`: LE Audio unicast source and LittleFS clips.
 - `firmware/src/display.cpp`, `buttons.cpp`, `battery.cpp`: board drivers.
 - `firmware/include/pc/`: portable engine, protocol, catalog, controls, USB gate (do not edit `catalog.h` by hand).
 - `firmware/include/app/`: transport/audio/storage contracts and team credentials.
 - `firmware/include/board/`: driver interfaces.
-- `firmware/roles/`: Kconfig fragments per role.
+- `firmware/roles/`: checked-in Kconfig fragments (coach, proof, shared field, audio, min-size); field capability fragments are generated per unit.
 - `firmware/boards/xiao_nrf54l15_nrf54l15_cpuapp.overlay`: OLED, ADC channel, display choice.
 - `firmware/boards/no_bootloader.overlay`, `firmware/boards/no_bootloader.conf`: untested no-MCUboot layout; see "No-MCUboot fallback (VERIFY)".
 
-## Roles and fragments
+## Units and fragments
 
-`west build` takes a semicolon-separated `EXTRA_CONF_FILE` list. `tools/build_firmware.ps1` wraps this:
+`west build` takes a semicolon-separated `EXTRA_CONF_FILE` list. `tools/build_firmware.ps1 -Units <key,...>` wraps this and generates the capability fragment for each field unit from `config/roster.json` at `firmware/build/unit-confs/<key>.conf`, so enrolling a position never needs a new checked-in conf. The fragments are:
 
-| Role | Fragments |
+| Build | Fragments |
 |---|---|
 | Coach | `roles/coach.conf` |
-| Catcher | `roles/catcher.conf;roles/field-common.conf` |
-| Pitcher | `roles/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf` |
-| Shortstop | `roles/shortstop.conf;roles/field-common.conf` |
-| Center field | `roles/centerfield.conf;roles/field-common.conf` |
+| Any enrolled field unit | generated `unit-confs/<key>.conf` then `roles/field-common.conf`, plus `roles/audio-unit.conf` when the roster gives it audio |
 | LE Audio proof | `roles/audio-proof.conf;roles/audio-unit.conf` |
 
-Each role conf sets `CONFIG_PITCHCOMM_ROLE_*`. The application `Kconfig` derives `CONFIG_PITCHCOMM_AUDIO`, `CONFIG_PITCHCOMM_DISPLAY`, `CONFIG_PITCHCOMM_CATCHER_MENU`, `CONFIG_PITCHCOMM_FIELD_BUTTON`, and `CONFIG_PITCHCOMM_BATTERY` from the role; `CONFIG_PITCHCOMM_CONSOLE` defaults to y for every role. Only the pitcher and the proof pass `roles/audio-unit.conf`; the catcher sets `CONFIG_PITCHCOMM_AUDIO=n` and passes no audio fragment.
+The generated fragment sets `CONFIG_PITCHCOMM_AUDIO`, `CONFIG_PITCHCOMM_DISPLAY`, `CONFIG_PITCHCOMM_CATCHER_MENU`, `CONFIG_PITCHCOMM_FIELD_BUTTON`, and `CONFIG_PITCHCOMM_BATTERY` from the unit's capabilities, and enables the display driver for display units. A unit with controls (the catcher-style menu) gets `FIELD_BUTTON=n` because its buttons own those pins. The `PITCHCOMM_ROLE` choice in `firmware/Kconfig` remains for the coach and the audio proof; field builds take their identity from `-DPC_UNIT=PC_UNIT_<key>`.
 
-Raw equivalent for one role:
+Raw equivalent for one unit (the generated conf path is absolute in the script):
 
 ```powershell
 west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/pitcher -- `
-  -DEXTRA_CONF_FILE="roles/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
+  -DEXTRA_CONF_FILE="firmware/build/unit-confs/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf" `
+  -DEXTRA_CPPFLAGS="-DPC_UNIT=PC_UNIT_pitcher"
 west flash -d firmware/build/pitcher
 ```
 
-The proof role is not in the script's default list; build it with `tools\build_firmware.ps1 -Units proof` or the raw form with `roles/audio-proof.conf;roles/audio-unit.conf`.
+Build the proof with `tools\build_firmware.ps1 -Units proof`. Add `-DryRun` to validate the unit list, fragments, and generated conf without west or any build directory write.
 
 ## Provisioning
 
@@ -56,7 +54,7 @@ python tools\provision.py --coach EUI1 --unit pitcher=EUI2 --unit catcher=EUI3 `
   --unit shortstop=EUI4 --unit center=EUI5 --channel 15
 ```
 
-Enrolled units come from `config/roster.json`; add a position there and provision its EUI to grow the team.
+Enrolled units come from `config/roster.json`; add a position with `python tools\roster.py enable <key>` (which also regenerates the catalog), then provision its EUI and build `-Units <key>`.
 
 Read each board's EUI-64 with the `eui` console command (or `status`) before provisioning. This writes `config/team.local.json` and `firmware/include/app/team_config.h`. Both are git-ignored; keep the JSON. Rebuild all enrolled units after provisioning. `--from-file` regenerates the header from saved values.
 
@@ -98,7 +96,7 @@ python dev/cad/generate_cases.py --no-preview
 
 The full item-by-item register is `dev/verification.md`. The short list:
 
-1. `west build` for each role; the build script reports `IMAGE <role>: bytes / 729088`.
+1. `west build` for each unit; the build script reports `IMAGE <unit>: bytes / 729088`.
 2. Check that every remaining `VERIFY:` comment is either confirmed or corrected (search `VERIFY:`); most API/Kconfig items are already source-verified.
 3. Confirm the `solomon,ssd1306` binding accepts 128x32 and the overlay pinctrl matches `i2c22`.
 4. Confirm `BT_LL_SOFTDEVICE` vs the nRF54L15 controller selection and that BT + 802.15.4 link without a coexistence option.
@@ -118,7 +116,8 @@ Build and flash (pitcher shown):
 west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/pitcher-nb -- `
   -DSB_CONFIG_BOOTLOADER_MCUBOOT=n `
   -DEXTRA_DTC_OVERLAY_FILE=boards/no_bootloader.overlay `
-  -DEXTRA_CONF_FILE="roles/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf;boards/no_bootloader.conf"
+  -DEXTRA_CONF_FILE="firmware/build/unit-confs/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf;boards/no_bootloader.conf" `
+  -DEXTRA_CPPFLAGS="-DPC_UNIT=PC_UNIT_pitcher"
 west flash -d firmware/build/pitcher-nb --erase
 ```
 
@@ -133,7 +132,7 @@ west flash -d firmware/build/pitcher-nb --erase
 Caveats:
 
 - `tools/build_firmware.ps1` has no fallback flag and always measures against the 729088-byte MCUboot slot; use the raw west command and check the map against 794624 bytes.
-- `tools/flash_firmware.ps1` only accepts `firmware/build/<role>` paths, so flash this build with `west flash -d firmware/build/pitcher-nb` or name the build directory after the role.
+- `tools/flash_firmware.ps1` accepts `firmware/build/<unit>` paths, so flash this build with `west flash -d firmware/build/pitcher-nb` or name the build directory after the unit and use `-Unit pitcher -BuildSuffix nb`.
 - There is no bootloader and no revert: a bad image has to be recovered over the XIAO debugger, and the normal USB update path does not apply.
 
 VERIFY (all of it): the overlay merges without a DTC error; `.config` shows `CONFIG_USE_DT_CODE_PARTITION=y` and `CONFIG_FLASH_USES_MAPPED_PARTITION=y`; the map starts at `0x0`, is at most 794624 bytes, and has no section past `0x0C2000`; LittleFS mounts `slot1`; settings mount `storage`; the erased board boots and enumerates on USB.
@@ -141,7 +140,7 @@ VERIFY (all of it): the overlay merges without a DTC error; `.config` shows `CON
 ## If the app does not fit
 
 1. Rebuild with `tools\build_firmware.ps1 -MinSize`; `roles/min-size.conf` disables logs/asserts, drops OpenThread debug, and cuts message buffers to 32.
-2. Drop map-consuming options in the role confs: `CONFIG_OPENTHREAD_DEBUG=n`, smaller `CONFIG_BT_RX_STACK_SIZE`, `CONFIG_LOG=n`.
+2. Drop map-consuming options in the capability fragment: `CONFIG_OPENTHREAD_DEBUG=n`, smaller `CONFIG_BT_RX_STACK_SIZE`, `CONFIG_LOG=n`.
 3. If it still does not fit, use the no-MCUboot fallback above (VERIFY).
 4. If only the audio filesystem is over, rebuild it with `tools\build_audio_fs.py` (compact mu-law) and keep the app image lean.
 

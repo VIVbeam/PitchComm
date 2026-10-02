@@ -29,6 +29,10 @@ config PITCHCOMM_ROLE_AUDIO_PROOF
 
 endchoice
 
+# Field builds set PITCHCOMM_AUDIO, PITCHCOMM_DISPLAY, PITCHCOMM_CATCHER_MENU,
+# PITCHCOMM_FIELD_BUTTON and PITCHCOMM_BATTERY explicitly from the generated
+# unit conf (firmware/build/unit-confs/<key>.conf). The role choice above
+# remains for the coach and the audio proof builds.
 config PITCHCOMM_AUDIO
 	bool "LE Audio earbud output"
 	default y if PITCHCOMM_ROLE_PITCHER || PITCHCOMM_ROLE_AUDIO_PROOF

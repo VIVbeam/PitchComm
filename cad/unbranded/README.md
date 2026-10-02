@@ -1,6 +1,6 @@
 # Cases
 
-Print files for the four field units. All dimensions in millimetres.
+Print files for the field units. All dimensions in millimetres.
 
 ## Print list
 

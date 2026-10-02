@@ -1,6 +1,6 @@
 # PitchComm wiring reference
 
-5 units, one Seeed XIAO nRF54L15 each (21 x 17.8 mm; Nordic nRF54L15; Bluetooth 6.0 LE Audio; 802.15.4). All peripheral logic is 3.3 V. Never source peripherals from the 5V pin on battery.
+Five units in the base set, one Seeed XIAO nRF54L15 each (21 x 17.8 mm; Nordic nRF54L15; Bluetooth 6.0 LE Audio; 802.15.4). Extra positions wire the same as shortstop. All peripheral logic is 3.3 V. Never source peripherals from the 5V pin on battery.
 
 ## XIAO nRF54L15 pin map (silk to port)
 

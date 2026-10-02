@@ -42,6 +42,7 @@ import generate_catalog
 import import_demo_audio
 import preflight
 import provision
+import roster
 import verify_audio_fs
 
 try:
@@ -1235,6 +1236,168 @@ class GenerateCatalogInvalidTests(TempRepoTestCase):
         self.write(calls)
         with self.assertRaises(ValueError):
             generate_catalog.rendered(self.tmp)
+
+
+# ---------------------------------------------------------------------------
+# roster.py (enrollment CLI)
+# ---------------------------------------------------------------------------
+
+class RosterCliTests(TempRepoTestCase):
+    """roster.py list/enable/disable run in-process against a staged root."""
+
+    def setUp(self):
+        super().setUp()
+        add_catalog(self.tmp)
+        self.roster_path = self.tmp / 'config/roster.json'
+        self.original_roster = self.roster_path.read_bytes()
+
+    def run_roster(self, *arguments):
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = roster.main([*arguments, '--root', str(self.tmp)])
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def run_roster_error(self, *arguments):
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            with self.assertRaises(SystemExit) as ctx:
+                roster.main([*arguments, '--root', str(self.tmp)])
+        self.assertEqual(ctx.exception.code, 1)
+        return stdout.getvalue(), stderr.getvalue()
+
+    def assert_roster_error(self, arguments, message):
+        before = self.roster_path.read_bytes()
+        _, stderr = self.run_roster_error(*arguments)
+        self.assertTrue(stderr.startswith('roster: '), stderr)
+        self.assertEqual(stderr.count('\n'), 1, stderr)
+        self.assertIn(message, stderr)
+        self.assertEqual(self.roster_path.read_bytes(), before)
+        self.assert_no_side_outputs()
+
+    def assert_no_side_outputs(self):
+        self.assertFalse((self.tmp / 'config/team.local.json').exists())
+        self.assertFalse((self.tmp / 'data/audio').exists())
+        self.assertFalse((self.tmp / 'firmware/build').exists())
+
+    def unit_by_key(self, key):
+        document = json.loads(self.roster_path.read_text(encoding='utf-8'))
+        return next(unit for unit in document['units'] if unit['key'] == key)
+
+    def test_list_shows_coach_and_every_unit_in_order(self):
+        code, out, err = self.run_roster('list')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        lines = out.splitlines()
+        self.assertEqual(lines[0].split(), list(roster.HEADERS))
+        rows = lines[1:]
+        self.assertEqual([row.split()[1] for row in rows],
+                         ['coach'] + [unit['key'] for unit in real_roster_units()])
+        expected_numbers = {'coach': 0}
+        index = 0
+        for unit in real_roster_units():
+            if unit['enrolled']:
+                index += 1
+            expected_numbers[unit['key']] = index if unit['enrolled'] else 0
+        self.assertEqual({row.split()[1]: int(row.split()[0]) for row in rows}, expected_numbers)
+        self.assertEqual(rows[0].split()[5], '-')
+        self.assertTrue(all(row.split()[-1] == 'no' for row in rows))
+        self.assertEqual(self.roster_path.read_bytes(), self.original_roster)
+        self.assert_no_side_outputs()
+
+    def test_enable_first_regenerates_catalog_and_disable_restores(self):
+        code, out, err = self.run_roster('enable', 'first')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        first = self.unit_by_key('first')
+        self.assertTrue(first['enrolled'])
+        self.assertEqual({field: first[field] for field in roster.CAPABILITY_FIELDS},
+                         {'audio': False, 'display': True, 'controls': False, 'pitches': False})
+        data, version = generate_catalog.load(self.tmp)
+        self.assertNotEqual(version, 0x299314f6)
+        by_key = {play['key']: play['audience'] for play in data['plays']}
+        self.assertIn('first', by_key[1])
+        self.assertIn('first', by_key[13])
+        self.assertEqual(by_key[18], ['center'])
+        catalog = (self.tmp / 'firmware/include/pc/catalog.h').read_text(encoding='utf-8')
+        self.assertIn('constexpr unsigned kUnitCount = 6;', catalog)
+        self.assertIn('#define PC_UNIT_first 3', catalog)
+        self.assertIn("Enabled unit 'first'.", out)
+        self.assertIn('python tools/provision.py --coach <EUI-64> --unit first=<EUI-64>', out)
+        self.assertIn('tools\\build_firmware.ps1 -Units first', out)
+        self.assertNotIn('python tools/import_demo_audio.py', out)
+        self.assertNotIn('python tools/build_audio_fs.py', out)
+        self.assert_no_side_outputs()
+
+        code, out, err = self.run_roster('disable', 'first')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertEqual(self.roster_path.read_bytes(), self.original_roster)
+        restored, restored_version = generate_catalog.load(self.tmp)
+        self.assertEqual(restored_version, 0x299314f6)
+        catalog = (self.tmp / 'firmware/include/pc/catalog.h').read_text(encoding='utf-8')
+        self.assertIn('constexpr unsigned kUnitCount = 5;', catalog)
+        self.assertIn('#define PC_UNIT_first 0', catalog)
+        self.assertIn("Disabled unit 'first'.", out)
+        self.assertIn('preflight will flag the drift', out)
+        self.assert_no_side_outputs()
+
+    def test_enable_left_audio_adds_outfield_play_clips_and_audio_steps(self):
+        before = {name for name, _ in generate_catalog.clips(generate_catalog.load(self.tmp)[0])}
+        self.assertNotIn('d18.wav', before)
+        code, out, err = self.run_roster('enable', 'left', '--audio')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        data, _ = generate_catalog.load(self.tmp)
+        after = {name for name, _ in generate_catalog.clips(data)}
+        self.assertEqual(after - before, {'d18.wav', 'd19.wav'})
+        self.assertTrue(self.unit_by_key('left')['audio'])
+        self.assertEqual({play['key']: play['audience'] for play in data['plays']}[18],
+                         ['left', 'center'])
+        self.assertIn('python tools/import_demo_audio.py', out)
+        self.assertIn('python tools/build_audio_fs.py', out)
+        self.assert_no_side_outputs()
+
+    def test_display_only_enable_does_not_print_audio_steps(self):
+        before = {name for name, _ in generate_catalog.clips(generate_catalog.load(self.tmp)[0])}
+        code, out, err = self.run_roster('enable', 'right')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        after = {name for name, _ in generate_catalog.clips(generate_catalog.load(self.tmp)[0])}
+        self.assertEqual(after, before)
+        self.assertNotIn('python tools/import_demo_audio.py', out)
+        self.assertNotIn('python tools/build_audio_fs.py', out)
+        self.assert_no_side_outputs()
+
+    def test_unknown_key_fails_one_line_and_leaves_roster(self):
+        self.assert_roster_error(['enable', 'nope'],
+                                 "Unknown unit key 'nope'; known keys: pitcher, catcher, first")
+
+    def test_controls_without_display_fails_one_line_and_leaves_roster(self):
+        self.assert_roster_error(['enable', 'first', '--no-display', '--controls'],
+                                 "Unit 'first' has controls without display")
+
+    def test_disabling_the_last_pitches_unit_fails_one_line_and_leaves_roster(self):
+        code, out, err = self.run_roster('disable', 'catcher')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assert_roster_error(['disable', 'pitcher'],
+                                 "Cannot disable 'pitcher': it is the last enrolled unit "
+                                 'with the pitches capability')
+
+    def test_repeated_enable_is_byte_idempotent(self):
+        code, _, err = self.run_roster('enable', 'first')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        first_bytes = self.roster_path.read_bytes()
+        first_header = (self.tmp / 'firmware/include/pc/catalog.h').read_bytes()
+        code, _, err = self.run_roster('enable', 'first')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertEqual(self.roster_path.read_bytes(), first_bytes)
+        self.assertEqual((self.tmp / 'firmware/include/pc/catalog.h').read_bytes(), first_header)
+        self.assert_no_side_outputs()
 
 
 # ---------------------------------------------------------------------------

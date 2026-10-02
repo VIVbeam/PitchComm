@@ -41,6 +41,16 @@ Rules:
 
 `tools/provision.py --coach AA:BB:.. --unit pitcher=AA:BB:.. --unit catcher=..` replaces the five fixed `--catcher/--pitcher/...` flags. It reads `config/roster.json`, requires exactly the enrolled keys plus coach, and `--from-file` still regenerates `team_config.h`. Enrollment can grow one unit at a time; the network secrets persist. A team file from before the roster change has exactly the four default keys plus coach, so it still validates unchanged.
 
+## Enrollment CLI
+
+`tools/roster.py` edits `config/roster.json` and regenerates the catalog in one step:
+
+- `python tools/roster.py list` prints every unit, its index when enrolled, capabilities, and whether an EUI exists.
+- `python tools/roster.py enable first` enrolls with the standard profile (pitcher: audio and pitches; catcher: display, controls and pitches; any other key: display). Capability flags such as `--audio`, `--no-pitches`, `--controls` override individual capabilities.
+- `python tools/roster.py disable first` un-enrolls; it refuses to remove the last unit with `pitches`.
+
+Both commands print the provisioning and build steps to run next. Disabling warns that `config/team.local.json` and `team_config.h` still hold the unit until provisioning reruns; preflight reports that drift.
+
 ## Generated catalog
 
 `tools/generate_catalog.py` reads `config/calls.json` and the enrolled units in `config/roster.json`, then emits:

@@ -7,7 +7,7 @@
 #     -DEXTRA_CONF_FILE=roles/coach.conf
 #   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware \
 #     -d firmware/build/pitcher -- \
-#     -DEXTRA_CONF_FILE="roles/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
+#     -DEXTRA_CONF_FILE="firmware/build/unit-confs/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
 
 cmake_minimum_required(VERSION 3.20.0)
 

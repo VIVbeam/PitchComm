@@ -35,6 +35,16 @@ it appends boards/no_bootloader.conf to EXTRA_CONF_FILE, passes
 selects one (builds land in firmware/build/<key>-<suffix>). The documented
 fallback layout is -NoBootloader -BuildSuffix nb.
 
+-DryRun validates the requested units exactly like a real run (roster keys,
+enrollment, the NCS pin, BuildSuffix, and the NoBootloader/MinSize fragments)
+but does not require west or nrfutil, writes no build directory, and prints for
+each unit the key, the PC_UNIT define, the full -DEXTRA_CONF_FILE list and the
+generated capability conf body.
+
+.EXAMPLE
+tools\build_firmware.ps1 -Units pitcher,catcher -DryRun
+Validates both units and prints their fragments and generated confs without building.
+
 .EXAMPLE
 tools\build_firmware.ps1
 Builds the default enrolled team: coach, pitcher, catcher, shortstop, center.
@@ -63,6 +73,7 @@ param(
     [switch]$MinSize,
     [switch]$StrictSize,
     [switch]$NoBootloader,
+    [switch]$DryRun,
     [string]$BuildSuffix = '',
     [string]$NcsVersion = '',
     [switch]$AllowVersionMismatch,
@@ -129,8 +140,11 @@ foreach ($unit in $requested) {
 
 # A field capability fragment is generated per build from the roster, so a new
 # enrollment needs no new checked-in conf. audio also pulls the LE Audio stack.
+# -DryRun prints the fragment and conf it would write without creating them.
 $generatedDir = Join-Path $root 'firmware/build/unit-confs'
-New-Item -ItemType Directory -Path $generatedDir -Force | Out-Null
+if (-not $DryRun) {
+    New-Item -ItemType Directory -Path $generatedDir -Force | Out-Null
+}
 
 function Get-CapabilityConf {
     param([string]$Key, [object]$Info)
@@ -144,15 +158,51 @@ function Get-CapabilityConf {
     $lines.Add('CONFIG_PITCHCOMM_AUDIO=' + $(if ($Info.audio) { 'y' } else { 'n' }))
     $lines.Add('CONFIG_PITCHCOMM_DISPLAY=' + $(if ($Info.display) { 'y' } else { 'n' }))
     $lines.Add('CONFIG_PITCHCOMM_CATCHER_MENU=' + $(if ($Info.controls) { 'y' } else { 'n' }))
-    $lines.Add('CONFIG_PITCHCOMM_FIELD_BUTTON=y')
+    # The catcher's five-button menu owns its own pins, so the single recall
+    # button is generated only for units without controls. The old per-role
+    # Kconfig gave the catcher no field button.
+    $lines.Add('CONFIG_PITCHCOMM_FIELD_BUTTON=' + $(if ($Info.controls) { 'n' } else { 'y' }))
     $lines.Add('CONFIG_PITCHCOMM_BATTERY=y')
     if ($Info.display) {
         $lines.Add('CONFIG_DISPLAY=y')
         $lines.Add('CONFIG_SSD1306=y')
     }
-    $path = Join-Path $generatedDir "$Key.conf"
-    Set-Content -LiteralPath $path -Value ($lines -join "`n") -Encoding ascii
-    return $path
+    return $lines
+}
+
+function Get-BuildPlan {
+    # Shared by the real build loop and -DryRun so both validate and print the
+    # exact same fragments, defines and generated capability conf.
+    param([string]$Key)
+
+    $pcDefine = $null
+    $capabilityLines = $null
+    $capabilityPath = $null
+    if ($Key -eq 'proof') {
+        $fragmentList = 'roles/audio-proof.conf;roles/audio-unit.conf'
+    } elseif ($Key -eq 'coach') {
+        $fragmentList = 'roles/coach.conf'
+    } else {
+        $info = $rosterUnits[$Key]
+        $capabilityLines = Get-CapabilityConf -Key $Key -Info $info
+        $capabilityPath = Join-Path $generatedDir "$Key.conf"
+        $fragmentList = @($capabilityPath, 'roles/field-common.conf')
+        if ($info.audio) { $fragmentList += 'roles/audio-unit.conf' }
+        $fragmentList = $fragmentList -join ';'
+        $pcDefine = "PC_UNIT=PC_UNIT_$Key"
+    }
+    if ($NoBootloader) { $fragmentList += ';boards/no_bootloader.conf' }
+    if ($MinSize) { $fragmentList += ';roles/min-size.conf' }
+
+    $buildName = if ($BuildSuffix) { "$Key-$BuildSuffix" } else { $Key }
+    [pscustomobject]@{
+        Key = $Key
+        BuildName = $buildName
+        PcDefine = $pcDefine
+        FragmentList = $fragmentList
+        CapabilityLines = $capabilityLines
+        CapabilityPath = $capabilityPath
+    }
 }
 
 function Find-SizeTool {
@@ -181,6 +231,31 @@ if ($NcsVersion -and $NcsVersion -ne $pinnedVersion) {
     Write-Warning "-NcsVersion $NcsVersion overrides the firmware/ncs_version.txt pin ($pinnedVersion)."
 }
 
+# -DryRun stops here: units, enrollment, the NCS pin and the fragment rules
+# above are validated exactly like a real run, but west and nrfutil are not
+# looked up and no build directory is written.
+if ($DryRun) {
+    Write-Host 'Dry run: no build directory is written; west and nrfutil are not required.'
+    Write-Host "Pinned NCS version: $pinnedVersion (format checked; no toolchain lookup)"
+    foreach ($unit in $requested) {
+        $plan = Get-BuildPlan -Key $unit
+        Write-Host ''
+        Write-Host "==> dry-run: $($plan.Key)"
+        Write-Host "  build directory: firmware/build/$($plan.BuildName) (not created)"
+        Write-Host "  PC_UNIT define:  $(if ($plan.PcDefine) { $plan.PcDefine } else { '(none)' })"
+        Write-Host "  -DEXTRA_CONF_FILE=$($plan.FragmentList)"
+        if ($plan.CapabilityLines) {
+            Write-Host "  generated capability conf ($($plan.CapabilityPath)):"
+            foreach ($line in $plan.CapabilityLines) {
+                Write-Host $line
+            }
+        } else {
+            Write-Host '  generated capability conf: (none; static fragments)'
+        }
+    }
+    exit 0
+}
+
 $nrfutil = $null
 $westPath = $null
 if ($NcsVersion) {
@@ -200,27 +275,16 @@ Push-Location $root
 $builtNames = New-Object 'System.Collections.Generic.List[string]'
 try {
     foreach ($unit in $requested) {
-        $pcDefine = $null
-        if ($unit -eq 'proof') {
-            $fragmentList = 'roles/audio-proof.conf;roles/audio-unit.conf'
-        } elseif ($unit -eq 'coach') {
-            $fragmentList = 'roles/coach.conf'
-        } else {
-            $info = $rosterUnits[$unit]
-            $capabilityConf = Get-CapabilityConf -Key $unit -Info $info
-            $fragmentList = @($capabilityConf, 'roles/field-common.conf')
-            if ($info.audio) { $fragmentList += 'roles/audio-unit.conf' }
-            $fragmentList = $fragmentList -join ';'
-            $pcDefine = "PC_UNIT=PC_UNIT_$unit"
+        $plan = Get-BuildPlan -Key $unit
+        if ($plan.CapabilityLines) {
+            Set-Content -LiteralPath $plan.CapabilityPath -Value ($plan.CapabilityLines -join "`n") -Encoding ascii
         }
-        if ($NoBootloader) { $fragmentList += ';boards/no_bootloader.conf' }
-        if ($MinSize) { $fragmentList += ';roles/min-size.conf' }
-        $buildName = if ($BuildSuffix) { "$unit-$BuildSuffix" } else { $unit }
+        $buildName = $plan.BuildName
         $arguments = @('build', '-b', $board, 'firmware', '-d', "firmware/build/$buildName")
         if ($Pristine) { $arguments += '--pristine' }
         if ($WestArgs.Count) { $arguments += $WestArgs }
-        $cmakeArgs = @("-DEXTRA_CONF_FILE=$fragmentList")
-        if ($pcDefine) { $cmakeArgs += "-DEXTRA_CPPFLAGS=-D$pcDefine" }
+        $cmakeArgs = @("-DEXTRA_CONF_FILE=$($plan.FragmentList)")
+        if ($plan.PcDefine) { $cmakeArgs += "-DEXTRA_CPPFLAGS=-D$($plan.PcDefine)" }
         if ($NoBootloader) {
             $cmakeArgs += @('-DSB_CONFIG_BOOTLOADER_MCUBOOT=n',
                             '-DEXTRA_DTC_OVERLAY_FILE=boards/no_bootloader.overlay')
