@@ -1,7 +1,7 @@
 {
   "revision": "v4-flat-tray-dashboard",
   "units": "mm",
-  "generator": "cad/unbranded/generate_cases.py",
+  "generator": "dev/cad/generate_cases.py",
   "engine": "manifold",
   "trimesh_version": "5.0.0",
   "hardware_measured": false,
@@ -311,40 +311,17 @@
         0.0,
         0.0,
         0.0,
-        31.1,
-        12.7,
+        30.1,
+        11.7,
         1.6
       ],
       "size_mm": [
-        31.1,
-        12.7,
+        30.1,
+        11.7,
         1.6
       ],
-      "volume_mm3": 210.941,
+      "volume_mm3": 200.363,
       "triangles": 1070,
-      "watertight": true,
-      "winding_consistent": true,
-      "components": 1,
-      "on_bed": true,
-      "negative_z": false
-    },
-    "wrist_window": {
-      "file": "wrist_window.stl",
-      "bounds_mm": [
-        0.0,
-        0.0,
-        0.0,
-        27.3,
-        8.9,
-        1.5
-      ],
-      "size_mm": [
-        27.3,
-        8.9,
-        1.5
-      ],
-      "volume_mm3": 358.03,
-      "triangles": 754,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -679,40 +656,17 @@
         0.0,
         0.0,
         0.0,
-        31.1,
-        12.7,
+        30.1,
+        11.7,
         1.6
       ],
       "size_mm": [
-        31.1,
-        12.7,
+        30.1,
+        11.7,
         1.6
       ],
-      "volume_mm3": 210.941,
+      "volume_mm3": 200.363,
       "triangles": 1070,
-      "watertight": true,
-      "winding_consistent": true,
-      "components": 1,
-      "on_bed": true,
-      "negative_z": false
-    },
-    "keypad_window": {
-      "file": "keypad_window.stl",
-      "bounds_mm": [
-        0.0,
-        0.0,
-        0.0,
-        27.3,
-        8.9,
-        1.5
-      ],
-      "size_mm": [
-        27.3,
-        8.9,
-        1.5
-      ],
-      "volume_mm3": 358.03,
-      "triangles": 754,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -984,30 +938,15 @@
         "warnings": [],
         "all_passed": true
       },
-      "ergonomics": {
-        "layout": "flat tray + raised control deck, only the deck tilted",
-        "dashboard_tilt_deg": null,
+      "control_deck": {
+        "tilt_deg": null,
         "flat_case_height_mm": 14.65,
         "max_height_mm": 14.65,
-        "screen_recess_acrylic_mm": null,
-        "screen_recess_glass_mm": null,
+        "screen_recess_mm": null,
         "bezel_height_mm": null,
         "hood_height_mm": null,
-        "mount_back_flatness_mm": 0.0,
-        "button_surface_mm": {
-          "recall": 14.65
-        },
         "plunger_top_vs_surface_mm": {
           "recall": -0.2
-        },
-        "assumed_eye_above_pod_mm": 450.0,
-        "assumed_eye_outboard_mm": 350.0,
-        "sight_line_note": "Lowest-profile belt pod, flat lid, no display. One recessed recall button in a 13.6 mm well at the hand end; the cell and board fill the rest.",
-        "switch_menu_keys": {
-          "recall": "throw / recall (D1)"
-        },
-        "operating_hand": {
-          "recall": "either, sized for a glove"
         }
       },
       "mounts": [
@@ -1198,40 +1137,17 @@
             0.0,
             0.0,
             0.0,
-            31.1,
-            12.7,
+            30.1,
+            11.7,
             1.6
           ],
           "size_mm": [
-            31.1,
-            12.7,
+            30.1,
+            11.7,
             1.6
           ],
-          "volume_mm3": 210.941,
+          "volume_mm3": 200.363,
           "triangles": 1070,
-          "watertight": true,
-          "winding_consistent": true,
-          "components": 1,
-          "on_bed": true,
-          "negative_z": false
-        },
-        "wrist_window": {
-          "file": "wrist_window.stl",
-          "bounds_mm": [
-            0.0,
-            0.0,
-            0.0,
-            27.3,
-            8.9,
-            1.5
-          ],
-          "size_mm": [
-            27.3,
-            8.9,
-            1.5
-          ],
-          "volume_mm3": 358.03,
-          "triangles": 754,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -1372,30 +1288,15 @@
         "warnings": [],
         "all_passed": true
       },
-      "ergonomics": {
-        "layout": "flat tray + raised control deck, only the deck tilted",
-        "dashboard_tilt_deg": 18.0,
+      "control_deck": {
+        "tilt_deg": 18.0,
         "flat_case_height_mm": 14.3,
         "max_height_mm": 19.9,
-        "screen_recess_acrylic_mm": 0.9,
-        "screen_recess_glass_mm": 4.1,
+        "screen_recess_mm": 4.1,
         "bezel_height_mm": 1.6,
         "hood_height_mm": 0.4,
-        "mount_back_flatness_mm": 0.0,
-        "button_surface_mm": {
-          "recall": 16.3
-        },
         "plunger_top_vs_surface_mm": {
           "recall": -0.2
-        },
-        "assumed_eye_above_pod_mm": 350.0,
-        "assumed_eye_outboard_mm": 400.0,
-        "sight_line_note": "Wrist or belt pod. The sloped display head holds the OLED at the hand end; the recall button sits on a low flat pad beside the head so it stays reachable at glove speed without raising the height.",
-        "switch_menu_keys": {
-          "recall": "recall / volume (D1)"
-        },
-        "operating_hand": {
-          "recall": "bare hand or glove heel"
         }
       },
       "mounts": [
@@ -1753,40 +1654,17 @@
             0.0,
             0.0,
             0.0,
-            31.1,
-            12.7,
+            30.1,
+            11.7,
             1.6
           ],
           "size_mm": [
-            31.1,
-            12.7,
+            30.1,
+            11.7,
             1.6
           ],
-          "volume_mm3": 210.941,
+          "volume_mm3": 200.363,
           "triangles": 1070,
-          "watertight": true,
-          "winding_consistent": true,
-          "components": 1,
-          "on_bed": true,
-          "negative_z": false
-        },
-        "keypad_window": {
-          "file": "keypad_window.stl",
-          "bounds_mm": [
-            0.0,
-            0.0,
-            0.0,
-            27.3,
-            8.9,
-            1.5
-          ],
-          "size_mm": [
-            27.3,
-            8.9,
-            1.5
-          ],
-          "volume_mm3": 358.03,
-          "triangles": 754,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -2014,44 +1892,19 @@
         "warnings": [],
         "all_passed": true
       },
-      "ergonomics": {
-        "layout": "flat tray + raised control deck, only the deck tilted",
-        "dashboard_tilt_deg": 18.0,
+      "control_deck": {
+        "tilt_deg": 18.0,
         "flat_case_height_mm": 16.8,
         "max_height_mm": 23.9,
-        "screen_recess_acrylic_mm": 0.9,
-        "screen_recess_glass_mm": 4.1,
+        "screen_recess_mm": 4.1,
         "bezel_height_mm": 1.6,
         "hood_height_mm": 0.4,
-        "mount_back_flatness_mm": 0.0,
-        "button_surface_mm": {
-          "call_1": 18.3,
-          "call_2": 18.3,
-          "call_3": 18.3,
-          "call_4": 18.3
-        },
         "plunger_top_vs_surface_mm": {
           "call_1": -0.2,
           "call_2": -0.2,
           "call_3": -0.2,
           "call_4": -0.2,
           "back": -0.2
-        },
-        "assumed_eye_above_pod_mm": 500.0,
-        "assumed_eye_outboard_mm": 450.0,
-        "sight_line_note": "Leg-guard pod on the outer throwing-side knee, long axis along the shin, 48 mm across the shin. Calls run in a 14 mm column along the length, Back at the bare-hand end, OLED on the sloped head beyond them.",
-        "switch_menu_keys": {
-          "call_1": "call 1 (D0)",
-          "call_2": "call 2 (D1)",
-          "call_3": "call 3 (D2)",
-          "call_4": "call 4 (D3)",
-          "back": "back (D13)"
-        },
-        "operating_hand": {
-          "call_1": "bare hand",
-          "call_2": "bare hand",
-          "call_3": "bare hand",
-          "call_4": "bare hand"
         }
       },
       "mounts": [

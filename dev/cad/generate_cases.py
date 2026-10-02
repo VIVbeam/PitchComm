@@ -1,24 +1,29 @@
 #!/usr/bin/env python3
 """
-PitchComm field-case generator.
+PitchComm field-case generator (maintainer tool).
 
-Builds the three field pods from profiles.json with trimesh + manifold3d CSG.
-The shell is a thin flat V1-family tray (tapered skirt, wide rim, inset-lip
+Builds the three field pods from dev/cad/profiles.json with trimesh +
+manifold3d CSG.  The shell is a thin flat tapered tray (wide rim, inset-lip
 lid, hanging screw bosses, internal deck between cell and board, friction
 charge cap, two-loop strap carriers).  The controls live on a raised control
 deck on the lid: a sloped display head plus, where used, a flat button
 plateau.  Only the control deck is tilted.
 
-Part set per style:
-    <style>_body.stl, _lid.stl, _deck.stl, _charge_cap.stl,
-    <style>_<mount>_carrier.stl, _plunger_*.stl, _label_*.stl,
-    _display_bezel.stl, _window.stl
-    plus *_color.stl copies, <style>_colored.3mf, <style>_lid_colored.3mf,
-    palette.json, fit_coupon.stl, dimensions.json and preview sheets.
+Product output (cad/unbranded/):
+    exports/<style>_body.stl, _lid.stl, _deck.stl, _charge_cap.stl,
+    exports/<style>_<mount>_carrier.stl, _plunger_*.stl, _label_*.stl,
+    exports/<style>_display_bezel.stl
+    exports/*_color.stl copies, exports/<style>_colored.3mf,
+    exports/<style>_lid_colored.3mf, exports/palette.json,
+    exports/fit_coupon.stl
+    preview.png, parts-preview.png, mounts-preview.png
+
+Maintainer output (dev/cad/):
+    dimensions.json
 
 Usage:
-    python cad/unbranded/generate_cases.py [--only receiver|wrist|keypad]
-                                           [--no-preview]
+    python dev/cad/generate_cases.py [--only receiver|wrist|keypad]
+                                     [--no-preview]
 """
 
 from __future__ import annotations
@@ -36,9 +41,12 @@ from xml.sax.saxutils import escape
 import numpy as np
 import trimesh
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-EXPORTS_DIR = os.path.join(HERE, "exports")
+HERE = os.path.dirname(os.path.abspath(__file__))            # dev/cad
+ROOT = os.path.dirname(os.path.dirname(HERE))                # repo root
+EXPORTS_DIR = os.path.join(ROOT, "cad", "unbranded", "exports")
+PREVIEW_DIR = os.path.join(ROOT, "cad", "unbranded")
 PROFILES_PATH = os.path.join(HERE, "profiles.json")
+DIMS_PATH = os.path.join(HERE, "dimensions.json")
 ENGINE = "manifold"
 SECTIONS = 48
 ARC_SEG = 16
@@ -963,20 +971,13 @@ def build_bezel_local(C):
     g = C.g
     bz, oled = g['bezel'], g['oled']
     bw, bl = oled['window']
-    ri = (bw + 1.6, bl + 1.6)
+    # no window insert: the opening hugs the lid's window with a 0.3 reveal
+    ri = (bw + 0.6, bl + 0.6)
     ro = (ri[0] + 2 * bz['frame'], ri[1] + 2 * bz['frame'])
     outer = rbox(ro[0], ro[1], bz['height'], 2.0, 0.6, (-ro[0] / 2.0, -ro[1] / 2.0, 0.0))
     inner = rbox(ri[0], ri[1], bz['height'] + 1.0, 1.4, 0.4,
                  (-ri[0] / 2.0, -ri[1] / 2.0, -0.4))
     return dif(outer, inner)
-
-
-def build_window_local(C):
-    g = C.g
-    bw, bl = g['oled']['window']
-    w, l = bw + 1.3, bl + 1.3
-    return rbox(w, l, g['bezel']['window_thickness'], 1.2, 0.4,
-                (-w / 2.0, -l / 2.0, -0.05))
 
 
 def bezel_matrix(C):
@@ -1204,131 +1205,6 @@ def render_part_sheet(cells, path, cols=4, cell=(360, 300)):
     return len(cells)
 
 
-def render_ergonomics(cases, path, width=1560, height=820):
-    from PIL import Image, ImageDraw, ImageFont
-    try:
-        f1 = ImageFont.load_default(size=16)
-        f2 = ImageFont.load_default(size=13)
-    except Exception:
-        f1 = f2 = None
-    img = Image.new('RGB', (width, height), (255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    n = len(cases)
-    panel = width // n
-    for i, C in enumerate(cases):
-        ox = i * panel
-        base = height * 0.74
-        s = (panel - 120.0) / max(C.l + 30.0, 120.0)
-        x0 = ox + 60.0
-        lt = C.lid_top()
-        # flat tray outline
-        draw.line([(x0, base), (x0, base - lt * s)], fill=(35, 35, 35), width=4)
-        draw.line([(x0, base - lt * s), (x0 + C.l * s, base - lt * s)], fill=(35, 35, 35), width=4)
-        draw.line([(x0, base), (x0 + C.l * s, base)], fill=(35, 35, 35), width=4)
-        draw.line([(x0 + C.l * s, base), (x0 + C.l * s, base - lt * s)], fill=(35, 35, 35), width=4)
-        # control deck
-        if C.dash and C.dash.get('plateau'):
-            q = C.dash['plateau']
-            h = q['height']
-            draw.line([(x0 + q['y'] * s, base - lt * s),
-                       (x0 + q['y'] * s, base - (lt + h) * s)], fill=(35, 35, 35), width=3)
-            draw.line([(x0 + q['y'] * s, base - (lt + h) * s),
-                       (x0 + (q['y'] + q['length']) * s, base - (lt + h) * s)],
-                      fill=(35, 35, 35), width=3)
-        if C.dash and C.dash.get('head'):
-            h = C.dash['head']
-            hb = C.head_base()
-            rise = h['length'] * math.tan(math.radians(C.dash['tilt_deg']))
-            draw.line([(x0 + h['y'] * s, base - hb * s),
-                       (x0 + (h['y'] + h['length']) * s, base - (hb + rise) * s)],
-                      fill=(35, 35, 35), width=3)
-            draw.line([(x0 + (h['y'] + h['length']) * s, base - hb * s),
-                       (x0 + (h['y'] + h['length']) * s, base - (hb + rise) * s)],
-                      fill=(35, 35, 35), width=3)
-            ym = h['y'] + h['length'] / 2.0
-            zm = C.surface_z(h['x'] + h['width'] / 2.0, ym)
-            nm = np.array([-math.sin(math.radians(C.dash['tilt_deg'])),
-                           math.cos(math.radians(C.dash['tilt_deg']))])
-            px, pz = x0 + ym * s, base - zm * s
-            draw.line([(px, pz), (px + nm[0] * 90, pz - nm[1] * 90)], fill=(210, 40, 40), width=3)
-            draw.text((px + nm[0] * 90 - 20, pz - nm[1] * 90 - 18), "display normal",
-                      fill=(210, 40, 40), font=f2)
-        # eye line
-        er = C.p.get('ergonomics', {})
-        eu = er.get('eye_above_pod_mm', 450.0)
-        eo = er.get('eye_outboard_mm', 400.0)
-        norm = math.hypot(eo, eu)
-        ux, uz = eo / norm, -eu / norm
-        px, pz = x0 + C.l * 0.55 * s, base - lt * s
-        eye = (px + ux * 120.0, pz + uz * 120.0)
-        draw.line([(px, pz), eye], fill=(30, 90, 200), width=2)
-        draw.ellipse([eye[0] - 6, eye[1] - 6, eye[0] + 6, eye[1] + 6],
-                     outline=(30, 90, 200), width=3)
-        draw.text((eye[0] + 10, eye[1] - 18), "assumed eye line", fill=(30, 90, 200), font=f2)
-        ang = math.degrees(math.atan2(eu, eo))
-        tilt = float(C.dash['tilt_deg']) if C.dash else 0.0
-        draw.text((ox + 20, 24), f"{C.style} ({C.p['role']})", fill=(20, 20, 20), font=f1)
-        draw.text((ox + 20, 46), f"footprint {C.w:.0f} x {C.l:.1f} mm | flat case "
-                                 f"{lt:.1f} mm | max height {getattr(C, 'max_h', lt):.1f} mm",
-                  fill=(70, 70, 70), font=f2)
-        draw.text((ox + 20, 64), f"display head tilt {tilt:.0f} deg | eye line {ang:.0f} deg "
-                                 f"above horizontal | offset {abs(ang - (90 - tilt)):.0f} deg",
-                  fill=(70, 70, 70), font=f2)
-        note = C.p.get('sight_line_note', '')
-        for k in range(0, len(note), 78):
-            draw.text((ox + 20, 86 + 16 * (k // 78)), note[k:k + 78], fill=(110, 110, 110), font=f2)
-    img.save(path)
-    return path
-
-
-def write_svg(C, path):
-    s, pad = 4.0, 16
-    W, Hh = int(C.w * s + 2 * pad), int(C.l * s + 2 * pad)
-    els = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{Hh}">',
-           f'<rect width="{W}" height="{Hh}" fill="#ffffff"/>',
-           f'<rect x="{pad}" y="{pad}" width="{C.w * s:.1f}" height="{C.l * s:.1f}" '
-           f'rx="{C.r_out * s:.1f}" fill="#edf2f7" stroke="#1a202c"/>']
-
-    def rect(x, y, w, l, fill, op=0.75, label=None, dash=None):
-        xs, ys = pad + x * s, pad + (C.l - y - l) * s
-        d = f' stroke-dasharray="{dash}"' if dash else ''
-        out = (f'<rect x="{xs:.1f}" y="{ys:.1f}" width="{w * s:.1f}" height="{l * s:.1f}" '
-               f'rx="2" fill="{fill}" fill-opacity="{op}" stroke="#1a202c"{d}/>')
-        if label:
-            out += (f'<text x="{xs + w * s / 2:.1f}" y="{ys + l * s / 2:.1f}" font-size="10" '
-                    f'text-anchor="middle" fill="#1a202c" font-family="monospace">{label}</text>')
-        return out
-
-    for c in C.p['components']:
-        nm = c['name']
-        fill = ('#38a169' if nm.startswith('switch_') else
-                '#d69e2e' if 'cell' in nm else
-                '#805ad5' if 'oled' in nm else
-                '#f6ad55' if 'keepout' in nm else '#2b6cb0')
-        dash = '5,3' if 'keepout' in nm else None
-        els.append(rect(float(c['x']), float(c['y']), float(c['width']), float(c['length']),
-                        fill, 0.4 if dash else 0.75, nm[:14], dash))
-    for (sx, sy) in C.p['fasteners']:
-        els.append(f'<circle cx="{pad + sx * s:.1f}" cy="{pad + (C.l - sy) * s:.1f}" '
-                   f'r="{3.3 * s:.1f}" fill="none" stroke="#1a202c"/>')
-    for b in C.buttons():
-        cx, cy = C.button_center(b)
-        els.append(f'<circle cx="{pad + cx * s:.1f}" cy="{pad + (C.l - cy) * s:.1f}" '
-                   f'r="9*s" fill="none" stroke="#e53e3e"/>')
-    if C.dash:
-        for key, color in (('plateau', '#e53e3e'), ('head', '#805ad5')):
-            q = C.dash.get(key)
-            if q:
-                els.append(rect(q['x'], q['y'], q['width'], q['length'], '#ffffff',
-                                1.0, key, '4,2'))
-    els.append(f'<text x="10" y="{Hh - 4}" font-size="11" font-family="monospace">'
-               f'{C.style} ({C.p["role"]}) {C.w:g} x {C.l:g} mm, flat lid '
-               f'{C.lid_top():.1f} mm</text>')
-    els.append('</svg>')
-    with open(path, 'w', encoding='utf-8') as fh:
-        fh.write('\n'.join(els))
-
-
 # ==========================================================================
 # one style: build, export, validate
 # ==========================================================================
@@ -1386,9 +1262,6 @@ def build_style(profiles, style, outdir, palette):
         bz = build_bezel_local(C)
         prints[C.name('display_bezel')] = (sit_on_bed(bz), xform(bz, bezel_matrix(C)))
         colors[C.name('display_bezel')] = palette['pink']
-        wn = build_window_local(C)
-        prints[C.name('window')] = (sit_on_bed(wn), xform(wn, bezel_matrix(C)))
-        colors[C.name('window')] = palette['pink']
 
     # ---- export ----------------------------------------------------------
     report = {
@@ -1397,7 +1270,7 @@ def build_style(profiles, style, outdir, palette):
         "flat_case_mm": round(C.lid_top(), 2),
         "dashboard_tilt_deg": float(C.dash['tilt_deg']) if C.dash else None,
         "parts": {}, "reserved_component_spaces": {}, "checks": {},
-        "ergonomics": {}, "mounts": [],
+        "control_deck": {}, "mounts": [],
     }
     failures, warnings = [], []
     max_z = C.lid_top()
@@ -1636,36 +1509,26 @@ def build_style(profiles, style, outdir, palette):
     if v > 40.0:
         failures.append(f"{style}: lid collides with body (~{v:.1f} mm3)")
 
-    # ---- ergonomics -------------------------------------------------------
+    # ---- control deck / protection ----------------------------------------
     bz = g['bezel']
     tilt = float(C.dash['tilt_deg']) if C.dash else 0.0
-    ergo = {
-        "layout": "flat tray + raised control deck, only the deck tilted",
-        "dashboard_tilt_deg": tilt if C.dash else None,
+    control_deck = {
+        "tilt_deg": tilt if C.dash else None,
         "flat_case_height_mm": round(C.lid_top(), 2),
         "max_height_mm": report['max_height_mm'],
-        "screen_recess_acrylic_mm": round(bz['height'] - (bz['window_thickness'] - bz['seat_depth']), 2) if p.get('oled') else None,
-        "screen_recess_glass_mm": round(float(g['oled']['seat_depth']) + bz['height'], 2) if p.get('oled') else None,
+        "screen_recess_mm": round(float(g['oled']['seat_depth']) + bz['height'], 2) if p.get('oled') else None,
         "bezel_height_mm": bz['height'] if p.get('oled') else None,
         "hood_height_mm": bz['hood_height'] if p.get('oled') else None,
-        "mount_back_flatness_mm": 0.0,
-        "button_surface_mm": {},
         "plunger_top_vs_surface_mm": {},
-        "assumed_eye_above_pod_mm": p.get('ergonomics', {}).get('eye_above_pod_mm'),
-        "assumed_eye_outboard_mm": p.get('ergonomics', {}).get('eye_outboard_mm'),
-        "sight_line_note": p.get('sight_line_note', ''),
-        "switch_menu_keys": p.get('menu_keys', {}),
-        "operating_hand": {b['id']: b.get('operating_hand', 'bare hand') for b in C.buttons()},
     }
     well_h = float(g['well']['depth'])
     for b in C.buttons():
         cx, cy = C.button_center(b)
         _h, _hd, hh = plunger_head_sizes(C, b)
-        ergo['button_surface_mm'][b['id']] = round(C.surface_z(cx, cy), 2)
-        ergo['plunger_top_vs_surface_mm'][b['id']] = round(-(well_h - hh), 2)
+        control_deck['plunger_top_vs_surface_mm'][b['id']] = round(-(well_h - hh), 2)
     if p.get('sidebar'):
-        ergo['plunger_top_vs_surface_mm'][p['sidebar']['id']] = -0.2
-    report['ergonomics'] = ergo
+        control_deck['plunger_top_vs_surface_mm'][p['sidebar']['id']] = -0.2
+    report['control_deck'] = control_deck
     for m in C.mounts():
         report['mounts'].append({"name": m['name'], "strap_width_mm": float(m['strap_width']),
                                  "layout": m.get('layout'), "loop_count": len(m['centers'])})
@@ -1686,7 +1549,6 @@ def build_style(profiles, style, outdir, palette):
         items.append((prints[C.name(f"plunger_{p['sidebar']['id']}")][1], hex_rgb(palette['pink'])))
     if p.get('bezel'):
         items.append((xform(build_bezel_local(C), bezel_matrix(C)), hex_rgb(palette['pink'])))
-        items.append((xform(build_window_local(C), bezel_matrix(C)), (0.72, 0.86, 0.92)))
     return C, report, prints, colors, items
 
 
@@ -1703,11 +1565,20 @@ def main(argv=None):
     with open(PROFILES_PATH, 'r', encoding='utf-8') as fh:
         profiles = json.load(fh)
     os.makedirs(EXPORTS_DIR, exist_ok=True)
+    os.makedirs(PREVIEW_DIR, exist_ok=True)
     if not args.only:
-        for stale in glob.glob(os.path.join(EXPORTS_DIR, '*.stl')) + \
-                     glob.glob(os.path.join(EXPORTS_DIR, '*.3mf')):
+        stale = (glob.glob(os.path.join(EXPORTS_DIR, '*.stl')) +
+                 glob.glob(os.path.join(EXPORTS_DIR, '*.3mf')) +
+                 glob.glob(os.path.join(EXPORTS_DIR, '*.svg')))
+        for path in stale:
             try:
-                os.remove(stale)
+                os.remove(path)
+            except OSError:
+                pass
+        legacy = os.path.join(EXPORTS_DIR, "dimensions.json")
+        if os.path.exists(legacy):
+            try:
+                os.remove(legacy)
             except OSError:
                 pass
     styles = [args.only] if args.only else ['receiver', 'wrist', 'keypad']
@@ -1715,18 +1586,17 @@ def main(argv=None):
 
     t0 = time.time()
     dims = {"revision": profiles['revision'], "units": "mm",
-            "generator": "cad/unbranded/generate_cases.py",
+            "generator": "dev/cad/generate_cases.py",
             "engine": ENGINE, "trimesh_version": trimesh.__version__,
             "hardware_measured": False,
             "parts": {}, "styles": {}, "fit_coupon": {}, "previews": {}, "validation": {}}
-    failures, sheet, ergo_cases, scene_units = [], [], [], []
+    failures, sheet, scene_units = [], [], []
 
     for style in styles:
         C, report, prints, colors, items = build_style(profiles, style, EXPORTS_DIR, palette)
         dims['styles'][style] = report
         for stem, rep in report['parts'].items():
             dims['parts'][stem] = rep
-        write_svg(C, os.path.join(EXPORTS_DIR, f"{style}_plan.svg"))
         for stem, (pm, _asm) in prints.items():
             prepare_export(pm).export(os.path.join(EXPORTS_DIR, stem + "_color.stl"),
                                       file_type='stl')
@@ -1740,7 +1610,6 @@ def main(argv=None):
             cap = f"{inches(pm.extents[0])} x {inches(pm.extents[1])} x {inches(pm.extents[2])} in"
             sheet.append((stem, pm, colors[stem], cap))
         C.max_h = report['max_height_mm']
-        ergo_cases.append(C)
         scene_units.append((C, items, prints))
         fl = report['checks']['failures']
         failures.extend(fl)
@@ -1797,8 +1666,8 @@ def main(argv=None):
                 m.apply_translation((off, 0.0, 0.0))
                 scene.append((m, col))
             off += C.w + gap
-        render_mesh_array(scene, 1560, 700, ss=2).save(os.path.join(HERE, "preview.png"))
-        render_part_sheet(sheet, os.path.join(HERE, "parts-preview.png"), cols=4)
+        render_mesh_array(scene, 1560, 700, ss=2).save(os.path.join(PREVIEW_DIR, "preview.png"))
+        render_part_sheet(sheet, os.path.join(PREVIEW_DIR, "parts-preview.png"), cols=4)
         mount_cells = []
         for C, _items, prints_ in scene_units:
             for m in C.mounts():
@@ -1807,19 +1676,17 @@ def main(argv=None):
                 mount_cells.append((stem, pm, palette['cyan'],
                                     f"{inches(pm.extents[0])} x {inches(pm.extents[1])} x "
                                     f"{inches(pm.extents[2])} in, {m['strap_width']:g} mm strap"))
-        render_part_sheet(mount_cells, os.path.join(HERE, "mounts-preview.png"), cols=3)
-        render_ergonomics(ergo_cases, os.path.join(HERE, "ergonomics-preview.png"))
+        render_part_sheet(mount_cells, os.path.join(PREVIEW_DIR, "mounts-preview.png"), cols=3)
         dims['previews'] = {
             "method": "built-in software z-buffer renderer (numpy) + Pillow labels; "
                       "trimesh scene.save_image needs pyglet, which is not installed",
-            "files": ["preview.png", "parts-preview.png", "mounts-preview.png",
-                      "ergonomics-preview.png"],
+            "files": ["preview.png", "parts-preview.png", "mounts-preview.png"],
             "render_seconds": round(time.time() - tp, 2)}
         print(f"[preview] sheets written in {time.time() - tp:.1f}s")
 
-    with open(os.path.join(EXPORTS_DIR, "dimensions.json"), 'w', encoding='utf-8') as fh:
+    with open(DIMS_PATH, 'w', encoding='utf-8') as fh:
         json.dump(dims, fh, indent=2)
-    print(f"wrote dimensions.json in {time.time() - t0:.1f}s")
+    print(f"wrote dev/cad/dimensions.json in {time.time() - t0:.1f}s")
     if failures:
         print("FAILURES:")
         for f in failures:

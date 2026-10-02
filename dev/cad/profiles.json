@@ -146,12 +146,9 @@
   "bezel": {
     "frame": 1.75,
     "height": 1.6,
-    "seat_depth": 0.8,
-    "window_thickness": 1.5,
-    "screen_recess": 1.5,
     "hood": 2.0,
     "hood_height": 0.4,
-    "note": "Pink bezel around the window on the sloped head; the optional acrylic window drops into a 0.8 mm recess and finishes below the bezel top. A small hood bar crosses the high edge of the head."
+    "note": "Pink bezel around the OLED window on the sloped head, no window insert: the opening hugs the lid window with a 0.3 mm reveal. A small hood bar crosses the high edge of the head."
   },
   "carrier": {
     "plate": 1.6,
@@ -293,11 +290,6 @@
         ]
       }
     ],
-    "ergonomics": {
-      "eye_above_pod_mm": 450.0,
-      "eye_outboard_mm": 350.0
-    },
-    "sight_line_note": "Lowest-profile belt pod, flat lid, no display. One recessed recall button in a 13.6 mm well at the hand end; the cell and board fill the rest.",
     "menu_keys": {
       "recall": "throw / recall (D1)"
     },
@@ -462,11 +454,6 @@
         ]
       }
     ],
-    "ergonomics": {
-      "eye_above_pod_mm": 350.0,
-      "eye_outboard_mm": 400.0
-    },
-    "sight_line_note": "Wrist or belt pod. The sloped display head holds the OLED at the hand end; the recall button sits on a low flat pad beside the head so it stays reachable at glove speed without raising the height.",
     "menu_keys": {
       "recall": "recall / volume (D1)"
     },
@@ -654,11 +641,6 @@
         ]
       }
     ],
-    "ergonomics": {
-      "eye_above_pod_mm": 500.0,
-      "eye_outboard_mm": 450.0
-    },
-    "sight_line_note": "Leg-guard pod on the outer throwing-side knee, long axis along the shin, 48 mm across the shin. Calls run in a 14 mm column along the length, Back at the bare-hand end, OLED on the sloped head beyond them.",
     "menu_keys": {
       "call_1": "call 1 (D0)",
       "call_2": "call 2 (D1)",
