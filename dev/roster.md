@@ -20,7 +20,7 @@ Internal spec for enrolling any number of positions and giving any unit optional
 
 Rules:
 
-- Standard keys available to enroll: `pitcher`, `catcher`, `first`, `second`, `third`, `shortstop`, `left`, `center`, `right`. Custom keys are allowed; `label` is the GUI name and `short` is at most 4 characters for the catcher menu and status lines.
+- Standard keys available to enroll: `pitcher`, `catcher`, `first`, `second`, `third`, `shortstop`, `left`, `center`, `right`. Custom keys are allowed and are added by hand to `config/roster.json` (`tools/roster.py` toggles the units already listed); `label` is the GUI name and `short` is at most 4 characters for the catcher menu and status lines.
 - `enrolled` marks the units the team actually has. Only enrolled units appear in the desk, the generated catalog, and the audio plan.
 - Capabilities: `audio` (earbud), `display` (OLED), `controls` (catcher-style menu), `pitches` (receives pitch calls). Plays are not a capability: each play resolves its own targets.
 - The committed default enrolls only the four current field units, so today's bench builds and tests behave exactly as before. Enrolling more is a config edit plus one EUI, not firmware surgery.

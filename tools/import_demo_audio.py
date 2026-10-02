@@ -152,7 +152,8 @@ def import_audio(root=ROOT, ffmpeg='ffmpeg', check_only=False, force=False, quie
         for source in missing:
             print(f'missing source: {root / SOURCE_DIR / source}', file=sys.stderr)
         raise ValueError(f'{len(missing)} of {len(pairs)} source recordings are missing '
-                         f'under {SOURCE_DIR}')
+                         f'under {SOURCE_DIR}. The text-to-speech fallback generates the same '
+                         'clip set: powershell tools/generate_audio.ps1')
     stale = stale_files(root, pairs)
     if check_only:
         print(f'All {len(pairs)} source recordings are present under {SOURCE_DIR}; nothing converted')

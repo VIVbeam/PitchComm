@@ -249,7 +249,8 @@ def command_enable(args):
     print(f'  python tools/provision.py --coach <EUI-64> --unit {unit["key"]}=<EUI-64>')
     print(f'  tools\\build_firmware.ps1 -Units {unit["key"]}')
     if audio_grew:
-        print('  python tools/import_demo_audio.py')
+        print('  python tools/import_demo_audio.py   # from College Demo Tracks/, or')
+        print('  powershell tools/generate_audio.ps1  # text-to-speech fallback')
         print('  python tools/build_audio_fs.py')
 
 

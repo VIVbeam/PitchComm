@@ -59,7 +59,7 @@ Run `selftest` on the console after the first flash. It reports each installed p
 
 1. Connect the coach board over USB.
 2. Start the coach desk: `powershell -NoProfile -ExecutionPolicy Bypass -File tools\start_coach_gui.ps1`.
-3. In the browser, click **Connect coach radio**, choose the coach port, pick a pitch and location, then **Send pitch**. Use **Defensive play** for shortstop / center field.
+3. In the browser, click **Connect coach radio**, choose the coach port, pick a pitch and location, then **Send pitch**. Use **Play call** for the defensive and pitching calls; the desk shows who receives each one.
 4. Save a session report with **Save session report** before reloading.
 
 ### Catcher
