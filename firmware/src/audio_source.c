@@ -49,6 +49,7 @@
 
 #include <app/audio_source.h>
 #include <app/storage.h>
+#include <pc/resampler.h>
 
 #if !defined(CONFIG_LIBLC3)
 #error "PitchComm audio source requires CONFIG_LIBLC3 (roles/audio-unit.conf)"
@@ -89,13 +90,11 @@ LOG_MODULE_REGISTER(pc_audio, LOG_LEVEL_INF);
 #define PC_SEND_RETRIES            32
 
 #define PC_MAX_FRAME_SAMPLES       480U    /* 48 kHz, 10 ms */
-#define PC_SRC_CHUNK_FRAMES        512U    /* per-open clip read chunk */
 #define PC_MAX_SLEEP_US            20000
 
-#define PC_VOLUME_MIN              1U
-#define PC_VOLUME_MAX              20U
+#define PC_VOLUME_MIN              PC_RESAMPLER_VOLUME_MIN
+#define PC_VOLUME_MAX              PC_RESAMPLER_VOLUME_MAX
 #define PC_VOLUME_DEFAULT          20U
-#define PC_HEADROOM_PERMILLE       950     /* 95 %, guard against clipping */
 
 /* VERIFY: stream context.  The runbook's sample uses UNSPECIFIED and the
  * 16_2_1 preset is mandatory, so that is the default.  If the JY300 rejects
@@ -306,39 +305,9 @@ static bool pc_stream_ok(void)
 	       unicast_group != NULL;
 }
 
-/* 1..20 maps linearly to 5 %..100 %; the headroom guard trims another 5 %.
- * Returned as a Q10 multiplier so the per-sample path has no division.
- */
-static int32_t pc_gain_q10(uint8_t volume)
-{
-	int32_t gain_milli;
-
-	if (volume < PC_VOLUME_MIN) {
-		volume = PC_VOLUME_MIN;
-	} else if (volume > PC_VOLUME_MAX) {
-		volume = PC_VOLUME_MAX;
-	}
-
-	gain_milli = 50 + ((int32_t)volume - 1) * 50;
-
-	return (int32_t)(((int64_t)gain_milli * PC_HEADROOM_PERMILLE * 1024) / 1000000);
-}
-
-static int16_t pc_apply_gain(int32_t sample, int32_t gain_q10)
-{
-	int32_t v = (sample * gain_q10) >> 10;
-
-	if (v > INT16_MAX) {
-		v = INT16_MAX;
-	} else if (v < INT16_MIN) {
-		v = INT16_MIN;
-	}
-
-	return (int16_t)v;
-}
-
-/* The linear-interpolation resampler is streaming: see pc_clip_stream_next()
- * in the playback section.  Nothing here allocates or buffers a whole clip.
+/* The linear-interpolation resampler, its volume gain, and the per-frame
+ * assembly are in <pc/resampler.h>; the playback path streams clip chunks
+ * through pc_clip_stream_next() without buffering a whole clip.
  */
 
 /* ------------------------------------------------------------------------- */
@@ -1151,14 +1120,12 @@ static void pc_sleep_until(int64_t *next_us)
 
 /* --- streaming clip resampler --------------------------------------------- */
 
+/* The clip stream owns the storage handle; the interpolation state and math
+ * live in struct pc_resampler (<pc/resampler.h>).
+ */
 struct pc_clip_stream {
 	void *handle;
-	uint32_t rate;        /* native source rate */
-	uint64_t pos_q16;     /* absolute source position, Q16 */
-	uint64_t base;        /* absolute index of buf[0] */
-	size_t len;           /* valid frames in buf */
-	bool eof;
-	int16_t buf[PC_SRC_CHUNK_FRAMES];
+	struct pc_resampler rs;
 };
 
 enum pc_call_phase {
@@ -1182,91 +1149,12 @@ struct pc_call_state {
 /* One call at a time; audio thread only. */
 static struct pc_call_state pc_call;
 
-/* Refill the source window so absolute index `need` becomes available. */
-static int pc_clip_stream_fill(struct pc_clip_stream *st, uint64_t need)
-{
-	size_t keep = 0U;
-	int n;
-
-	if (need > st->base) {
-		const uint64_t k = need - st->base;
-
-		keep = (k > st->len) ? st->len : (size_t)k;
-	}
-
-	if (keep > 0U) {
-		memmove(st->buf, st->buf + keep, (st->len - keep) * sizeof(st->buf[0]));
-		st->base += keep;
-		st->len -= keep;
-	}
-
-	if (st->len >= ARRAY_SIZE(st->buf)) {
-		return 0;
-	}
-
-	n = pc_clip_read(st->handle, st->buf + st->len, ARRAY_SIZE(st->buf) - st->len);
-	if (n < 0) {
-		return n;
-	}
-	if (n == 0) {
-		st->eof = true;
-		return 0;
-	}
-
-	st->len += (size_t)n;
-	return 0;
-}
-
 /* Produce one resampled, volume-adjusted output sample.
  * Returns 1 on success, 0 at the end of the clip, negative errno on error.
  */
 static int pc_clip_stream_next(struct pc_clip_stream *st, int16_t *out, int32_t gain_q10)
 {
-	uint32_t step;
-
-	if (st->rate == 0U || pc_sample_rate == 0U) {
-		return -EINVAL;
-	}
-
-	step = (uint32_t)(((uint64_t)st->rate << 16) / pc_sample_rate);
-	if (step == 0U) {
-		return -EINVAL;
-	}
-
-	for (;;) {
-		const uint64_t idx = st->pos_q16 >> 16;
-		size_t i;
-
-		while (!st->eof && st->base + st->len <= idx + 1U) {
-			const int err = pc_clip_stream_fill(st, idx);
-
-			if (err < 0) {
-				return err;
-			}
-		}
-
-		if (idx < st->base) {
-			return -EIO;
-		}
-
-		i = (size_t)(idx - st->base);
-		if (i >= st->len) {
-			return 0;   /* all source samples consumed */
-		}
-
-		{
-			const int32_t s0 = st->buf[i];
-			const int32_t s1 = (i + 1U < st->len) ? st->buf[i + 1U] : s0;
-			const uint32_t frac = (uint32_t)(st->pos_q16 & 0xFFFFU);
-			const int32_t v =
-				s0 + (int32_t)(((int64_t)(s1 - s0) * (int32_t)frac) >> 16);
-
-			*out = pc_apply_gain(v, gain_q10);
-		}
-
-		st->pos_q16 += step;
-		return 1;
-	}
+	return pc_resampler_next(&st->rs, pc_clip_read, st->handle, gain_q10, out);
 }
 
 static void pc_call_close(struct pc_call_state *cs)
@@ -1278,7 +1166,8 @@ static void pc_call_close(struct pc_call_state *cs)
 
 static void pc_call_reset(struct pc_call_state *cs, const struct pc_call_req *req)
 {
-	memset(&cs->stream, 0, sizeof(cs->stream));
+	cs->stream.handle = NULL;
+	pc_resampler_init(&cs->stream.rs, 0U, pc_sample_rate);
 
 	for (int i = 0; i < PC_CLIP_SLOTS; i++) {
 		cs->paths[i] = req->clips[i];
@@ -1289,7 +1178,7 @@ static void pc_call_reset(struct pc_call_state *cs, const struct pc_call_req *re
 	cs->phase = PC_CALL_OPEN;
 	cs->gap_frames = 0U;
 	cs->gap_total = (pc_sample_rate / 1000U) * PC_GAP_MS;
-	cs->gain_q10 = pc_gain_q10((uint8_t)atomic_get(&pc_volume));
+	cs->gain_q10 = pc_resampler_gain_q10((uint8_t)atomic_get(&pc_volume));
 }
 
 /* Open the next non-empty path.  Returns true when a clip is streaming. */
@@ -1313,7 +1202,8 @@ static bool pc_call_open_next(struct pc_call_state *cs)
 		}
 
 		cs->stream.handle = handle;
-		cs->stream.rate = pc_clip_rate(handle);
+		/* Reset the stream so this clip starts at its own sample 0. */
+		pc_resampler_init(&cs->stream.rs, pc_clip_rate(handle), pc_sample_rate);
 		return true;
 	}
 
@@ -1370,21 +1260,17 @@ static int pc_call_pull_sample(struct pc_call_state *cs, int16_t *out)
 	}
 }
 
+static int pc_call_pull_cb(void *ctx, int16_t *out)
+{
+	return pc_call_pull_sample((struct pc_call_state *)ctx, out);
+}
+
 /* Fill exactly one LC3 frame; the tail is zero-padded when the call ends.
  * Returns false once the call is over (the frame then holds silence).
  */
 static bool pc_call_fill_frame(struct pc_call_state *cs, int16_t *dst, uint32_t frames)
 {
-	for (uint32_t i = 0; i < frames; i++) {
-		int16_t sample = 0;
-
-		if (cs->phase != PC_CALL_DONE) {
-			(void)pc_call_pull_sample(cs, &sample);
-		}
-		dst[i] = sample;
-	}
-
-	return cs->phase != PC_CALL_DONE;
+	return pc_resampler_fill_frame(pc_call_pull_cb, cs, dst, frames);
 }
 
 static void pc_play_call(const struct pc_call_req *req, int64_t *next_us)

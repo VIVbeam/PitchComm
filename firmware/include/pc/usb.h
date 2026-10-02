@@ -14,7 +14,7 @@ class UsbGate {
   template<class SubmitCall>
   UsbResult execute(const UsbCall& call,uint64_t boot,uint32_t dictionary,uint32_t now,SubmitCall submit) {
     // The catcher calls from its keypad. USB calling belongs only to coach.
-    if (role_!=Role::Coach || !client_ || call.client!=client_) return {};
+    if (role_!=kCoach || !client_ || call.client!=client_) return {};
     // Retries of the last command return its original result, including busy/expired.
     // They never become a new pitch after the coordinator becomes idle.
     if (call.id==last_.id && call.id) {

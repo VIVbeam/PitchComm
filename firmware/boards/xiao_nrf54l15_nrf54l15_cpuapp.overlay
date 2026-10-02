@@ -44,8 +44,9 @@
 		segment-remap;
 		com-invdir;
 		com-sequential;
-		/* VERIFY: the upstream solomon,ssd1306-common.yaml marks these
-		 * four properties as required; the values are the documented
+		/* VERIFY: the upstream solomon,ssd1306-common.yaml marks
+		 * segment-offset, page-offset, display-offset, multiplex-ratio
+		 * and prechargep as required; the values are the documented
 		 * 128x32 SSD1306 defaults. */
 		segment-offset = <0>;
 		page-offset = <0>;

@@ -1,0 +1,43 @@
+/*
+ * PitchComm no-MCUboot fallback partition layout (target
+ * xiao_nrf54l15/nrf54l15/cpuapp).
+ *
+ * Use only with a sysbuild that disables MCUboot:
+ *   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/<role>-nb -- \
+ *     -DSB_CONFIG_BOOTLOADER_MCUBOOT=n \
+ *     -DEXTRA_DTC_OVERLAY_FILE=boards/no_bootloader.overlay \
+ *     -DEXTRA_CONF_FILE="<role fragments>;boards/no_bootloader.conf"
+ *
+ * Layout (nRF54L15 RRAM is 1524 KB total):
+ *   slot0_partition    0x000000   776 KB   application (was mcuboot 62 KB + slot0 712 KB)
+ *   slot1_partition    0x0C2000   712 KB   LittleFS audio clips
+ *   storage_partition  0x174000    36 KB   settings + Bluetooth bonds
+ *
+ * slot1_partition and storage_partition keep their stock MCUboot offsets
+ * (see dts/vendor/nordic/nrf54l15_cpuapp_partition.dtsi in NCS v3.4.0), so a
+ * previously written audio image and saved bonds stay where the firmware
+ * expects them.
+ *
+ * VERIFY(no-bootloader): untested, nothing here has seen a compiler. Confirm:
+ *   - the overlay merges (old boot_partition and slot0_partition deleted, the
+ *     new slot0 at 0x0 does not overlap slot1 or storage);
+ *   - the image links at 0x0 with a 794624-byte limit; CONFIG_USE_DT_CODE_PARTITION=y
+ *     in boards/no_bootloader.conf makes the linker use this partition
+ *     (CONFIG_FLASH_USES_MAPPED_PARTITION; the cortex_m linker.ld takes
+ *     ROM address/size from the chosen partition);
+ *   - the map shows no section past 0x0C2000;
+ *   - LittleFS still mounts slot1 and settings still mounts storage.
+ */
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+
+&cpuapp_rram {
+	partitions {
+		slot0_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0x0 DT_SIZE_K(776)>;
+		};
+	};
+};

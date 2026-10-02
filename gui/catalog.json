@@ -1,116 +1,435 @@
 {
-  "dictionary": "7d8e943c",
+  "dictionary": "299314f6",
+  "schema": 3,
+  "units": [
+    {
+      "key": "pitcher",
+      "label": "Pitcher",
+      "short": "P",
+      "audio": true,
+      "display": false,
+      "controls": false,
+      "pitches": true
+    },
+    {
+      "key": "catcher",
+      "label": "Catcher",
+      "short": "C",
+      "audio": false,
+      "display": true,
+      "controls": true,
+      "pitches": true
+    },
+    {
+      "key": "shortstop",
+      "label": "Shortstop",
+      "short": "SS",
+      "audio": false,
+      "display": true,
+      "controls": false,
+      "pitches": false
+    },
+    {
+      "key": "center",
+      "label": "Center field",
+      "short": "CF",
+      "audio": false,
+      "display": true,
+      "controls": false,
+      "pitches": false
+    }
+  ],
   "pitches": [
     {
       "key": 1,
-      "label": "FASTBALL",
-      "speech": "Fastball"
+      "label": "FOUR-SEAM",
+      "short": "4S",
+      "speech": "Four-Seam Fastball"
     },
     {
       "key": 2,
-      "label": "CHANGEUP",
-      "speech": "Changeup"
-    },
-    {
-      "key": 3,
       "label": "CURVEBALL",
+      "short": "CB",
       "speech": "Curveball"
     },
     {
-      "key": 4,
+      "key": 3,
       "label": "SLIDER",
+      "short": "SL",
       "speech": "Slider"
+    },
+    {
+      "key": 4,
+      "label": "CHANGEUP",
+      "short": "CH",
+      "speech": "Changeup"
     },
     {
       "key": 5,
       "label": "SINKER",
+      "short": "SI",
       "speech": "Sinker"
     },
     {
       "key": 6,
-      "label": "CUTTER",
-      "speech": "Cutter"
+      "label": "TWO-SEAM",
+      "short": "2S",
+      "speech": "Two-Seam Fastball"
     },
     {
       "key": 7,
-      "label": "SPLITTER",
-      "speech": "Splitter"
+      "label": "CUTTER",
+      "short": "CT",
+      "speech": "Cutter"
     },
     {
       "key": 8,
-      "label": "KNUCKLE",
-      "speech": "Knuckleball"
+      "label": "SWEEPER",
+      "short": "SW",
+      "speech": "Sweeper"
     },
     {
       "key": 9,
-      "label": "PITCH OUT",
-      "speech": "Pitch out"
+      "label": "SPLITTER",
+      "short": "SP",
+      "speech": "Splitter"
+    }
+  ],
+  "rows": [
+    {
+      "key": 1,
+      "label": "HIGH",
+      "short": "HI",
+      "speech": "High"
+    },
+    {
+      "key": 2,
+      "label": "MIDDLE",
+      "short": "MID",
+      "speech": "Middle"
+    },
+    {
+      "key": 3,
+      "label": "LOW",
+      "short": "LO",
+      "speech": "Low"
+    }
+  ],
+  "cols": [
+    {
+      "key": 1,
+      "label": "INSIDE",
+      "short": "IN",
+      "speech": "Inside"
+    },
+    {
+      "key": 2,
+      "label": "MIDDLE",
+      "short": "MID",
+      "speech": "Middle"
+    },
+    {
+      "key": 3,
+      "label": "OUTSIDE",
+      "short": "OUT",
+      "speech": "Outside"
+    }
+  ],
+  "locations": [
+    {
+      "row": 1,
+      "col": 1,
+      "speech": "High Inside"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "speech": "High Middle"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "speech": "High Outside"
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "speech": "Middle Inside"
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "speech": "Middle Center"
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "speech": "Middle Outside"
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "speech": "Low Inside"
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "speech": "Low Middle"
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "speech": "Low Outside"
     }
   ],
   "plays": [
     {
       "key": 1,
-      "label": "NORMAL",
-      "shortstop": "NORMAL",
-      "centerfield": "NORMAL"
+      "label": "PICKOFF",
+      "shortstop": "PICKOFF",
+      "centerfield": "PICKOFF",
+      "speech": "Pickoff",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
     },
     {
       "key": 2,
-      "label": "DOUBLE PLAY",
-      "shortstop": "DP DEPTH",
-      "centerfield": "NORMAL"
+      "label": "STEP OFF",
+      "shortstop": "STEP OFF",
+      "centerfield": "STEP OFF",
+      "speech": "Hold and Step Off",
+      "audience": [
+        "pitcher",
+        "catcher"
+      ]
     },
     {
       "key": 3,
-      "label": "INFIELD IN",
-      "shortstop": "INFIELD IN",
-      "centerfield": "NORMAL"
+      "label": "INSIDE MOVE",
+      "shortstop": "INSIDE MOVE",
+      "centerfield": "INSIDE MOVE",
+      "speech": "Inside Move",
+      "audience": [
+        "pitcher",
+        "catcher"
+      ]
     },
     {
       "key": 4,
-      "label": "PLAY DEEP",
-      "shortstop": "NORMAL",
-      "centerfield": "PLAY DEEP"
+      "label": "PICK 1ST",
+      "shortstop": "PICK 1ST",
+      "centerfield": "PICK 1ST",
+      "speech": "Pick to First",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
     },
     {
       "key": 5,
-      "label": "PLAY SHALLOW",
-      "shortstop": "NORMAL",
-      "centerfield": "SHALLOW"
+      "label": "PICK 2ND",
+      "shortstop": "PICK 2ND",
+      "centerfield": "PICK 2ND",
+      "speech": "Pick to Second",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
     },
     {
       "key": 6,
-      "label": "SHADE LEFT",
-      "shortstop": "SHADE LEFT",
-      "centerfield": "SHADE LEFT"
+      "label": "PICK 3RD",
+      "shortstop": "PICK 3RD",
+      "centerfield": "PICK 3RD",
+      "speech": "Pick to Third",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
     },
     {
       "key": 7,
-      "label": "SHADE RIGHT",
-      "shortstop": "SHADE RIGHT",
-      "centerfield": "SHADE RIGHT"
+      "label": "BACKPICK",
+      "shortstop": "BACKPICK",
+      "centerfield": "BACKPICK",
+      "speech": "Backpick",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
     },
     {
       "key": 8,
-      "label": "NO DOUBLES",
-      "shortstop": "NORMAL",
-      "centerfield": "NO DOUBLES"
+      "label": "HOLD",
+      "shortstop": "HOLD",
+      "centerfield": "HOLD",
+      "speech": "Infield Hold",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
     },
     {
       "key": 9,
-      "label": "BUNT DEFENSE",
-      "shortstop": "BUNT COVER",
-      "centerfield": "NORMAL"
+      "label": "HOLD & PICK",
+      "shortstop": "HOLD & PICK",
+      "centerfield": "HOLD & PICK",
+      "speech": "Hold and Pick",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
+    },
+    {
+      "key": 10,
+      "label": "HOLD PITCH",
+      "shortstop": "HOLD PITCH",
+      "centerfield": "HOLD PITCH",
+      "speech": "Hold and Pitch",
+      "audience": [
+        "pitcher",
+        "catcher"
+      ]
+    },
+    {
+      "key": 11,
+      "label": "DROP GLOVE",
+      "shortstop": "DROP GLOVE",
+      "centerfield": "DROP GLOVE",
+      "speech": "Drop Glove Pick Second",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
+    },
+    {
+      "key": 12,
+      "label": "QUICK PICK",
+      "shortstop": "QUICK PICK",
+      "centerfield": "QUICK PICK",
+      "speech": "Quick Pick",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop"
+      ]
+    },
+    {
+      "key": 13,
+      "label": "BUNT DEF",
+      "shortstop": "BUNT DEF",
+      "centerfield": "BUNT DEF",
+      "speech": "Regular Bunt Defense",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop",
+        "center"
+      ]
+    },
+    {
+      "key": 14,
+      "label": "BUNT 2",
+      "shortstop": "BUNT 2",
+      "centerfield": "BUNT 2",
+      "speech": "Bunt Play 2",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop",
+        "center"
+      ]
+    },
+    {
+      "key": 15,
+      "label": "BUNT 3",
+      "shortstop": "BUNT 3",
+      "centerfield": "BUNT 3",
+      "speech": "Bunt Play 3",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop",
+        "center"
+      ]
+    },
+    {
+      "key": 16,
+      "label": "BUNT ONE",
+      "shortstop": "BUNT ONE",
+      "centerfield": "BUNT ONE",
+      "speech": "Bunt One",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop",
+        "center"
+      ]
+    },
+    {
+      "key": 17,
+      "label": "WHEEL",
+      "shortstop": "WHEEL",
+      "centerfield": "WHEEL",
+      "speech": "Wheel Play",
+      "audience": [
+        "pitcher",
+        "catcher",
+        "shortstop",
+        "center"
+      ]
+    },
+    {
+      "key": 18,
+      "label": "SEE DOWN",
+      "shortstop": "SEE DOWN",
+      "centerfield": "SEE DOWN",
+      "speech": "See Down",
+      "audience": [
+        "center"
+      ]
+    },
+    {
+      "key": 19,
+      "label": "SEE UP",
+      "shortstop": "SEE UP",
+      "centerfield": "SEE UP",
+      "speech": "See Up",
+      "audience": [
+        "center"
+      ]
+    },
+    {
+      "key": 20,
+      "label": "AROUND",
+      "shortstop": "AROUND",
+      "centerfield": "AROUND",
+      "speech": "Pitch Around",
+      "audience": [
+        "pitcher",
+        "catcher"
+      ]
+    },
+    {
+      "key": 21,
+      "label": "IGNORE RUN",
+      "shortstop": "IGNORE RUN",
+      "centerfield": "IGNORE RUN",
+      "speech": "Ignore Runner",
+      "audience": [
+        "pitcher",
+        "catcher"
+      ]
     }
-  ],
-  "heights": [
-    "UP",
-    "MIDDLE",
-    "DOWN"
-  ],
-  "sides": [
-    "INSIDE",
-    "MIDDLE",
-    "AWAY"
   ]
 }

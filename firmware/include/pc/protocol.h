@@ -3,30 +3,27 @@
 #include <cstdint>
 
 namespace pc {
-enum class Role : uint8_t { Coach, Catcher, Pitcher, Shortstop, Centerfield };
+// A unit index on the wire: 0 is the coach, 1..kUnitCount-1 are the enrolled
+// field units generated from config/roster.json. units.h adds the named unit
+// constants and the capability helpers over the generated catalog.
+using Role = uint8_t;
 enum class Kind : uint8_t { Hello=1, Sync, Ready, Ping, Pong, Resync, Request, Response, Call, Ack };
 enum class Category : uint8_t { Pitch=1, Play=2 };
 enum class Status : uint8_t { Ok, Busy, Invalid, Incompatible, OutputError, Expired };
-constexpr unsigned kRoles = 5;
+// The wire holds one nibble per unit field; the engine rejects indices at or
+// above the generated kUnitCount while a stale catalog can still be parsed.
+constexpr unsigned kMaxUnits = 16;
 constexpr size_t kPacketBytes = 56;
 constexpr uint8_t kProtocolVersion = 1;
 constexpr uint32_t kCallWindow = 1000;
 constexpr uint32_t kLinkTimeout = 3500;
 constexpr uint32_t kOldCall = 15000;
-constexpr uint8_t roleMask(Role r) { return uint8_t(1u << uint8_t(r)); }
-constexpr bool validRole(Role r) { return uint8_t(r) < kRoles; }
-constexpr bool audioRole(Role r) { return r == Role::Catcher || r == Role::Pitcher; }
-constexpr bool displayRole(Role r) { return !audioRole(r); }
 constexpr uint32_t elapsed(uint32_t now, uint32_t then) { return now - then; }
 constexpr bool newer(uint32_t a, uint32_t b) { return a != b && uint32_t(a-b) < 0x80000000u; }
-inline const char* roleName(Role r) {
-  static const char* names[] = {"COACH", "CATCHER", "PITCHER", "SHORTSTOP", "CENTER FIELD"};
-  return validRole(r) ? names[uint8_t(r)] : "UNKNOWN";
-}
 
 struct Packet {
   Kind kind = Kind::Hello;
-  Role source = Role::Coach, target = Role::Coach;
+  Role source = Role(0), target = Role(0);
   Category category = Category::Pitch;
   Status status = Status::Ok;
   uint32_t dictionary = 0;
@@ -52,7 +49,7 @@ inline void encode(const Packet& p, uint8_t* b) {
 }
 inline bool decode(const uint8_t* b, size_t n, Packet& p) {
   if (n != kPacketBytes || b[0]!='P' || b[1]!='C' || b[2]!=kProtocolVersion ||
-      b[3]<uint8_t(Kind::Hello) || b[3]>uint8_t(Kind::Ack) || b[4]>=kRoles || b[5]>=kRoles ||
+      b[3]<uint8_t(Kind::Hello) || b[3]>uint8_t(Kind::Ack) || b[4]>=kMaxUnits || b[5]>=kMaxUnits ||
       b[6]<1 || b[6]>2 || b[7]>uint8_t(Status::Expired)) return false;
   p.kind=Kind(b[3]); p.source=Role(b[4]); p.target=Role(b[5]);
   p.category=Category(b[6]); p.status=Status(b[7]); p.dictionary=uint32_t(get(b+8,4));
@@ -62,4 +59,3 @@ inline bool decode(const uint8_t* b, size_t n, Packet& p) {
   return true;
 }
 } // namespace pc
-

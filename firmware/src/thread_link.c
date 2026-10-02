@@ -37,6 +37,8 @@
 #include <openthread/thread.h>
 #endif /* CONFIG_OPENTHREAD */
 
+#include "pc/addr.h"
+
 #include "app/thread_link.h"
 
 #if defined(__has_include)
@@ -91,21 +93,6 @@ static K_THREAD_STACK_DEFINE(radio_stack, PC_LINK_RADIO_STACK);
 static struct k_thread radio_thread_data;
 
 /*
- * Link-local IPv6 address of an 802.15.4 EUI-64: fe80::/64 plus the EUI-64
- * with the universal/local bit of its first byte flipped. This is exactly how
- * OpenThread derives the link-local address from an extended address
- * (otIp6AddressFromExtAddr), so it also matches peers provisioned by EUI-64.
- */
-static void link_local_from_eui(const uint8_t eui[8], uint8_t out[16])
-{
-	memset(out, 0, 16);
-	out[0] = 0xfe;
-	out[1] = 0x80;
-	out[8] = (uint8_t)(eui[0] ^ 0x02u);
-	memcpy(out + 9, eui + 1, 7);
-}
-
-/*
  * Provisioned bring-up. Runs on the caller's thread (main), before the radio
  * thread exists. OpenThread API calls are serialized with the module mutex
  * (openthread_mutex_lock), as required by the Zephyr port.
@@ -130,7 +117,7 @@ static int link_bring_up(void)
 	}
 
 	for (unsigned i = 0; i < PC_LINK_ROLES; ++i) {
-		link_local_from_eui(team_eui64[i], peer_address[i]);
+		pc_link_local_from_eui(team_eui64[i], peer_address[i]);
 	}
 
 	otExtAddress extended;

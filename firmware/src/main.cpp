@@ -2,12 +2,16 @@
  * PitchComm role application: portable call engine, Thread radio link,
  * buttons, OLED, LE Audio output and the USB console.
  *
- * Build (coach, USB console only):
+ * Build (coach, USB console only, no field unit selector):
  *   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/coach -- \
  *     -DEXTRA_CONF_FILE=roles/coach.conf
- * Build (pitcher, Thread SED + LE Audio):
+ * Build (one enrolled unit; the key picks the generated unit index):
  *   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/pitcher -- \
+ *     -DEXTRA_CPPFLAGS=-DPC_UNIT=PC_UNIT_pitcher \
  *     -DEXTRA_CONF_FILE="roles/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
+ *
+ * tools/build_firmware.ps1 derives the fragments and the unit define from
+ * config/roster.json; this header only needs the -DPC_UNIT shape.
  */
 
 #include <zephyr/kernel.h>
@@ -20,6 +24,7 @@
 #include <string.h>
 
 #include "pc/engine.h"
+#include "pc/units.h"
 #include "pc/controls.h"
 #include "pc/usb.h"
 #include "pc/diagnostics.h"
@@ -38,12 +43,16 @@
 
 #if defined(CONFIG_PITCHCOMM_AUDIO)
 #include "app/audio_source.h"
+#include "app/storage.h"
 #endif
 #if defined(CONFIG_PITCHCOMM_DISPLAY)
 #include "board/display.h"
 #endif
 #if defined(CONFIG_PITCHCOMM_CATCHER_MENU) || defined(CONFIG_PITCHCOMM_FIELD_BUTTON)
 #include "board/buttons.h"
+#endif
+#if defined(CONFIG_PITCHCOMM_FIELD_BUTTON)
+#include <zephyr/drivers/gpio.h>
 #endif
 #if defined(CONFIG_PITCHCOMM_BATTERY)
 #include "board/battery.h"
@@ -73,8 +82,7 @@ int main(void)
 
 	for (;;) {
 		if (!played && pc_audio_ready()) {
-			played = pc_audio_play("/audio/p01.wav", "/audio/h1.wav",
-					       "/audio/s1.wav");
+			played = pc_audio_play("/audio/p01.wav", "/audio/l1.wav", "");
 			printf("AUDIO PLAY queued=%d\n", played ? 1 : 0);
 		}
 
@@ -90,19 +98,27 @@ int main(void)
 
 #else /* !CONFIG_PITCHCOMM_ROLE_AUDIO_PROOF */
 
-#if defined(CONFIG_PITCHCOMM_ROLE_COACH)
-constexpr pc::Role kRole = pc::Role::Coach;
-#elif defined(CONFIG_PITCHCOMM_ROLE_CATCHER)
-constexpr pc::Role kRole = pc::Role::Catcher;
-#elif defined(CONFIG_PITCHCOMM_ROLE_PITCHER)
-constexpr pc::Role kRole = pc::Role::Pitcher;
-#elif defined(CONFIG_PITCHCOMM_ROLE_SHORTSTOP)
-constexpr pc::Role kRole = pc::Role::Shortstop;
-#elif defined(CONFIG_PITCHCOMM_ROLE_CENTERFIELD)
-constexpr pc::Role kRole = pc::Role::Centerfield;
-#else
-#error "No PitchComm role selected: set CONFIG_PITCHCOMM_ROLE_* in the role .conf"
+#if defined(PC_UNIT)
+/* Field build: the unit selector from -DPC_UNIT=PC_UNIT_<key>. A key that is
+ * not enrolled maps to 0 in catalog.h, which is only the coach. */
+constexpr pc::Role kRole = PC_UNIT;
+static_assert(pc::validRole(kRole), "PC_UNIT must be inside the generated roster");
+#if defined(CONFIG_PITCHCOMM_ROLE_CATCHER) || defined(CONFIG_PITCHCOMM_ROLE_PITCHER) || \
+	defined(CONFIG_PITCHCOMM_ROLE_SHORTSTOP) || defined(CONFIG_PITCHCOMM_ROLE_CENTERFIELD) || \
+	defined(CONFIG_PITCHCOMM_AUDIO) || defined(CONFIG_PITCHCOMM_DISPLAY) || \
+	defined(CONFIG_PITCHCOMM_CATCHER_MENU) || defined(CONFIG_PITCHCOMM_FIELD_BUTTON) || \
+	defined(CONFIG_PITCHCOMM_BATTERY)
+static_assert(kRole != pc::kCoach, "PC_UNIT names a unit that is not enrolled");
 #endif
+#else
+/* Console-only coach build: no field unit selector. */
+constexpr pc::Role kRole = pc::kCoach;
+#endif
+
+/* Capabilities come from the generated catalog, never from the key name. */
+constexpr bool kAudio = pc::audioRole(kRole);
+constexpr bool kDisplay = pc::displayRole(kRole);
+constexpr bool kControls = pc::controlsRole(kRole);
 
 #if defined(CONFIG_PITCHCOMM_CATCHER_MENU) && !defined(CONFIG_PITCHCOMM_DISPLAY)
 #error "The catcher menu needs the OLED display (CONFIG_PITCHCOMM_DISPLAY)"
@@ -123,6 +139,8 @@ bool displayReady = false;
 board::CatcherControls catcherControls;
 pc::CatcherMenu catcherMenu;
 uint32_t catcherTouchedAt = 0;
+uint32_t catcherCallUntil = 0;
+uint16_t lastRequestCode = 0;
 #endif
 #if defined(CONFIG_PITCHCOMM_FIELD_BUTTON)
 board::Button recall;
@@ -203,7 +221,7 @@ void note(const char *text)
 bool audioIsReady()
 {
 #if defined(CONFIG_PITCHCOMM_AUDIO)
-	return pc::audioRole(kRole) ? pc_audio_ready() : true;
+	return kAudio ? pc_audio_ready() : true;
 #else
 	return true;
 #endif
@@ -303,24 +321,30 @@ class AppHooks : public pc::Hooks {
 		screenWake();
 		lastInteraction = now32();
 		printf("CALL #%lu %s\n", static_cast<unsigned long>(out.sequence),
-			    pc::labelFor(*call, kRole));
+			    call->label);
 
 #if defined(CONFIG_PITCHCOMM_AUDIO)
-		if (pc::audioRole(kRole)) {
+		if (kAudio) {
 			return pc_audio_play(call->audio[0], call->audio[1], call->audio[2]);
 		}
 #endif
 
 		/* The coach has no local output; the laptop GUI renders the state. */
-		if (kRole == pc::Role::Coach) {
+		if (kRole == pc::kCoach) {
 			return true;
 		}
 
 #if defined(CONFIG_PITCHCOMM_DISPLAY)
+#if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
+		/* A controls unit shows received calls on the OLED for four seconds. */
+		if (kControls) {
+			catcherCallUntil = now32() + 4000;
+		}
+#endif
 		if (!displayReady) {
 			return false;
 		}
-		if (!screen.strip(pc::labelFor(*call, kRole), "CALL")) {
+		if (!screen.strip(call->label, "CALL")) {
 			displayReady = false;
 			return false;
 		}
@@ -334,6 +358,9 @@ class AppHooks : public pc::Hooks {
 	{
 #if defined(CONFIG_PITCHCOMM_AUDIO)
 		pc_audio_stop();
+#endif
+#if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
+		catcherCallUntil = 0;
 #endif
 		lastOutputSeen = 0;
 		screenWake();
@@ -366,8 +393,21 @@ void repeat(uint32_t now)
 		return;
 	}
 
+#if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
+	/* A controls unit has no audio: re-show the received call on the OLED. */
+	if (kControls) {
+		if (engine->outputOld(now)) {
+			note("CALL TOO OLD");
+			return;
+		}
+		catcherCallUntil = now + 4000;
+		screenWake();
+		return;
+	}
+#endif
+
 	/* Old or disconnected audio is never silently replayed. */
-	if (pc::audioRole(kRole)) {
+	if (kAudio) {
 		if (!linkReady() || !engine->linked()) {
 			note("NO LINK TO RECALL");
 			return;
@@ -392,7 +432,7 @@ void repeat(uint32_t now)
 
 void cycleVolume()
 {
-	if (!pc::audioRole(kRole)) {
+	if (!kAudio) {
 		return;
 	}
 
@@ -420,6 +460,7 @@ void cycleVolume()
 #if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
 void handleCatcher(unsigned input, uint32_t now)
 {
+	catcherCallUntil = 0;
 	lastInteraction = now;
 	catcherTouchedAt = now;
 	screenWake();
@@ -448,6 +489,7 @@ void handleCatcher(unsigned input, uint32_t now)
 		}
 		catcherMenu.commit(displayReady, catcherControls.available(), audioIsReady(),
 				   [&](uint16_t code) {
+					   lastRequestCode = code;
 					   return submit(pc::Category::Pitch, code, now) ==
 						  pc::Submit::Accepted;
 				   });
@@ -512,7 +554,7 @@ void diagnostics()
 	const bool controlsReady = true;
 #endif
 
-	printf("ROLE=%s EUI=%s CONFIG=%s LINK=%s DICT=%08lx BATT=%s AUDIO=%s OLED=%s "
+	printf("UNIT=%s EUI=%s CONFIG=%s LINK=%s DICT=%08lx BATT=%s AUDIO=%s OLED=%s "
 		    "CONTROLS=%s VOL=%u RX_DROP=%lu RX_BAD=%lu TX_ERR=%lu TX_DROP=%lu "
 		    "IN_DROP=%lu\n",
 		    pc::roleName(kRole), eui, provisioned() ? "YES" : "NO", pc_link_state(),
@@ -524,9 +566,9 @@ void diagnostics()
 		    static_cast<unsigned long>(pc_link_tx_dropped()),
 		    static_cast<unsigned long>(atomic_get(&inboundDropped)));
 
-	if (engine != nullptr && kRole == pc::Role::Coach) {
-		for (unsigned i = 1; i < pc::kRoles; ++i) {
-			printf("%s LINK=%s DELIVERY=%s\n", pc::roleName(pc::Role(i)),
+	if (engine != nullptr && kRole == pc::kCoach) {
+		for (unsigned i = 1; i < pc::kUnitCount; ++i) {
+			printf("%s LINK=%s DELIVERY=%s\n", pc::kUnitLabel[i],
 				    engine->peer(pc::Role(i)).ready ? "UP" : "DOWN",
 				    deliveryName(engine->delivery(pc::Role(i))));
 		}
@@ -534,6 +576,28 @@ void diagnostics()
 }
 
 #if defined(CONFIG_PITCHCOMM_CONSOLE)
+/* Append comma-separated decimal values for a compact JSON array; index 0 is
+ * the coach and every caller reports it as 0. */
+template <class Value>
+void appendUnitJson(char *out, size_t size, Value value)
+{
+	size_t used = 0;
+
+	if (size == 0) {
+		return;
+	}
+	out[0] = '\0';
+	for (unsigned i = 0; i < pc::kUnitCount && used + 8 < size; ++i) {
+		const int written = snprintf(out + used, size - used, "%s%u",
+					     i == 0 ? "" : ",", unsigned(value(i)));
+
+		if (written <= 0 || static_cast<size_t>(written) >= size - used) {
+			break;
+		}
+		used += static_cast<size_t>(written);
+	}
+}
+
 void guiState()
 {
 	if (engine == nullptr) {
@@ -543,68 +607,141 @@ void guiState()
 	const auto out = engine->hasOutput() ? engine->output() : pc::Output{};
 	const auto& pitch = engine->record(pc::Category::Pitch);
 	const auto& play = engine->record(pc::Category::Play);
+	char links[4 * pc::kMaxUnits];
+	char delivery[4 * pc::kMaxUnits];
+	char pitchDelivery[4 * pc::kMaxUnits];
+	char playDelivery[4 * pc::kMaxUnits];
+
+	appendUnitJson(links, sizeof(links), [](unsigned i) {
+		return i != 0 && engine->peer(pc::Role(i)).ready ? 1u : 0u;
+	});
+	appendUnitJson(delivery, sizeof(delivery), [](unsigned i) {
+		return i == 0 ? 0u : unsigned(engine->delivery(pc::Role(i)));
+	});
+	appendUnitJson(pitchDelivery, sizeof(pitchDelivery), [&](unsigned i) {
+		return i == 0 ? 0u : unsigned(pitch.delivery[i]);
+	});
+	appendUnitJson(playDelivery, sizeof(playDelivery), [&](unsigned i) {
+		return i == 0 ? 0u : unsigned(play.delivery[i]);
+	});
 
 	printf("@PC {\"type\":\"state\",\"v\":4,\"client\":\"%08lx\",\"clock\":%lu,"
 		    "\"role\":%u,\"dictionary\":\"%08lx\",\"configured\":%u,\"radio\":%u,"
 		    "\"busy\":%u,\"boot\":\"%016llx\",\"seq\":%lu,\"category\":%u,\"code\":%u,"
-		    "\"links\":[%u,%u,%u,%u],\"delivery\":[%u,%u,%u,%u],"
-		    "\"records\":[{\"category\":1,\"seq\":%lu,\"code\":%u,\"delivery\":[%u,%u]},"
-		    "{\"category\":2,\"seq\":%lu,\"code\":%u,\"delivery\":[%u,%u]}]}\n",
+		    "\"links\":[%s],\"delivery\":[%s],"
+		    "\"records\":[{\"category\":1,\"seq\":%lu,\"code\":%u,\"delivery\":[%s]},"
+		    "{\"category\":2,\"seq\":%lu,\"code\":%u,\"delivery\":[%s]}]}\n",
 		    static_cast<unsigned long>(usbGate.client()),
-		    static_cast<unsigned long>(now32()), unsigned(uint8_t(kRole)),
+		    static_cast<unsigned long>(now32()), unsigned(kRole),
 		    static_cast<unsigned long>(pc::kDictionary), unsigned(provisioned()),
 		    unsigned(pc_link_ready()), unsigned(engine->busy()),
 		    static_cast<unsigned long long>(engine->boot()),
 		    static_cast<unsigned long>(out.sequence), unsigned(out.category),
-		    unsigned(out.code), unsigned(engine->peer(pc::Role::Catcher).ready),
-		    unsigned(engine->peer(pc::Role::Pitcher).ready),
-		    unsigned(engine->peer(pc::Role::Shortstop).ready),
-		    unsigned(engine->peer(pc::Role::Centerfield).ready),
-		    unsigned(engine->delivery(pc::Role::Catcher)),
-		    unsigned(engine->delivery(pc::Role::Pitcher)),
-		    unsigned(engine->delivery(pc::Role::Shortstop)),
-		    unsigned(engine->delivery(pc::Role::Centerfield)),
+		    unsigned(out.code), links, delivery,
 		    static_cast<unsigned long>(pitch.output.sequence),
-		    unsigned(pitch.output.code), unsigned(pitch.delivery[1]),
-		    unsigned(pitch.delivery[2]),
+		    unsigned(pitch.output.code), pitchDelivery,
 		    static_cast<unsigned long>(play.output.sequence),
-		    unsigned(play.output.code), unsigned(play.delivery[3]),
-		    unsigned(play.delivery[4]));
+		    unsigned(play.output.code), playDelivery);
 }
 #endif /* CONFIG_PITCHCOMM_CONSOLE */
 
 void reportOutputFailures()
 {
-	if (engine == nullptr || kRole != pc::Role::Coach) {
+	if (engine == nullptr || kRole != pc::kCoach) {
 		return;
 	}
 
-	static uint32_t reported[pc::kRoles]{};
+	static uint32_t reported[2][pc::kUnitCount]{};
 
-	for (unsigned i = 1; i < pc::kRoles; ++i) {
-		const auto& record = engine->record(i <= 2 ? pc::Category::Pitch
-							   : pc::Category::Play);
+	for (unsigned index = 0; index < 2; ++index) {
+		const auto& record = engine->record(index == 0 ? pc::Category::Pitch
+							       : pc::Category::Play);
 
-		if (record.delivery[i] != pc::Delivery::OutputError || !record.output.sequence ||
-		    reported[i] == record.output.sequence) {
-			continue;
+		for (unsigned i = 1; i < pc::kUnitCount; ++i) {
+			if (record.delivery[i] != pc::Delivery::OutputError ||
+			    !record.output.sequence || reported[index][i] == record.output.sequence) {
+				continue;
+			}
+			reported[index][i] = record.output.sequence;
+
+			char text[32];
+
+			snprintf(text, sizeof(text), "%s FAIL #%lu", pc::kUnitShort[i],
+				      static_cast<unsigned long>(record.output.sequence));
+			note(text);
 		}
-		reported[i] = record.output.sequence;
-
-		char text[32];
-
-		snprintf(text, sizeof(text), "%s FAIL #%lu",
-			      i == 1 ? "C" : i == 2 ? "P" : i == 3 ? "SS" : "CF",
-			      static_cast<unsigned long>(record.output.sequence));
-		note(text);
 	}
 }
 
 #if defined(CONFIG_PITCHCOMM_CONSOLE)
+void selftest(uint32_t now)
+{
+	char eui[17];
+
+	formatEui(eui);
+	printf("SELFTEST UNIT=%s EUI=%s CONFIG=%s LINK=%s\n", pc::roleName(kRole), eui,
+	       provisioned() ? "YES" : "NO", pc_link_state());
+
+#if defined(CONFIG_PITCHCOMM_DISPLAY)
+	printf("SELFTEST OLED=%s\n", board::Display::probe(0x3C) ? "PASS" : "FAIL");
+#else
+	printf("SELFTEST OLED=SKIP (no display on this unit)\n");
+#endif
+
+#if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
+	printf("SELFTEST CONTROLS=%s\n", catcherControls.available() ? "PASS" : "FAIL");
+#elif defined(CONFIG_PITCHCOMM_FIELD_BUTTON)
+	/*
+	 * Button::begin() is void; run it and confirm the same D1 pin (P1.05 =
+	 * gpio1 pin 5) is configured and readable through the public GPIO API.
+	 */
+	recall.begin();
+
+	const struct device *gpio1 = DEVICE_DT_GET(DT_NODELABEL(gpio1));
+	const bool controlsOk = device_is_ready(gpio1) &&
+				gpio_pin_configure(gpio1, 5, GPIO_INPUT | GPIO_PULL_UP) == 0 &&
+				gpio_pin_get_raw(gpio1, 5) >= 0;
+
+	printf("SELFTEST CONTROLS=%s\n", controlsOk ? "PASS" : "FAIL");
+#else
+	printf("SELFTEST CONTROLS=SKIP (no controls on this unit)\n");
+#endif
+
+#if defined(CONFIG_PITCHCOMM_BATTERY)
+	battery.tick(now);
+	printf("SELFTEST BATTERY=%lumV LOW=%s\n",
+	       (unsigned long)battery.millivolts(), battery.low() ? "YES" : "NO");
+#else
+	ARG_UNUSED(now);
+	printf("SELFTEST BATTERY=SKIP (no battery sense)\n");
+#endif
+
+#if defined(CONFIG_PITCHCOMM_AUDIO)
+	printf("SELFTEST STORAGE=%s DICT=%08lx\n", pc_storage_ready() ? "READY" : "OFFLINE",
+	       (unsigned long)pc_storage_dictionary());
+	printf("SELFTEST AUDIO=%s READY=%u BUSY=%u VOL=%u\n", pc_audio_state(),
+	       pc_audio_ready() ? 1u : 0u, pc_audio_busy() ? 1u : 0u,
+	       (unsigned)pc_audio_volume());
+#else
+	printf("SELFTEST STORAGE=SKIP (no audio on this unit)\n");
+	printf("SELFTEST AUDIO=SKIP (no audio on this unit)\n");
+#endif
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+	printf("SELFTEST SETTINGS=%s\n", settingsReady ? "READY" : "OFFLINE");
+#else
+	printf("SELFTEST SETTINGS=SKIP (settings disabled)\n");
+#endif
+
+	printf("SELFTEST DONE\n");
+}
+
 void serialInput(char *line, uint32_t now)
 {
 	if (strcmp(line, "status") == 0) {
 		diagnostics();
+	} else if (strcmp(line, "selftest") == 0) {
+		selftest(now);
 	} else if (strcmp(line, "gui") == 0 || strncmp(line, "gui ", 4) == 0) {
 		static uint32_t lastState = 0;
 		uint32_t client = 0;
@@ -636,7 +773,7 @@ void serialInput(char *line, uint32_t now)
 								result,
 								result == pc::Submit::Accepted &&
 										kRole ==
-											pc::Role::Coach
+											pc::kCoach
 									? engine->output()
 										  .sequence
 									: 0};
@@ -654,9 +791,9 @@ void serialInput(char *line, uint32_t now)
 	} else if (strcmp(line, "repeat") == 0) {
 		repeat(now);
 	} else if (strcmp(line, "help") == 0) {
-		printf("status | eui | gui [CLIENT8HEX] | call CLIENT ID p TYPE HEIGHT "
-			    "SIDE BOOT16HEX DICT8HEX DEADLINE | call CLIENT ID d PLAY BOOT "
-			    "DICT DEADLINE | repeat | vol 1..20 | scan\n");
+		printf("status | selftest | eui | gui [CLIENT8HEX] | call CLIENT ID p TYPE "
+		       "HEIGHT SIDE BOOT16HEX DICT8HEX DEADLINE | call CLIENT ID d PLAY "
+		       "BOOT DICT DEADLINE | repeat | vol 1..20 | scan\n");
 	} else if (strcmp(line, "eui") == 0) {
 		char eui[17];
 
@@ -725,6 +862,28 @@ void draw(uint32_t now)
 	lastFrame = now;
 
 #if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
+	/* A received call owns the panel briefly, then the selection menu returns. */
+	if (!catcherMenu.draft() && lastOutputSeen != 0 &&
+	    pc::elapsed(now, catcherCallUntil) < 4000) {
+		const char *label = "CALL";
+
+		if (engine->hasOutput()) {
+			if (const auto* call =
+				    pc::findCall(engine->output().category, engine->output().code)) {
+				label = call->label;
+			}
+		}
+		if (screen.strip(label, "CALL")) {
+			return;
+		}
+		displayReady = false;
+		if (engine->hasOutput()) {
+			engine->outputFailed(engine->output().sequence, now);
+		}
+		note("DISPLAY DISCONNECTED");
+		return;
+	}
+
 	auto frame = catcherMenu.frame();
 	const char *notice = nullptr;
 
@@ -760,7 +919,7 @@ void draw(uint32_t now)
 	if (hasCall) {
 		if (const auto* call =
 			    pc::findCall(engine->output().category, engine->output().code)) {
-			play = pc::labelFor(*call, kRole);
+			play = call->label;
 		}
 	}
 
@@ -783,7 +942,7 @@ void draw(uint32_t now)
 
 void receiveLink(uint8_t source, const uint8_t *bytes, size_t len)
 {
-	if (len != pc::kPacketBytes || source >= pc::kRoles) {
+	if (len != pc::kPacketBytes || source >= pc::kUnitCount) {
 		atomic_inc(&decodeErrors);
 		return;
 	}
@@ -818,7 +977,7 @@ void engineThread(void *arg1, void *arg2, void *arg3)
 			pc::Packet packet;
 
 			if (!pc::decode(in.bytes, pc::kPacketBytes, packet) ||
-			    in.source >= pc::kRoles || pc::Role(in.source) == kRole) {
+			    in.source >= pc::kUnitCount || pc::Role(in.source) == kRole) {
 				atomic_inc(&decodeErrors);
 				continue;
 			}
@@ -878,7 +1037,7 @@ void appSetup()
 	battery.tick(now);
 #endif
 #if defined(CONFIG_PITCHCOMM_AUDIO)
-	if (pc::audioRole(kRole)) {
+	if (kAudio) {
 		(void)pc_audio_start();
 	}
 #endif
@@ -922,21 +1081,25 @@ void loop()
 		linkWarned = false;
 	}
 
+#if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
 	if (engine != nullptr && engine->requestFinished() && !requestNotified &&
-	    kRole == pc::Role::Catcher) {
+	    kControls) {
 		requestNotified = true;
 		switch (engine->requestResult()) {
 		case pc::Status::Ok:
 			note("COACH ACCEPTED");
 			break;
 		case pc::Status::Busy:
+			catcherMenu.restore(lastRequestCode);
 			note("COACH BUSY: RESEND");
 			break;
 		default:
+			catcherMenu.restore(lastRequestCode);
 			note("CALL STATUS UNKNOWN");
 			break;
 		}
 	}
+#endif
 
 #if defined(CONFIG_PITCHCOMM_CATCHER_MENU)
 	if (const auto input = catcherControls.tick(now)) {
@@ -962,7 +1125,7 @@ void loop()
 	draw(now);
 
 #if defined(CONFIG_PITCHCOMM_DISPLAY)
-	if (kRole != pc::Role::Coach && pc::displayRole(kRole) && engine != nullptr &&
+	if (kRole != pc::kCoach && kDisplay && engine != nullptr &&
 	    engine->linked() && pc::elapsed(now, lastInteraction) > 30000) {
 		screen.sleep();
 	}

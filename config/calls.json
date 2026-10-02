@@ -1,105 +1,58 @@
 {
+  "schema": 3,
   "pitches": [
-    {
-      "key": 1,
-      "label": "FASTBALL",
-      "speech": "Fastball"
-    },
-    {
-      "key": 2,
-      "label": "CHANGEUP",
-      "speech": "Changeup"
-    },
-    {
-      "key": 3,
-      "label": "CURVEBALL",
-      "speech": "Curveball"
-    },
-    {
-      "key": 4,
-      "label": "SLIDER",
-      "speech": "Slider"
-    },
-    {
-      "key": 5,
-      "label": "SINKER",
-      "speech": "Sinker"
-    },
-    {
-      "key": 6,
-      "label": "CUTTER",
-      "speech": "Cutter"
-    },
-    {
-      "key": 7,
-      "label": "SPLITTER",
-      "speech": "Splitter"
-    },
-    {
-      "key": 8,
-      "label": "KNUCKLE",
-      "speech": "Knuckleball"
-    },
-    {
-      "key": 9,
-      "label": "PITCH OUT",
-      "speech": "Pitch out"
-    }
+    {"key": 1, "label": "FOUR-SEAM", "short": "4S", "speech": "Four-Seam Fastball", "file": "A1 Four-Seam Fastball.mp3"},
+    {"key": 2, "label": "CURVEBALL", "short": "CB", "speech": "Curveball", "file": "A2 Curveball.mp3"},
+    {"key": 3, "label": "SLIDER", "short": "SL", "speech": "Slider", "file": "A3 Slider.mp3"},
+    {"key": 4, "label": "CHANGEUP", "short": "CH", "speech": "Changeup", "file": "A4 Changeup.mp3"},
+    {"key": 5, "label": "SINKER", "short": "SI", "speech": "Sinker", "file": "A5 Sinker.mp3"},
+    {"key": 6, "label": "TWO-SEAM", "short": "2S", "speech": "Two-Seam Fastball", "file": "A6 Two-Seam Fastball.mp3"},
+    {"key": 7, "label": "CUTTER", "short": "CT", "speech": "Cutter", "file": "G7 Cutter.mp3"},
+    {"key": 8, "label": "SWEEPER", "short": "SW", "speech": "Sweeper", "file": "J6 Sweeper.mp3"},
+    {"key": 9, "label": "SPLITTER", "short": "SP", "speech": "Splitter", "file": "J8 Splitter.mp3"}
+  ],
+  "rows": [
+    {"key": 1, "label": "HIGH", "short": "HI", "speech": "High"},
+    {"key": 2, "label": "MIDDLE", "short": "MID", "speech": "Middle"},
+    {"key": 3, "label": "LOW", "short": "LO", "speech": "Low"}
+  ],
+  "cols": [
+    {"key": 1, "label": "INSIDE", "short": "IN", "speech": "Inside"},
+    {"key": 2, "label": "MIDDLE", "short": "MID", "speech": "Middle"},
+    {"key": 3, "label": "OUTSIDE", "short": "OUT", "speech": "Outside"}
+  ],
+  "locations": [
+    {"row": 1, "col": 1, "speech": "High Inside", "file": "B1 High Inside.mp3"},
+    {"row": 1, "col": 2, "speech": "High Middle", "file": "B2 High Middle.mp3"},
+    {"row": 1, "col": 3, "speech": "High Outside", "file": "B3 High Outside.mp3"},
+    {"row": 2, "col": 1, "speech": "Middle Inside", "file": "B4 Middle Inside.mp3"},
+    {"row": 2, "col": 2, "speech": "Middle Center", "file": "B5 Middle Center.mp3"},
+    {"row": 2, "col": 3, "speech": "Middle Outside", "file": "B6 Middle Outside.mp3"},
+    {"row": 3, "col": 1, "speech": "Low Inside", "file": "B7 Low Inside.mp3"},
+    {"row": 3, "col": 2, "speech": "Low Middle", "file": "B8 Low Middle.mp3"},
+    {"row": 3, "col": 3, "speech": "Low Outside", "file": "B9 Low Outside.mp3"}
   ],
   "plays": [
-    {
-      "key": 1,
-      "label": "NORMAL",
-      "shortstop": "NORMAL",
-      "centerfield": "NORMAL"
-    },
-    {
-      "key": 2,
-      "label": "DOUBLE PLAY",
-      "shortstop": "DP DEPTH",
-      "centerfield": "NORMAL"
-    },
-    {
-      "key": 3,
-      "label": "INFIELD IN",
-      "shortstop": "INFIELD IN",
-      "centerfield": "NORMAL"
-    },
-    {
-      "key": 4,
-      "label": "PLAY DEEP",
-      "shortstop": "NORMAL",
-      "centerfield": "PLAY DEEP"
-    },
-    {
-      "key": 5,
-      "label": "PLAY SHALLOW",
-      "shortstop": "NORMAL",
-      "centerfield": "SHALLOW"
-    },
-    {
-      "key": 6,
-      "label": "SHADE LEFT",
-      "shortstop": "SHADE LEFT",
-      "centerfield": "SHADE LEFT"
-    },
-    {
-      "key": 7,
-      "label": "SHADE RIGHT",
-      "shortstop": "SHADE RIGHT",
-      "centerfield": "SHADE RIGHT"
-    },
-    {
-      "key": 8,
-      "label": "NO DOUBLES",
-      "shortstop": "NORMAL",
-      "centerfield": "NO DOUBLES"
-    },
-    {
-      "key": 9,
-      "label": "BUNT DEFENSE",
-      "shortstop": "BUNT COVER",
-      "centerfield": "NORMAL"
-    }
+    {"key": 1, "label": "PICKOFF", "shortstop": "PICKOFF", "centerfield": "PICKOFF", "speech": "Pickoff", "targets": ["battery", "infield"], "file": "A7 Pickoff.mp3"},
+    {"key": 2, "label": "STEP OFF", "shortstop": "STEP OFF", "centerfield": "STEP OFF", "speech": "Hold and Step Off", "targets": ["battery"], "file": "A8 Hold and Step Off.mp3"},
+    {"key": 3, "label": "INSIDE MOVE", "shortstop": "INSIDE MOVE", "centerfield": "INSIDE MOVE", "speech": "Inside Move", "targets": ["battery"], "file": "A9 Inside Move.mp3"},
+    {"key": 4, "label": "PICK 1ST", "shortstop": "PICK 1ST", "centerfield": "PICK 1ST", "speech": "Pick to First", "targets": ["battery", "infield"], "file": "I1 Pick to First.mp3"},
+    {"key": 5, "label": "PICK 2ND", "shortstop": "PICK 2ND", "centerfield": "PICK 2ND", "speech": "Pick to Second", "targets": ["battery", "infield"], "file": "I2 Pick to Second.mp3"},
+    {"key": 6, "label": "PICK 3RD", "shortstop": "PICK 3RD", "centerfield": "PICK 3RD", "speech": "Pick to Third", "targets": ["battery", "infield"], "file": "I3 Pick to Third.mp3"},
+    {"key": 7, "label": "BACKPICK", "shortstop": "BACKPICK", "centerfield": "BACKPICK", "speech": "Backpick", "targets": ["battery", "infield"], "file": "I8 Backpick.mp3"},
+    {"key": 8, "label": "HOLD", "shortstop": "HOLD", "centerfield": "HOLD", "speech": "Infield Hold", "targets": ["battery", "infield"], "file": "I9 Infield Hold.mp3"},
+    {"key": 9, "label": "HOLD & PICK", "shortstop": "HOLD & PICK", "centerfield": "HOLD & PICK", "speech": "Hold and Pick", "targets": ["battery", "infield"], "file": "Q7 Hold and Pick.mp3"},
+    {"key": 10, "label": "HOLD PITCH", "shortstop": "HOLD PITCH", "centerfield": "HOLD PITCH", "speech": "Hold and Pitch", "targets": ["battery"], "file": "Q8 Hold and Pitch.mp3"},
+    {"key": 11, "label": "DROP GLOVE", "shortstop": "DROP GLOVE", "centerfield": "DROP GLOVE", "speech": "Drop Glove Pick Second", "targets": ["battery", "infield"], "file": "Q2 Drop Glove Pick Second.mp3"},
+    {"key": 12, "label": "QUICK PICK", "shortstop": "QUICK PICK", "centerfield": "QUICK PICK", "speech": "Quick Pick", "targets": ["battery", "infield"], "file": "Q3 Quick Pick.mp3"},
+    {"key": 13, "label": "BUNT DEF", "shortstop": "BUNT DEF", "centerfield": "BUNT DEF", "speech": "Regular Bunt Defense", "targets": ["all"], "file": "I4 Regular Bunt Defense.mp3"},
+    {"key": 14, "label": "BUNT 2", "shortstop": "BUNT 2", "centerfield": "BUNT 2", "speech": "Bunt Play 2", "targets": ["all"], "file": "I5 Bunt Play 2.mp3"},
+    {"key": 15, "label": "BUNT 3", "shortstop": "BUNT 3", "centerfield": "BUNT 3", "speech": "Bunt Play 3", "targets": ["all"], "file": "I6 Bunt Play 3.mp3"},
+    {"key": 16, "label": "BUNT ONE", "shortstop": "BUNT ONE", "centerfield": "BUNT ONE", "speech": "Bunt One", "targets": ["all"], "file": "Q6 Bunt One.mp3"},
+    {"key": 17, "label": "WHEEL", "shortstop": "WHEEL", "centerfield": "WHEEL", "speech": "Wheel Play", "targets": ["all"], "file": "I7 Wheel Play.mp3"},
+    {"key": 18, "label": "SEE DOWN", "shortstop": "SEE DOWN", "centerfield": "SEE DOWN", "speech": "See Down", "targets": ["outfield"], "file": "C7 See Down.mp3"},
+    {"key": 19, "label": "SEE UP", "shortstop": "SEE UP", "centerfield": "SEE UP", "speech": "See Up", "targets": ["outfield"], "file": "C8 See Up.mp3"},
+    {"key": 20, "label": "AROUND", "shortstop": "AROUND", "centerfield": "AROUND", "speech": "Pitch Around", "targets": ["battery"], "file": "E8 Pitch Around.mp3"},
+    {"key": 21, "label": "IGNORE RUN", "shortstop": "IGNORE RUN", "centerfield": "IGNORE RUN", "speech": "Ignore Runner", "targets": ["battery"], "file": "E9 Ignore Runner.mp3"}
   ]
 }

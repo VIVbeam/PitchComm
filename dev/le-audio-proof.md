@@ -1,11 +1,11 @@
-# LE Audio proof on XIAO nRF54L15 — runbook
+# LE Audio proof on XIAO nRF54L15: runbook
 
 Goal: build the PitchComm LE Audio source (`roles/audio-proof.conf`), flash it
 to a XIAO nRF54L15 (`xiao_nrf54l15/nrf54l15/cpuapp`), and play one spoken call
 to one HomeSpot JY300 earbud. This is the riskiest unknown; finish it before
 any call-link work. Nothing here has been verified on hardware yet.
 
-## Platform caveat — read first
+## Platform caveat: read first
 
 Nordic's official LE Audio platform is nRF5340 (nRF5340 Audio DK). nRF54L has
 no Audio PLL, which synchronizes two independent L/R receivers, so it cannot do
@@ -51,14 +51,14 @@ Seeed's board repo `zephyr` folder as a board root, or copy it into the tree.
 ## 3. Build the proof role
 
 The proof role is the PitchComm BAP unicast client (`src/audio_source.c`)
-without the Thread link. It plays `/audio/p01.wav` + `/audio/h1.wav` +
-`/audio/s1.wav` (FASTBALL / UP / INSIDE) once an earbud stream is running.
+without the Thread link. It plays `/audio/p01.wav` + `/audio/l1.wav`
+(FOUR-SEAM FASTBALL / HIGH INSIDE) once an earbud stream is running.
 
 ```bat
 west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware -d firmware/build/proof -- -DEXTRA_CONF_FILE="roles/audio-proof.conf;roles/audio-unit.conf"
 ```
 
-`tools/build_firmware.ps1 -Roles proof` wraps this. If the board config has no
+`tools/build_firmware.ps1 -Units proof` wraps this. If the board config has no
 nRF54L15 LE Audio config, `roles/audio-unit.conf` supplies `CONFIG_LIBLC3=y`,
 `CONFIG_FPU=y`, and the BT buffer sizes. No devicetree overlay is needed for
 audio; the board DTS already enables the radio and IEEE 802.15.4 nodes.

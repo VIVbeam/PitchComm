@@ -31,8 +31,7 @@ endchoice
 
 config PITCHCOMM_AUDIO
 	bool "LE Audio earbud output"
-	default y if PITCHCOMM_ROLE_CATCHER || PITCHCOMM_ROLE_PITCHER || \
-		     PITCHCOMM_ROLE_AUDIO_PROOF
+	default y if PITCHCOMM_ROLE_PITCHER || PITCHCOMM_ROLE_AUDIO_PROOF
 
 config PITCHCOMM_DISPLAY
 	bool "128x32 OLED output"

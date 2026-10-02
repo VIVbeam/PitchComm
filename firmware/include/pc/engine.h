@@ -1,6 +1,5 @@
 #pragma once
-#include "protocol.h"
-#include "catalog.h"
+#include "units.h"
 
 namespace pc {
 enum class Delivery : uint8_t { Unused, Pending, Delivered, Missing, OutputError };
@@ -10,8 +9,8 @@ struct Output { Category category; uint16_t code; uint32_t sequence, receivedAt;
 // so a late pitch failure is still reported after a defensive play is sent.
 struct CallRecord {
   Output output{};
-  Delivery delivery[kRoles]{};
-  uint64_t boots[kRoles]{};
+  Delivery delivery[kUnitCount]{};
+  uint64_t boots[kUnitCount]{};
   uint16_t window=0;
 };
 struct Hooks {
@@ -32,13 +31,13 @@ struct Peer {
 class Engine {
  public:
   Engine(Role role, uint64_t boot, Hooks& hooks) : role_(role), boot_(boot ? boot : 1), hooks_(hooks) {
-    session_ = role == Role::Coach ? boot_ : 0;
-    if (role != Role::Coach) startSync();
+    session_ = role == kCoach ? boot_ : 0;
+    if (role != kCoach) startSync();
   }
   Role role() const { return role_; }
   uint64_t session() const { return session_; }
   uint64_t boot() const { return boot_; }
-  bool linked() const { return role_ == Role::Coach || (!syncing_ && session_ != 0); }
+  bool linked() const { return role_ == kCoach || (!syncing_ && session_ != 0); }
   bool incompatible() const { return incompatible_; }
   bool busy() const { return active_ || requesting_; }
   bool hasOutput() const { return hasOutput_; }
@@ -52,12 +51,16 @@ class Engine {
   bool outputOld(uint32_t now) const { return hasOutput_ && outputAge(now) >= kOldCall; }
 
   Submit submit(Category category, uint16_t code, uint32_t now) {
-    if (!findCall(category,code) || (role_ != Role::Coach && role_ != Role::Catcher) ||
-        (role_==Role::Catcher && category!=Category::Pitch)) return Submit::Invalid;
+    const bool coach = role_ == kCoach;
+    // Only the coach originates any call; a controls unit may request pitches.
+    if (!findCall(category,code) ||
+        (!coach && (!controlsRole(role_) || category != Category::Pitch))) {
+      return Submit::Invalid;
+    }
     if (!linked()) return Submit::Offline;
     if (busy()) return Submit::Busy;
-    if (role_==Role::Coach) { beginCall(category,code,now,kCallWindow); return Submit::Accepted; }
-    request_ = base(Kind::Request,Role::Coach);
+    if (coach) { beginCall(category,code,now,kCallWindow); return Submit::Accepted; }
+    request_ = base(Kind::Request,kCoach);
     request_.category=category; request_.code=code; request_.sequence=++requestCounter_;
     request_.deadline=coordinatorLower(now)+kCallWindow;
     if (!request_.sequence) request_.sequence=++requestCounter_;
@@ -67,25 +70,25 @@ class Engine {
   }
 
   void tick(uint32_t now) {
-    if (role_==Role::Coach) {
+    if (role_==kCoach) {
       // Heartbeats often arrive together. Keep one bounded control reply per peer
       // instead of dropping every reply after the first while the radio is busy.
-      for (unsigned n=0;n<kRoles-1;++n) {
-        const unsigned i=1+((controlRoundRobin_+n)%(kRoles-1));
+      for (unsigned n=0;n<kUnitCount-1;++n) {
+        const unsigned i=1+((controlRoundRobin_+n)%(kUnitCount-1));
         if (!controlPending_[i]) continue;
         if (transmit(control_[i],now)) {
-          controlPending_[i]=false; controlRoundRobin_=i%(kRoles-1); break;
+          controlPending_[i]=false; controlRoundRobin_=i%(kUnitCount-1); break;
         }
       }
-      for (unsigned i=1;i<kRoles;++i) {
+      for (unsigned i=1;i<kUnitCount;++i) {
         auto& p=peers_[i]; if (p.ready && elapsed(now,p.seenAt)>kLinkTimeout) p.ready=false;
       }
       if (active_) {
         if (elapsed(now,callAt_)>=callWindow_) finishCall();
         else {
           bool pending=false;
-          for (unsigned n=0;n<kRoles-1;++n) {
-            const unsigned i=1+((roundRobin_+n)%(kRoles-1));
+          for (unsigned n=0;n<kUnitCount-1;++n) {
+            const unsigned i=1+((roundRobin_+n)%(kUnitCount-1));
             if (delivery_[i]!=Delivery::Pending) continue;
             pending=true; auto& peer=peers_[i];
             // Reconnecting receivers never get the call that preceded their handshake.
@@ -95,7 +98,7 @@ class Engine {
             p.sequence=callSequence_; p.category=callCategory_; p.code=callCode_;
             p.deadline=callAt_+callWindow_;
             p.ttl=uint16_t(callWindow_-elapsed(now,callAt_));
-            if (transmit(p,now)) { callSent_[i]=now; roundRobin_=i%(kRoles-1); break; }
+            if (transmit(p,now)) { callSent_[i]=now; roundRobin_=i%(kUnitCount-1); break; }
           }
           if (!pending) active_=false;
         }
@@ -105,13 +108,13 @@ class Engine {
     if (!syncing_ && (elapsed(now,heardAt_)>kLinkTimeout || elapsed(now,clockAt_)>kLinkTimeout)) startSync();
     if (syncing_) {
       if (elapsed(now,helloAt_)>=600) {
-        Packet p=base(Kind::Hello,Role::Coach); p.session=0; p.token=challenge_;
+        Packet p=base(Kind::Hello,kCoach); p.session=0; p.token=challenge_;
         if (transmit(p,now)) helloAt_=now;
       }
       return;
     }
     if (readyPending_) {
-      Packet p=base(Kind::Ready,Role::Coach); p.token=challenge_;
+      Packet p=base(Kind::Ready,kCoach); p.token=challenge_;
       if (elapsed(now,readySent_)>=200 && transmit(p,now)) readySent_=now;
     }
     if (ackPending_ && elapsed(now,ackAt_)<kCallWindow && elapsed(now,ackSent_)>=80) {
@@ -127,15 +130,15 @@ class Engine {
       }
     }
     if (elapsed(now,pingAt_)>=1000) {
-      Packet p=base(Kind::Ping,Role::Coach);
+      Packet p=base(Kind::Ping,kCoach);
       if (transmit(p,now)) pingAt_=now;
     }
   }
 
   void receive(Role authenticatedSource, const Packet& p, uint32_t now, uint32_t queueAge=0) {
     if (!validRole(authenticatedSource) || p.source!=authenticatedSource || p.target!=role_) return;
-    if (role_==Role::Coach) { receiveCoach(p,now,queueAge); return; }
-    if (p.source!=Role::Coach || p.boot!=boot_) return;
+    if (role_==kCoach) { receiveCoach(p,now,queueAge); return; }
+    if (p.source!=kCoach || p.boot!=boot_) return;
     if (p.kind==Kind::Resync) { if (!syncing_) startSync(); return; }
     if (p.kind==Kind::Sync) {
       if (!syncing_ || p.token!=challenge_) return;
@@ -152,12 +155,12 @@ class Engine {
       if (updateClock(p,now)) { heardAt_=now; readyPending_=false; }
       return;
     }
-    if (p.kind==Kind::Response && role_==Role::Catcher && requesting_ &&
+    if (p.kind==Kind::Response && controlsRole(role_) && requesting_ &&
         p.sequence==request_.sequence && p.code==request_.code) {
       heardAt_=now; requesting_=false; requestFinished_=true; requestResult_=p.status; return;
     }
     if (p.kind!=Kind::Call || !p.sequence || !findCall(p.category,p.code) ||
-        !(recipients(p.category) & roleMask(role_))) return;
+        !(recipients(p.category,p.code) & roleMask(role_))) return;
     if (p.ttl==0 || p.ttl>kCallWindow || queueAge>=p.ttl ||
         elapsed(now,heardAt_)>kLinkTimeout || elapsed(now,clockAt_)>kLinkTimeout ||
         reached(coordinatorUpper(now)+40,p.deadline)) return;
@@ -174,7 +177,7 @@ class Engine {
   }
 
   void outputFailed(uint32_t sequence, uint32_t now) {
-    if (role_==Role::Coach || !hasOutput_ || sequence!=lastSequence_) return;
+    if (role_==kCoach || !hasOutput_ || sequence!=lastSequence_) return;
     lastOutputStatus_=Status::OutputError;
     ack_.status=Status::OutputError; ackAt_=now; ackSent_=now-80; ackPending_=true;
   }
@@ -187,7 +190,7 @@ class Engine {
   bool transmit(Packet& p,uint32_t now) { p.clock=now; return hooks_.send(p); }
   void queueControl(const Packet& p) {
     const auto i=uint8_t(p.target);
-    if (i>0 && i<kRoles) { control_[i]=p; controlPending_[i]=true; }
+    if (i>0 && i<kUnitCount) { control_[i]=p; controlPending_[i]=true; }
   }
   static bool reached(uint32_t now,uint32_t deadline) { return uint32_t(now-deadline)<0x80000000u; }
   bool updateClock(const Packet& p,uint32_t now) {
@@ -212,7 +215,7 @@ class Engine {
     helloAt_=uint32_t(0)-600;
   }
   void scheduleAck(const Packet& p, Status status, uint32_t now) {
-    ack_=base(Kind::Ack,Role::Coach); ack_.sequence=p.sequence; ack_.category=p.category;
+    ack_=base(Kind::Ack,kCoach); ack_.sequence=p.sequence; ack_.category=p.category;
     ack_.code=p.code; ack_.status=status; ackAt_=now; ackSent_=now-80; ackPending_=true;
   }
   void beginCall(Category category, uint16_t code, uint32_t now, uint16_t window) {
@@ -220,28 +223,28 @@ class Engine {
     callCategory_=category; callCode_=code; callAt_=now; callWindow_=window; active_=true;
     output_={category,code,callSequence_,now}; hasOutput_=true;
     const bool localOk=hooks_.present(output_);
-    for (unsigned i=0;i<kRoles;++i) {
-      delivery_[i]=(recipients(category)&roleMask(Role(i))) ? Delivery::Pending : Delivery::Unused;
+    for (unsigned i=0;i<kUnitCount;++i) {
+      delivery_[i]=(recipients(category,code)&roleMask(Role(i))) ? Delivery::Pending : Delivery::Unused;
       callBoot_[i]=peers_[i].ready ? peers_[i].boot : 0; callSent_[i]=now-100;
     }
     delivery_[0]=localOk ? Delivery::Delivered : Delivery::OutputError;
     auto& record=records_[category==Category::Pitch ? 0 : 1];
     record.output=output_; record.window=window;
-    for (unsigned i=0;i<kRoles;++i) { record.delivery[i]=delivery_[i]; record.boots[i]=callBoot_[i]; }
+    for (unsigned i=0;i<kUnitCount;++i) { record.delivery[i]=delivery_[i]; record.boots[i]=callBoot_[i]; }
   }
   void finishCall() {
     for (auto& d:delivery_) if (d==Delivery::Pending) d=Delivery::Missing;
     auto& record=records_[callCategory_==Category::Pitch ? 0 : 1];
-    for (unsigned i=0;i<kRoles;++i) record.delivery[i]=delivery_[i];
+    for (unsigned i=0;i<kUnitCount;++i) record.delivery[i]=delivery_[i];
     active_=false;
   }
   void response(const Packet& request, Status status, uint32_t call) {
-    Packet p=base(Kind::Response,Role::Catcher); p.boot=request.boot;
+    Packet p=base(Kind::Response,request.source); p.boot=request.boot;
     p.sequence=request.sequence; p.code=request.code; p.status=status; p.token=call;
     queueControl(p);
   }
   void receiveCoach(const Packet& p, uint32_t now, uint32_t queueAge) {
-    if (p.source==Role::Coach) return;
+    if (p.source==kCoach) return;
     auto& peer=peers_[uint8_t(p.source)];
     if (p.kind==Kind::Hello) {
       if (!p.boot || !p.token) return;
@@ -294,7 +297,7 @@ class Engine {
       if (p.sequence==callSequence_ && p.category==callCategory_) delivery_[uint8_t(p.source)]=d;
       return;
     }
-    if (p.kind!=Kind::Request || p.source!=Role::Catcher || !p.sequence) return;
+    if (p.kind!=Kind::Request || !controlsRole(p.source) || !p.sequence) return;
     peer.seenAt=now;
     if (p.sequence==peer.lastRequest) {
       if (p.code==peer.requestCode) response(p,peer.requestStatus,peer.requestCall);
@@ -316,10 +319,10 @@ class Engine {
   }
 
   Role role_; uint64_t boot_; Hooks& hooks_;
-  Peer peers_[kRoles]{}; Delivery delivery_[kRoles]{};
+  Peer peers_[kUnitCount]{}; Delivery delivery_[kUnitCount]{};
   CallRecord records_[2]{};
-  Packet control_[kRoles]{}; bool controlPending_[kRoles]{}; unsigned controlRoundRobin_=0;
-  uint64_t session_=0, challenge_=0, challengeCounter_=0, callBoot_[kRoles]{};
+  Packet control_[kUnitCount]{}; bool controlPending_[kUnitCount]{}; unsigned controlRoundRobin_=0;
+  uint64_t session_=0, challenge_=0, challengeCounter_=0, callBoot_[kUnitCount]{};
   uint32_t helloAt_=0, heardAt_=0, pingAt_=0, lastSequence_=0, readySent_=0;
   uint32_t clockLower_=0, clockUpper_=0, clockAt_=0; bool clockReady_=false;
   bool syncing_=false, incompatible_=false, readyPending_=false, hasOutput_=false;
@@ -327,9 +330,8 @@ class Engine {
   Packet ack_{}; bool ackPending_=false; uint32_t ackAt_=0, ackSent_=0;
   Packet request_{}; bool requesting_=false, requestFinished_=false;
   Status requestResult_=Status::Ok; uint32_t requestCounter_=0, requestAt_=0, requestSent_=0;
-  bool active_=false; uint32_t callSequence_=0, callAt_=0, callSent_[kRoles]{};
+  bool active_=false; uint32_t callSequence_=0, callAt_=0, callSent_[kUnitCount]{};
   uint16_t callCode_=0, callWindow_=kCallWindow; Category callCategory_=Category::Pitch;
   unsigned roundRobin_=0;
 };
 } // namespace pc
-

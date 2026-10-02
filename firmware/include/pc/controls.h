@@ -8,10 +8,10 @@ struct Selection {
   void clear() { type=height=side=0; }
   uint16_t code() const { return pitchCode(type,height,side); }
   bool choose(unsigned key) {
-    if (!key || key>9) return false;
+    if (!key || key>kPitchCount) return false;
     if (!type) type=key;
-    else if (!height) { if (key>3) return false; height=key; }
-    else if (!side) { if (key>3) return false; side=key; }
+    else if (!height) { if (key>kRows) return false; height=key; }
+    else if (!side) { if (key>kCols) return false; side=key; }
     else { clear(); type=key; }
     return true;
   }
@@ -64,7 +64,7 @@ inline bool parseUsbCall(const char* line, UsbCall& result) {
   if (category=='p') {
     if (!space() || !number(height) || !space() || !number(side)) return false;
     code=pitchCode(type,height,side);
-  } else if (category=='d') { if (type<1 || type>9) return false; code=uint16_t(type); }
+  } else if (category=='d') { if (type<1 || type>kPlayCount) return false; code=uint16_t(type); }
   else return false;
   if (!code || !space() || !parseHex(cursor,16,boot) || !boot || !space() || !parseHex(cursor,8,dictionary) ||
       !space() || !number(deadline) || *cursor) return false;

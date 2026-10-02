@@ -23,8 +23,8 @@ bool pc_audio_busy(void);
 
 /*
  * Queue a call assembled from up to three catalog clip paths (for example
- * "/audio/p01.wav", "/audio/h1.wav", "/audio/s1.wav"). Pass NULL for unused
- * slots. Returns false when audio is not ready or the queue is full.
+ * "/audio/p01.wav", "/audio/l1.wav"). Pass NULL for unused slots. Returns
+ * false when audio is not ready or the queue is full.
  */
 bool pc_audio_play(const char *clip_a, const char *clip_b, const char *clip_c);
 

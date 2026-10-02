@@ -20,17 +20,18 @@ The design is decided. Do not re-derive it:
 - Call trigger: 802.15.4 over Thread. The coach is the leader; field units are
   Sleepy End Devices. See dev/transport.md.
 - Audio: LE Audio (LC3) to ONE earbud, mono only (no TWS). Headphones: HomeSpot
-  JY300 neckband (LC3 / LE Audio), one per pitcher and catcher.
+  JY300 neckband (LC3 / LE Audio), one for the pitcher.
 - Firmware: Zephyr / nRF Connect SDK (C).
 - Units:
   - Coach: board + laptop over USB.
-  - Catcher: board + 128x32 OLED + four buttons + Back + cell + JY300. The
-    catcher selects a pitch (type, height, location) and sends it as a request
-    through the coach, then hears the delivered call in the JY300.
+  - Catcher: board + 128x32 OLED + four buttons + Back + cell. The catcher
+    selects a pitch (type, row, column) and sends it as a request through
+    the coach, then sees the delivered call on the OLED.
   - Pitcher: board + recall button + cell + JY300.
   - Shortstop / center field: board + OLED + button + cell.
-- Vocabulary: 9 pitch types x 3 heights x 3 sides (81 calls) + 9 defensive
-  plays.
+- Vocabulary: 9 pitch types x 3 rows x 3 columns (81 calls) + 21 tactical plays.
+  Positions are enrollable (`dev/roster.md`) and any unit can carry audio. Pitch
+  calls are spoken as two clips: the pitch name and the location phrase.
 
 Reuse V1's code, do not rewrite it. The portable C++ call engine and wire
 protocol are in v1/include/pc/ (engine.h, protocol.h, catalog.h), plus the
@@ -40,8 +41,8 @@ the two transports (LE Audio and Thread) and the nRF54L15 board drivers new.
 The engine is transport-agnostic: its send hook maps to a Thread datagram, its
 present hook maps to the LE Audio source or the OLED.
 
-Goal: bring this repo to the same completeness as V1 — all firmware, case CAD,
-coach GUI, provisioning, and docs written and complete — but with no hardware
+Goal: bring this repo to the same completeness as V1: all firmware, case CAD,
+coach GUI, provisioning, and docs written and complete, but with no hardware
 in place: nothing flashed, nothing field-tested, no performance claims.
 
 Workflow: working can only be proven on hardware, so it is a loop. Write
@@ -51,7 +52,7 @@ something works that has not been flashed and observed. Everything short of
 that must be complete and clean.
 
 Prove LE Audio first (flash a minimal LE Audio unicast source and get a JY300
-to connect and play) — see dev/le-audio-proof.md. That is the one risky unknown.
+to connect and play); see dev/le-audio-proof.md. That is the one risky unknown.
 
 Constraints:
 - User-facing docs stay minimal and product-style: plain, concise, factual, no

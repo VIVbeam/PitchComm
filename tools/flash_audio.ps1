@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Writes the LittleFS audio image to one audio unit (pitcher or catcher).
+Writes the LittleFS audio image to the pitcher unit.
 
 .DESCRIPTION
 This is a data image, not a firmware ELF, so west flash does not apply. It is
@@ -9,7 +9,7 @@ programmed with nRF Util at the raw slot address recorded in the Intel HEX:
   nrfutil device program --firmware firmware/build/audio/littlefs.hex `
     --options chip_erase_mode=ERASE_RANGES,verify=VERIFY_READ
 
-Run this once per audio unit after flashing its firmware with
+Run this once on the pitcher unit after flashing its firmware with
 tools\flash_firmware.ps1. nrfutil (nRF Util) and its device command must be on
 PATH; install with `nrfutil install device` if needed. Use -Serial to pick a
 probe when several are attached.

@@ -9,6 +9,8 @@ class CatcherMenu {
  public:
   enum class Screen { Pitches, Height, Location };
   enum class Action { None, Send, Recall, Volume, Cancel };
+  // Three numbered slots per page; the fourth front key pages forward.
+  static constexpr unsigned kPitchPages = (kPitchCount + 2) / 3;
   Screen screen() const { return screen_; }
   unsigned page() const { return page_; }
   unsigned pitch() const { return pitch_; }
@@ -19,6 +21,16 @@ class CatcherMenu {
   void cancel() { screen_=Screen::Pitches; pitch_=height_=location_=0; engaged_=false; }
   // Call only after queue acceptance; a rejected Send retains the editable draft.
   void accepted() { cancel(); }
+  // Re-arm a complete selection after the coach rejects the request (busy) or
+  // it expires, so a resend is one press from the Location screen.
+  void restore(uint16_t code) {
+    constexpr unsigned kCodesPerPitch = kRows * kCols;
+    if (!code || code > kPitchCount * kCodesPerPitch) return;
+    pitch_=(code-1)/kCodesPerPitch+1;
+    height_=((code-1)%kCodesPerPitch)/kCols+1;
+    location_=(code-1)%kCols+1;
+    page_=(pitch_-1)/3; screen_=Screen::Location; engaged_=true;
+  }
   template<class Submit>
   bool commit(bool displayReady,bool controlsReady,bool audioReady,Submit submit) {
     if (screen_!=Screen::Location || !code() || !displayReady || !controlsReady || !audioReady)
@@ -29,15 +41,16 @@ class CatcherMenu {
   Action front(unsigned key) {
     if (key<1 || key>4) return Action::None;
     if (screen_==Screen::Pitches) {
-      if (key==4) { page_=(page_+1)%3; engaged_=true; return Action::None; }
+      if (key==4) { page_=(page_+1)%kPitchPages; engaged_=true; return Action::None; }
       const unsigned selected=page_*3+key;
+      if (selected>kPitchCount) return Action::None;  // short final page
       if (selected!=pitch_) height_=location_=0;
       engaged_=true; pitch_=selected; screen_=Screen::Height;
     } else if (screen_==Screen::Height) {
-      if (key<=3) { if (height_!=key) location_=0; height_=key; }
-      else if (height_) screen_=Screen::Location;
-    } else if (key<=3) location_=key;
-    else if (code()) return Action::Send;
+      if (key<4 && key<=kRows) { if (height_!=key) location_=0; height_=key; }
+      else if (key==4 && height_) screen_=Screen::Location;
+    } else if (key<4 && key<=kCols) location_=key;
+    else if (key==4 && code()) return Action::Send;
     return Action::None;
   }
   Action back(bool longHold) {
@@ -50,28 +63,31 @@ class CatcherMenu {
     else if (!draft()) return Action::Recall;
     return Action::None;
   }
-  // Display aliases only: catalog codes and spoken recordings remain unchanged.
-  inline static constexpr const char* kPitchLabels[]={"FB","CH","CB","SL","SI","CT","SPL","KN","PO"};
-  inline static constexpr const char* kHeightLabels[]={"Hi","Mid","Lo"};
-  inline static constexpr const char* kLocationLabels[]={"IN","MID","OUT"};
+  // The generated short forms are the only labels the menu displays.
   struct Frame { char header[24]{}, rows[2][24]{}, footer[24]{}; };
   Frame frame() const {
     Frame f;
-    const char* labels[3]; unsigned selected=0;
+    const char* labels[3]={"","",""}; unsigned selected=0;
     const char* fourth="--";
     if (screen_==Screen::Pitches) {
-      snprintf(f.header,sizeof(f.header),"PITCHES %u/3",page_+1);
-      for (unsigned i=0;i<3;++i) labels[i]=kPitchLabels[page_*3+i];
+      snprintf(f.header,sizeof(f.header),"PITCHES %u/%u",page_+1,kPitchPages);
+      for (unsigned i=0;i<3;++i) {
+        const unsigned index=page_*3+i;
+        if (index<kPitchCount) labels[i]=kPitchShort[index];
+      }
       if (pitch_ && (pitch_-1)/3==page_) selected=(pitch_-1)%3+1;
       fourth="Next";
       snprintf(f.footer,sizeof(f.footer),"%s",draft() ? "Hold Back: cancel" : "Back recall; hold vol");
     } else {
       const bool heightScreen=screen_==Screen::Height;
       selected=heightScreen ? height_ : location_;
-      for (unsigned i=0;i<3;++i) labels[i]=heightScreen ? kHeightLabels[i] : kLocationLabels[i];
-      if (heightScreen) snprintf(f.header,sizeof(f.header),"%s HEIGHT",kPitchLabels[pitch_-1]);
-      else snprintf(f.header,sizeof(f.header),"%s %s %s",kPitchLabels[pitch_-1],
-                         kHeightLabels[height_-1],location_ ? kLocationLabels[location_-1] : "--");
+      for (unsigned i=0;i<3;++i) {
+        if (heightScreen) { if (i<kRows) labels[i]=kRowShort[i]; }
+        else if (i<kCols) labels[i]=kColShort[i];
+      }
+      if (heightScreen) snprintf(f.header,sizeof(f.header),"%s HEIGHT",kPitchShort[pitch_-1]);
+      else snprintf(f.header,sizeof(f.header),"%s %s %s",kPitchShort[pitch_-1],
+                         kRowShort[height_-1],location_ ? kColShort[location_-1] : "--");
       if (selected) fourth=heightScreen ? "Confirm" : "Send";
       snprintf(f.footer,sizeof(f.footer),"%s",selected ? "Back; hold: cancel" :
                     (heightScreen ? "Choose height; Back" : "Choose side; Back"));

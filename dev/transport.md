@@ -16,7 +16,7 @@ The engine has no platform dependencies. Only `firmware/src/main.cpp` (`AppHooks
 
 | Constant | Value | Meaning |
 |---|---|---|
-| `kRoles` | 5 | Coach, Catcher, Pitcher, Shortstop, Centerfield |
+| `kUnitCount` | 5 | Coach plus the enrolled roster (default pitcher, catcher, shortstop, center) |
 | `kPacketBytes` | 56 | wire payload, explicit little-endian |
 | `kProtocolVersion` | 1 | byte `b[2]` |
 | `kCallWindow` | 1000 ms | call lifetime |
@@ -25,7 +25,7 @@ The engine has no platform dependencies. Only `firmware/src/main.cpp` (`AppHooks
 
 - `elapsed()`/`newer()` are `uint32_t` wrap math, valid only for milliseconds (wrap ~49.7 days). Never feed microseconds.
 - `Engine` API (`submit`, `tick`, `receive`, `outputFailed`, accessors) is unchanged.
-- The core is verified on the host by `firmware/tests/test_core.cpp` (`127 checks, 0 failures`) including handshake, call/ACK, duplicate suppression, requests, expiry, USB gate, catcher menu and button filtering.
+- The core is verified on the host by `firmware/tests/test_core.cpp` (3348 checks, 0 failures) including handshake, call/ACK, duplicate suppression, requests, expiry, USB gate, catcher menu, button filtering, clock-wrap behavior, lossy and reordered links, multi-node fairness, and 100k-buffer protocol fuzzing.
 
 ## 2. Transport: Thread, not Zigbee
 
@@ -47,7 +47,7 @@ No border router and no phone are needed. The coach is the leader (`CONFIG_OPENT
 
 `tools/provision.py` generates one closed Thread dataset per team and writes it into `firmware/include/app/team_config.h`:
 
-- five EUI-64 extended addresses (one per role),
+- one EUI-64 extended address per unit (coach plus the enrolled roster),
 - active dataset: channel (11-26, default 15), PAN ID, extended PAN ID, network key, mesh-local ULA prefix, network name `PitchComm-XXXX`,
 - UDP port 45678 (constant).
 
@@ -57,7 +57,7 @@ Every unit is built with the same dataset and calls `otDatasetSetActive()` + `ot
 
 - Each unit sets its 802.15.4 extended address to its provisioned EUI-64 (`otLinkSetExtendedAddress`) before enabling Thread.
 - Link-local IPv6 addresses are therefore deterministic: `fe80::/64` plus the EUI-64 with the universal/local bit flipped. The coach computes all five, and every unit can compute the coach's.
-- Outgoing datagrams set `sin6_scope_id` from the default network interface; incoming datagrams are matched against the five link-local addresses to identify the source role.
+- Outgoing datagrams set `sin6_scope_id` from the default network interface; incoming datagrams are matched against the unit link-local addresses to identify the source unit.
 - The engine's `authenticatedSource` argument is meaningful because Thread binds a node's link-local address to its EUI-64 and encrypts/authenticates at the MAC layer with the network key.
 
 No application HMAC is added: the 56-byte payload stays 56 bytes, and a node cannot spoof another's source address without the network key. Revisit only if a threat model appears.
@@ -69,7 +69,7 @@ The engine calls these on its own thread. None may block on the radio or audio: 
 | Hook | V2 implementation |
 |---|---|
 | `send(p)` | `pc::encode` to 56 bytes, `pc_link_send(target, bytes, 56)` pushes to the radio TX `k_msgq`; false on a full queue, which the engine treats as a failed transmit and retries |
-| `present(out)` | audio roles: `pc_audio_play()` (queues, does not block); display roles: `board::Display` frame/strip; catcher also drives the OLED menu |
+| `present(out)` | audio units: `pc_audio_play()` (queues, does not block); display units: `board::Display` frame/strip; controls units also drive the OLED menu |
 | `clearOutput()` | `pc_audio_stop()` and wake the display |
 
 On-air framing: the app payload is the 56-byte `encode()` output sent as one UDPv6 datagram. Thread handles addressing and MAC retries.
@@ -85,31 +85,52 @@ On-air framing: the app payload is the 56-byte `encode()` output sent as one UDP
 | TX queue | `k_msgq`, depth 8, drained by the radio thread |
 | radio thread | `zsock_poll` 2 ms + TX drain; RX callback enqueues only |
 | console | `console_getline()` thread |
-| UI / audio | main thread (UI) plus one audio thread on audio roles |
+| UI / audio | main thread (UI) plus one audio thread on audio units |
 
 `CONFIG_SYS_CLOCK_TICKS_PER_SEC=1000` so `k_msleep(1)` is truly 1 ms.
 
 Thread layout:
 
 - **engine thread** (priority 6): drain inbox, `receive(src, pkt, now, now - receivedAt)`, then `tick(now)`, 1 ms cadence.
-- **radio thread** (`thread_link.c`, priority 4): owns the UDP socket, drains the TX queue, polls RX, resolves the source role from the link-local address, calls the inbox callback.
+- **radio thread** (`thread_link.c`, priority 4): owns the UDP socket, drains the TX queue, polls RX, resolves the source unit from the link-local address, calls the inbox callback.
 - **main thread** (priority 7, lowest application thread): UI drawing, buttons, battery, catcher menu, serial console parse loop. A full OLED frame is a multi-millisecond I2C transfer and must not delay radio or audio.
 - **console thread** (priority 7): blocks on `console_getline()`.
-- **audio thread** (priority 5, catcher/pitcher/proof): BAP unicast client, LC3 encode, LittleFS clips.
+- **audio thread** (priority 5, pitcher/proof): BAP unicast client, LC3 encode, LittleFS clips.
 
 Radio callbacks and audio callbacks never call the engine directly except through the bounded inbox.
 
+## 4.1 Request, shake-off, and timing
+
+Workflow constants: `kCallWindow` 1000 ms, request retry 100 ms, ACK resend 80 ms, SED poll period 200 ms, radio thread 2 ms, engine cadence 1 ms.
+
+One catcher pitch request, measured from the Send button release on the catcher:
+
+| Step | Time |
+|---|---|
+| Button filter stable release | 35 ms |
+| Engine tick + radio queue | <= 3 ms |
+| Thread uplink to the coach | 10-40 ms typical |
+| Coach engine accept and queue the response | <= 2 ms |
+| Downlink to the Sleepy End Device | 0-200 ms (poll phase; budget the worst case) |
+| Response handling and OLED write | <= 15 ms |
+
+Expected about 130 ms, worst case about 260 ms from release to the catcher seeing the call. The pitcher hears the same call on the same schedule, and the coach marks it delivered or missing within the 1000 ms call window.
+
+Shake-off: there is no in-system shake-off message. The pitcher shakes his head, and the catcher selects the next pitch. Re-selecting the three axes usually takes longer than the call window, so the coach module is free; if a request does arrive inside the window, the coach answers Busy. The catcher menu re-arms the last selection on Busy or expiry (`CatcherMenu::restore`), so the retry is one press. No person accepts anything: the coach module is the relay, and the human coach only originates calls from the laptop.
+
+A four-pitch sequence with three shake-offs is dominated by human selection time (roughly 8-15 s); the radio link contributes well under 1 s across all four calls.
+
 ## 5. File layout (V2)
 
-- `firmware/src/main.cpp` — role app, `AppHooks`, engine thread, console, UI loop.
-- `firmware/src/thread_link.c` — OpenThread bring-up and UDP transport.
-- `firmware/include/app/thread_link.h` — transport contract.
-- `firmware/include/app/team_config.example.h` — committed placeholder; `team_config.h` is generated.
-- `firmware/src/audio_source.c`, `firmware/src/storage.c` — LE Audio source and clip storage.
-- `firmware/src/display.cpp`, `buttons.cpp`, `battery.cpp` — board drivers.
-- `firmware/boards/xiao_nrf54l15_nrf54l15_cpuapp.overlay` — OLED, ADC channel, display choice.
-- `firmware/roles/*.conf` — per-role Kconfig fragments.
-- `firmware/tests/` — host tests for the portable core.
+- `firmware/src/main.cpp`: unit app, `AppHooks`, engine thread, console, UI loop.
+- `firmware/src/thread_link.c`: OpenThread bring-up and UDP transport.
+- `firmware/include/app/thread_link.h`: transport contract.
+- `firmware/include/app/team_config.example.h`: committed placeholder; `team_config.h` is generated.
+- `firmware/src/audio_source.c`, `firmware/src/storage.c`: LE Audio source and clip storage.
+- `firmware/src/display.cpp`, `buttons.cpp`, `battery.cpp`: board drivers.
+- `firmware/boards/xiao_nrf54l15_nrf54l15_cpuapp.overlay`: OLED, ADC channel, display choice.
+- `firmware/roles/*.conf`: per-unit Kconfig fragments.
+- `firmware/tests/`: host tests for the portable core.
 - `tools/provision.py`, `tools/build_firmware.ps1`, `tools/flash_firmware.ps1`.
 
 Unchanged input: `config/calls.json` to `firmware/include/pc/catalog.h`.
