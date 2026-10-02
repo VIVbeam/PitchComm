@@ -56,7 +56,7 @@ Every unit is built with the same dataset and calls `otDatasetSetActive()` + `ot
 ### Addressing
 
 - Each unit sets its 802.15.4 extended address to its provisioned EUI-64 (`otLinkSetExtendedAddress`) before enabling Thread.
-- Link-local IPv6 addresses are therefore deterministic: `fe80::/64` plus the EUI-64 with the universal/local bit flipped. The coach computes all five, and every unit can compute the coach's.
+- Link-local IPv6 addresses are therefore deterministic: `fe80::/64` plus the EUI-64 with the universal/local bit flipped. The coach computes every enrolled unit's address, and every unit can compute the coach's.
 - Outgoing datagrams set `sin6_scope_id` from the default network interface; incoming datagrams are matched against the unit link-local addresses to identify the source unit.
 - The engine's `authenticatedSource` argument is meaningful because Thread binds a node's link-local address to its EUI-64 and encrypts/authenticates at the MAC layer with the network key.
 

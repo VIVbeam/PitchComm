@@ -42,7 +42,7 @@ Options:
 | `-Provisioned` | Check the provisioned build path with a temporary `PC_TEAM_CONFIGURED 1` header. |
 | `-MinSize` | Recheck every role with the `roles/min-size.conf` effects applied. |
 | `-RawI2c` | Check the `display.cpp` raw I2C fallback with `CONFIG_SSD1306` undefined. |
-| `-RosterVariant` | Render a catalog for `roster-variant.json` and compile one probe TU that pins it. |
+| `-RosterVariant` | Render a catalog for `roster-variant.json`, stage a 7-unit `team_config.h`, and compile the probe plus `thread_link.c`. |
 | `-Strict` | Add extra warning flags; warnings are informational, not failures. |
 | `-SkipAudio` | Skip `storage.c` and `audio_source.c` for `pitcher` and `proof`, printing a SKIP note. |
 | `-CompilerC path` | Override the C compiler (default: `gcc` from `PATH`). |
@@ -72,11 +72,12 @@ pwsh -NoProfile -File dev/host_compile/run.ps1 -Provisioned -MinSize -RawI2c -St
 | `-Provisioned` | 14 | Generates a temporary `app/team_config.h` shaped like `team_config.example.h` with `PC_TEAM_CONFIGURED 1`, unique nonzero EUIs, and lab channel, PAN ID, keys and prefix. The temp directory is added with `-I` before `firmware/include`, and `main.cpp` plus `thread_link.c` are recompiled for all seven roles, so the provisioned branch (including its `_Static_assert` on the network name) is parsed. `firmware/include/app/team_config.h` is never written to, and the temp directory is removed afterwards even when a check fails. |
 | `-MinSize` | 29 | Applies the `roles/min-size.conf` effects to every role: `CONFIG_LOG` and `CONFIG_ASSERT` are omitted (`n` in Kconfig), `CONFIG_OPENTHREAD_DEBUG` is omitted, `CONFIG_OPENTHREAD_NUM_MESSAGE_BUFFERS` becomes 32, `CONFIG_OPENTHREAD_MAX_CHILDREN` becomes 4, then every role source is recompiled. |
 | `-RawI2c` | 3 | Recompiles `display.cpp` for catcher, shortstop and center with `CONFIG_SSD1306` removed (and `CONFIG_I2C` still set), so the raw SSD1306 fallback branch is parsed instead of the in-tree driver branch. |
-| `-RosterVariant` | 1 | Copies `config/calls.json` and `dev/host_compile/roster-variant.json` into a temporary config root, renders the variant `catalog.h` with `tools/generate_catalog.py` (read only: `load()`/`render()`, never `generate()`, so the committed `catalog.h`, `gui/catalog.json` and `build/validation.lock` stay untouched), and compiles `catalog_probe.cpp` against a temporary overlay of the real headers. The probe's `static_assert`s pin coach plus six enrolled units, the `PC_UNIT_bench` index, `kUnitMask`, the custom unit's label and capability arrays, the pitch audience mask, the `all` and `outfield` audiences that the added units change, and the `SEE DOWN` clip path that only exists once two outfield units have audio. |
+| `-RosterVariant` | 2 | Copies `config/calls.json` and `dev/host_compile/roster-variant.json` into a temporary config root, then renders two files into a temporary overlay of the real headers: the variant `catalog.h` with `tools/generate_catalog.py` and the matching `app/team_config.h` with `tools/provision.py`'s `header_text` (`PC_TEAM_UNIT_COUNT 7`, seven EUI rows in unit order). `catalog_probe.cpp` and `firmware/src/thread_link.c` (C11) are compiled against that overlay, so the catalog values and the Thread transport's `PC_TEAM_UNIT_COUNT` sizing are both checked with six enrolled units. `load()`/`render()` are read only, never `generate()`, so the committed `catalog.h`, `gui/catalog.json` and `build/validation.lock` stay untouched. |
 | `-Strict` | adds notes | Adds `-Wundef -Wshadow -Wcast-qual -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations`, drops `-Werror`, and prints warnings as `NOTE` lines with a per-mode note count. `-Wstrict-prototypes` and `-Wmissing-prototypes` go to C files only because g++ rejects them for C++. Compile errors still fail the run. |
 
-With every mode enabled the run performs 76 checks: 29 base, 29 min-size,
-3 raw I2C, 14 provisioned, and 1 roster variant.
+With every mode enabled the run performs 77 checks: 29 base, 29 min-size,
+3 raw I2C, 14 provisioned, 1 variant catalog probe, and 1 seven-unit Thread
+transport.
 
 ### Variant roster mode
 
@@ -98,6 +99,18 @@ order (so `PC_UNIT_right` is 5 and the custom `PC_UNIT_bench` is 6),
 and the `SEE DOWN` play gaining `/audio/d18.wav` because both of its resolved
 targets now have audio. A missing generated define stops the probe at compile
 time and is reported as a normal FAIL check.
+
+The same pass stages `app/team_config.h` through `tools/provision.py`'s
+`header_text`, so the header carries `PC_TEAM_UNIT_COUNT 7` and seven
+`team_eui64` rows in unit order (coach, pitcher, catcher, shortstop, center,
+right, bench). The count line and the row count are checked before the file is
+written, and the run prints
+`team PC_TEAM_UNIT_COUNT 7  EUI rows 7  unit order: ...`. `thread_link.c` is
+then compiled against that header with the field-unit define set, which pins
+that the transport's peer address table, EUI setup loop and receive loop size
+themselves from `PC_TEAM_UNIT_COUNT` instead of the default five. The
+generator and provision imports keep `-B`, so `tools/__pycache__` is not
+written either.
 
 Because a quoted include such as `units.h -> "catalog.h"` resolves next to the
 including header first, the variant catalog only takes effect inside a
@@ -176,11 +189,17 @@ are declared but not defined; `-fsyntax-only` never needs a linker.
 * `roles/min-size.conf` is mirrored by `-MinSize`. No source in
   `firmware/src` currently branches on `CONFIG_LOG` or `CONFIG_ASSERT`, so
   the mode mainly guards future edits.
-* `-RosterVariant` compiles one probe translation unit that includes
-  `pc/engine.h`, not the Zephyr-facing sources. It proves the generator and
-  the portable headers agree on the variant roster and that masks, audiences
-  and clip paths follow it, but it does not build a firmware image for a
-  `right`, `bench` or audio-enabled `center` role.
+* `-RosterVariant` compiles the catalog probe and `thread_link.c` against the
+  variant roster, but not `main.cpp` or a full role image, and it stays
+  `-fsyntax-only`. It proves the generator, the provisioned header shape and
+  the Thread transport sizing agree on seven units; it does not prove the
+  radio or the engine runtime.
+* The 16-unit ceiling in `thread_link.c` is a `_Static_assert`, not a
+  permanent host check. It was verified once by hand: a temp root with a
+  17-unit roster through `provision.header_text` yields
+  `#define PC_TEAM_UNIT_COUNT 17` and fails to compile with
+  `static assertion failed: "team unit count must fit the wire unit index"`
+  at `thread_link.c:67`. The harness only stages the valid 7-unit header.
 * `CONFIG_BT_ISO_TX_MTU` and `CONFIG_BT_CONN_TX_USER_DATA_SIZE` are Kconfig
   ints without explicit values in `roles/audio-unit.conf`. Representative
   values (251 and 4) are pinned in `run.ps1`.
@@ -210,15 +229,22 @@ Every mode with the base error gate
 | rawi2c | 3 | 0 | 0 |
 | provisioned | 14 | 0 | 0 |
 | rostervariant | 1 | 0 | 0 |
+| roster7transport | 1 | 0 | 0 |
 
-All 76 checks pass with exit code 0, and the plain default run
+All 77 checks pass with exit code 0, and the plain default run
 (`run.ps1`) passes its 29 checks with exit code 0. Every mode was also run
 with `-Strict` (`run.ps1 -Provisioned -MinSize -RawI2c -RosterVariant -Strict`):
-the same 76 checks pass, exit code 0, and the only notes are the known
+the same 77 checks pass, exit code 0, and the only notes are the known
 `audio_source.c:693` const-cast warning, reported twice in the base pass
-(pitcher and proof) and twice in the min-size pass. The strict roster-variant
-probe adds no notes. No files were skipped and no fixes were required in
+(pitcher and proof) and twice in the min-size pass. Neither strict variant
+check adds notes. No files were skipped and no fixes were required in
 `firmware/src`.
+
+The variant pass staged `team PC_TEAM_UNIT_COUNT 7  EUI rows 7  unit order:
+coach, pitcher, catcher, shortstop, center, right, bench`, and
+`thread_link.c` compiled against it as `roster7`. The one-off 17-unit check
+described under Known gaps failed at `thread_link.c:67` as expected and is not
+part of the run.
 
 The variant rendered on that run was dictionary `0x22583391`: `kUnitCount 7`,
 `PC_UNIT_right 5`, `PC_UNIT_bench 6`, `kUnitMask(bench) 64`, pitch audience

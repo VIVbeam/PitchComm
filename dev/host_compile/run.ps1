@@ -21,10 +21,11 @@
 #   -RawI2c       recheck display.cpp with CONFIG_SSD1306 undefined so the
 #                 raw I2C fallback is parsed
 #   -RosterVariant render a catalog for dev/host_compile/roster-variant.json
-#                 with the generator API into a temporary include overlay and
-#                 compile dev/host_compile/catalog_probe.cpp against it, so its
-#                 static_asserts pin a six-unit roster (coach + default four +
-#                 right + custom bench, center audio on) end to end
+#                 with the generator API into a temporary include overlay,
+#                 stage the matching 7-unit app/team_config.h there, compile
+#                 dev/host_compile/catalog_probe.cpp against it, and compile
+#                 firmware/src/thread_link.c against the same 7-unit header so
+#                 the Thread transport is checked past the default five units
 #   -Strict       add extra warning flags, do not treat warnings as errors,
 #                 and print them as informational NOTE lines
 #
@@ -453,9 +454,11 @@ function New-ProvisionedTeamConfig {
 
 # -RosterVariant support: render the catalog for
 # dev/host_compile/roster-variant.json with the generator API into a fresh
-# temporary include overlay, then compile dev/host_compile/catalog_probe.cpp
-# against it. The repo's config/, firmware/include/ and tools/ are only read,
-# and build/validation.lock is never created because generate() is not called.
+# temporary include overlay, stage a matching app/team_config.h with
+# PC_TEAM_UNIT_COUNT 7, then compile dev/host_compile/catalog_probe.cpp and
+# firmware/src/thread_link.c against it. The repository's config/,
+# firmware/include/ and tools/ are only read, and build/validation.lock is
+# never created because generate() is not called.
 function Invoke-RosterVariantPass {
     param([switch]$StrictMode)
 
@@ -486,7 +489,10 @@ function Invoke-RosterVariantPass {
         $overlay = Join-Path $root 'include'
         New-Item -ItemType Directory -Path $overlay -Force | Out-Null
         Copy-Item -Path (Join-Path $includeDir '*') -Destination $overlay -Recurse -Force
+        # Written after the copy so the staged files win over any local
+        # firmware/include/app/team_config.h or committed catalog.h.
         $catalogPath = Join-Path $overlay 'pc\catalog.h'
+        $teamConfigPath = Join-Path $overlay 'app\team_config.h'
 
         $python = Get-Command python -ErrorAction SilentlyContinue
         if (-not $python) {
@@ -497,6 +503,7 @@ function Invoke-RosterVariantPass {
 import sys
 sys.path.insert(0, r'$toolsDir')
 import generate_catalog as generator
+import provision
 data, version = generator.load(r'$root')
 files = generator.render(data, version)
 with open(r'$catalogPath', 'w', encoding='utf-8', newline='\n') as output:
@@ -509,6 +516,27 @@ all_play = generator.unit_mask(data, by_key[13]['audience'])
 see_down = generator.unit_mask(data, by_key[18]['audience'])
 listeners = [unit['key'] for unit in data['units']
              if unit['audio'] and generator.unit_mask(data, [unit['key']]) & see_down]
+keys = provision.unit_keys(r'$root')
+team = {
+    'network_name': 'PitchCommHost',
+    'panid': 0x5a17,
+    'channel': 19,
+    'udp_port': provision.UDP_PORT,
+    'xpanid': '0A1B2C3D4E5F6071',
+    'network_key': '112233445566778899AABBCCDDEEF001',
+    'mesh_local_prefix': 'FD123456789ABCDE',
+    'eui64': {key: '02:10:20:30:40:50:60:{:02x}'.format(0x10 + position)
+              for position, key in enumerate(keys)},
+}
+team_text = provision.header_text(team, r'$root')
+table_marker = 'static const uint8_t team_eui64[PC_TEAM_UNIT_COUNT][8] = {'
+if table_marker not in team_text:
+    raise SystemExit('staged team_config.h is missing the EUI table')
+table_rows = team_text.split(table_marker, 1)[1].split('};', 1)[0].count('{0x')
+if '#define PC_TEAM_UNIT_COUNT {}'.format(len(keys)) not in team_text or table_rows != len(keys):
+    raise SystemExit('staged team_config.h count or EUI rows are wrong')
+with open(r'$teamConfigPath', 'w', encoding='utf-8', newline='\n') as output:
+    output.write(team_text)
 print('dictionary 0x{:08x}'.format(version))
 print('kUnitCount {}  PC_UNIT_bench {}  kUnitMask(bench) {}  kUnitMask(right) {}'.format(
     len(data['units']) + 1, index['bench'],
@@ -517,9 +545,12 @@ print('pitch audience {}  audio mask {}'.format(pitch_mask, audio_mask))
 print('play 13 audience {}  play 18 audience {}  audio in play 18: {}'.format(
     all_play, see_down, ', '.join(listeners)))
 print('play 18 clip {}'.format('/audio/d18.wav' if see_down & audio_mask else 'absent'))
+print('team PC_TEAM_UNIT_COUNT {}  EUI rows {}  unit order: {}'.format(
+    len(keys), table_rows, ', '.join(keys)))
 "@
 
-        # -B keeps the generator import from writing tools/__pycache__.
+        # -B keeps the generator and provision imports from writing
+        # tools/__pycache__.
         $previousEap = $ErrorActionPreference
         $ErrorActionPreference = 'Continue'
         try {
@@ -529,13 +560,13 @@ print('play 18 clip {}'.format('/audio/d18.wav' if see_down & audio_mask else 'a
             $ErrorActionPreference = $previousEap
         }
         if ($generatorExit -ne 0) {
-            Write-Host ("FAIL {0,-22} {1,-11} [{2}]" -f 'catalog_probe.cpp', 'roster', $label) -ForegroundColor Red
+            Write-Host ("FAIL {0,-22} {1,-11} [{2}]" -f 'variant-setup', 'roster', $label) -ForegroundColor Red
             foreach ($line in $generated) { Write-Host "    $line" }
             Add-Stat -Mode $label -Fail 1
             $script:failed = $script:failed + 1
             return
         }
-        Write-Host 'Variant catalog from tools/generate_catalog.py (read only; no lock taken):'
+        Write-Host 'Variant catalog and team header staged (read only; no lock taken):'
         foreach ($line in $generated) { Write-Host "  $line" }
 
         $compilerArgs = @('-fsyntax-only', '-Wall', '-Wextra')
@@ -566,6 +597,15 @@ print('play 18 clip {}'.format('/audio/d18.wav' if see_down & audio_mask else 'a
             Add-Stat -Mode $label -Fail 1
             $script:failed = $script:failed + 1
         }
+
+        # The Thread transport sizes its peer address table and its loops from
+        # PC_TEAM_UNIT_COUNT, so recheck firmware/src/thread_link.c against the
+        # same 7-unit header. Invoke-FileCheck is the provisioned-mode path: it
+        # already puts the overlay before firmware/include and the stubs and
+        # applies the same C11 warning flags.
+        Invoke-FileCheck -Role 'roster7' -File 'thread_link.c' `
+            -Defines $roleTable['catcher'].Defines -Mode 'roster7transport' `
+            -ExtraIncludes @($overlay) -StrictMode:$StrictMode
     } finally {
         if (Test-Path -LiteralPath $root) {
             Remove-Item -LiteralPath $root -Recurse -Force

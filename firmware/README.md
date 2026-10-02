@@ -1,13 +1,13 @@
 # PitchComm firmware
 
-Zephyr / nRF Connect SDK application for the five XIAO nRF54L15 units.
+Zephyr / nRF Connect SDK application for the XIAO nRF54L15 units in the roster.
 
 Board target: `xiao_nrf54l15/nrf54l15/cpuapp`
 
 ## What you need
 
 - nRF Connect SDK v3.4.0 with the ARM toolchain, `west`, and `nrfutil` on `PATH`.
-- Five wired boards ([wiring](../docs/wiring.md)).
+- Five wired boards in the base set ([wiring](../docs/wiring.md)); extra positions enroll the same way.
 - A laptop with Python 3.10 or newer.
 - One HomeSpot JY300 neckband for the pitcher. Pair it once: put it in pairing mode; the pitcher unit reconnects to it after that.
 
