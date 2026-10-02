@@ -88,7 +88,7 @@ function render() {
   const pitchIndices = catalog.units.map((unit, index) => unit.pitches ? index + 1 : 0).filter(Boolean);
   const audienceIndices = selectedPlay ? selectedPlay.audience.map(key => unitIndexOf(catalog, key)).filter(index => index > 0) : [];
   const targetIndices = category === 1 ? pitchIndices : audienceIndices;
-  $('previewCategory').textContent = category === 1 ? 'PITCH CALL' : 'DEFENSIVE PLAY';
+  $('previewCategory').textContent = category === 1 ? 'PITCH CALL' : 'PLAY CALL';
   $('previewType').textContent = category === 1 ? catalog.pitches.find(p => p.key === type)?.speech ?? 'Choose a pitch' : selectedPlay?.label ?? 'Choose a play';
   $('previewLocation').textContent = category === 1 ? selectedLocation ? selectedLocation.speech : selectedRow && selectedCol ? `${selectedRow.label} · ${selectedCol.label}` : 'Then choose a location' : selectedPlay ? selectedPlay.speech : '';
   $('previewTargets').textContent = category === 1

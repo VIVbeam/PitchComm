@@ -41,7 +41,7 @@ const COMMAND_HEADER = `# PitchComm coach USB command fixtures, USB protocol v4.
 # Fields:
 #   client: 8 lowercase hex digits, nonzero
 #   id: canonical decimal uint32, nonzero
-#   category: p = pitch, d = defensive play
+#   category: p = pitch, d = play
 #   type: decimal 1..${catalog.pitches.length}; row: decimal 1..${COUNTS.rows}; col: decimal 1..${COUNTS.cols}; play: decimal 1..${COUNTS.maxPlay}
 #   boot: 16 lowercase hex digits, nonzero
 #   dictionary: 8 lowercase hex digits
@@ -67,7 +67,7 @@ const FRAME_HEADER = `# PitchComm @PC frame fixtures, USB protocol v4.
 #   boot: 16 lowercase hex        coach boot id
 #   configured, radio, busy: 0|1  provisioning flag, radio flag, call busy flag
 #   seq: uint32                   last call sequence, 0 when idle
-#   category: 0|1|2               0 none, 1 pitch, 2 defensive play
+#   category: 0|1|2               0 none, 1 pitch, 2 play
 #   code: uint32                  0 when seq is 0, else 1..${COUNTS.maxPitch} pitch or 1..${COUNTS.maxPlay} play
 #   links: ${COUNTS.unitCount} x 0|1                  per unit index, in unit order
 #   delivery: ${COUNTS.unitCount} x 0..4               per unit: 0 none, 1 waiting, 2 accepted, 3 unconfirmed, 4 error

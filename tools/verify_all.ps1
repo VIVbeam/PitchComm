@@ -12,7 +12,8 @@ resolved from this script's own path:
   4. gui/test/run_tests.ps1
   5. python tools/test_tools.py
   6. dev/host_compile/run.ps1 -Provisioned -MinSize -RawI2c -RosterVariant
-  7. python tools/audit_repo.py
+  7. tools/check_build_plan.ps1
+  8. python tools/audit_repo.py
 
 Each step runs in its own child process, captures all output to a per-run
 temporary log, and prints one PASS or FAIL line. A failing step also prints
@@ -109,7 +110,7 @@ function Add-Step {
     }) | Out-Null
 }
 
-# The seven required host steps, in fixed order.
+# The eight required host steps, in fixed order.
 Add-Step -Name 'preflight --audio' -Kind python `
     -Script (Join-Path $root 'tools\preflight.py') -Arguments @('--audio') `
     -LogName '01-preflight-audio.log'
@@ -134,15 +135,19 @@ Add-Step -Name 'host compile (all modes)' -Kind powershell `
     -Arguments @('-Provisioned', '-MinSize', '-RawI2c', '-RosterVariant') `
     -LogName '06-host-compile.log' -SkipReason $quickReason
 
+Add-Step -Name 'build plan (dry run)' -Kind powershell `
+    -Script (Join-Path $root 'tools\check_build_plan.ps1') `
+    -LogName '07-build-plan.log'
+
 Add-Step -Name 'repo audit' -Kind python `
     -Script (Join-Path $root 'tools\audit_repo.py') `
-    -LogName '07-repo-audit.log'
+    -LogName '08-repo-audit.log'
 
 $toolchainReason = $quickReason
 if (-not $Quick -and $SkipToolchain) { $toolchainReason = '-SkipToolchain' }
 Add-Step -Name 'toolchain check' -Kind powershell `
     -Script (Join-Path $root 'tools\check_toolchain.ps1') `
-    -LogName '08-toolchain.log' -Informational -SkipReason $toolchainReason
+    -LogName '09-toolchain.log' -Informational -SkipReason $toolchainReason
 
 $results = New-Object 'System.Collections.Generic.List[object]'
 $totalWatch = [System.Diagnostics.Stopwatch]::StartNew()

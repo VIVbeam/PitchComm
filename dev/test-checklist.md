@@ -34,7 +34,7 @@ Already verified on this machine:
 - [x] `python dev/cad/generate_cases.py --no-preview` -> all checks passed; STLs written to `cad/unbranded/exports/`.
 - [x] `powershell tools/build_print_pack.ps1` and `-Bench` -> both packs written and verified by `-Verify`.
 - [x] `powershell tools/check_toolchain.ps1` -> only `west` and `nrfutil` missing on this bench, as expected.
-- [x] `powershell tools/verify_all.ps1` -> all seven required host steps pass, exit 0; the informational toolchain check reports only `west`/`nrfutil` missing, and `-Quick` skips the host compile and toolchain check.
+- [x] `powershell tools/verify_all.ps1` -> all eight required host steps pass, exit 0 (including the build-plan dry run); the informational toolchain check reports only `west`/`nrfutil` missing, and `-Quick` skips the host compile and toolchain check.
 
 Still needs the NCS toolchain:
 

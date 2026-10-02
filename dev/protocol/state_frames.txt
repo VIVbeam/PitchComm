@@ -17,7 +17,7 @@
 #   boot: 16 lowercase hex        coach boot id
 #   configured, radio, busy: 0|1  provisioning flag, radio flag, call busy flag
 #   seq: uint32                   last call sequence, 0 when idle
-#   category: 0|1|2               0 none, 1 pitch, 2 defensive play
+#   category: 0|1|2               0 none, 1 pitch, 2 play
 #   code: uint32                  0 when seq is 0, else 1..81 pitch or 1..21 play
 #   links: 5 x 0|1                  per unit index, in unit order
 #   delivery: 5 x 0..4               per unit: 0 none, 1 waiting, 2 accepted, 3 unconfirmed, 4 error
