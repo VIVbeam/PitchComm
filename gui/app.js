@@ -69,7 +69,7 @@ function buildControls() {
     const top = document.createElement('div'); top.className = 'receiver-top';
     const title = document.createElement('strong'); title.textContent = unit.label;
     const dot = document.createElement('span'); dot.className = 'dot'; dot.id = `dot${i}`; top.append(title, dot);
-    const caps = [unit.audio ? 'Audio' : '', unit.controls ? 'Controls' : '', unit.pitches ? 'Pitches' : ''].filter(Boolean);
+    const caps = [unit.audio ? 'Audio' : '', unit.relay ? 'Relay' : '', unit.controls ? 'Controls' : '', unit.pitches ? 'Pitches' : ''].filter(Boolean);
     const link = document.createElement('div'); link.id = `link${i}`; link.className = 'receiver-link'; link.textContent = 'Connection unknown';
     if (caps.length) { const capabilities = document.createElement('div'); capabilities.className = 'receiver-link'; capabilities.textContent = caps.join(' · '); card.append(top, capabilities, link); }
     else { card.append(top, link); }

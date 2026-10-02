@@ -34,7 +34,7 @@ Internal build/design notes for the Zephyr / nRF Connect SDK (NCS) application. 
 | Any enrolled field unit | generated `unit-confs/<key>.conf` then `roles/field-common.conf`, plus `roles/audio-unit.conf` when the roster gives it audio |
 | LE Audio proof | `roles/audio-proof.conf;roles/audio-unit.conf` |
 
-The generated fragment sets `CONFIG_PITCHCOMM_AUDIO`, `CONFIG_PITCHCOMM_DISPLAY`, `CONFIG_PITCHCOMM_CATCHER_MENU`, `CONFIG_PITCHCOMM_FIELD_BUTTON`, and `CONFIG_PITCHCOMM_BATTERY` from the unit's capabilities, and enables the display driver for display units. A unit with controls (the catcher-style menu) gets `FIELD_BUTTON=n` because its buttons own those pins. The `PITCHCOMM_ROLE` choice in `firmware/Kconfig` remains for the coach and the audio proof; field builds take their identity from `-DPC_UNIT=PC_UNIT_<key>`.
+The generated fragment sets `CONFIG_PITCHCOMM_AUDIO`, `CONFIG_PITCHCOMM_DISPLAY`, `CONFIG_PITCHCOMM_CATCHER_MENU`, `CONFIG_PITCHCOMM_FIELD_BUTTON`, and `CONFIG_PITCHCOMM_BATTERY` from the unit's capabilities, and enables the display driver for display units. A unit with controls (the catcher-style menu) gets `FIELD_BUTTON=n` because its buttons own those pins. The fragment also picks the Thread device type: sleepy units get `CONFIG_OPENTHREAD_MTD` plus `CONFIG_OPENTHREAD_MTD_SED` and a 200 ms poll, while a unit with `relay` true gets `CONFIG_OPENTHREAD_FTD=y` and a larger OpenThread stack so it forwards for the mesh (`dev/transport.md`). The `PITCHCOMM_ROLE` choice in `firmware/Kconfig` remains for the coach and the audio proof; field builds take their identity from `-DPC_UNIT=PC_UNIT_<key>`.
 
 Raw equivalent for one unit (the generated conf path is absolute in the script):
 

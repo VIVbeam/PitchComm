@@ -32,7 +32,7 @@ Pick a channel (11-26) clear of local Wi-Fi. Keep `config\team.local.json` to re
 powershell -NoProfile -File tools\build_firmware.ps1
 ```
 
-`-Units coach` builds one unit; `-Roles` is kept as an alias that maps `centerfield` to `center`. `-Pristine` rebuilds clean. The script prints each image size.
+`-Units coach` builds one unit; `-Roles` is kept as an alias that maps `centerfield` to `center`. `-Pristine` rebuilds clean. The script prints each image size. A unit with `relay: true` in the roster is built as a Thread router that forwards for the mesh; see `dev/transport.md`.
 
 ## 3. Flash
 

@@ -55,6 +55,7 @@ Status key: **closed** (no further action), **build** (first toolchain contact),
 |---|---|---|
 | Handshake, call, ACK, retry, expiry | bench | Checklist phase 2; host simulation already passes (3348 checks, 0 failures, including lossy and reordered links). |
 | Per-play audiences | closed (host), bench | Plays route to the enrolled audience their targets resolve to; generator, engine deliveries and the desk SEND TO are covered by host, fixture and GUI tests. Bench: phase 4 sends a play and checks exactly the audience reacts. |
+| Mesh relay coverage | closed (source), bench | `relay: true` builds a Full Thread Device with an 8 KB OpenThread stack; the dry run and build-plan checks pin the fragments. Bench: phase 2 compares range and battery drain against the sleepy baseline, phase 3 repeats it with pitcher audio. |
 | Concurrent LE Audio + 802.15.4 | field | Checklist phase 3; top remaining risk. |
 | SED poll period vs runtime | field | Checklist phase 3/5; 200 ms starting point. |
 | Channel choice at the field | field | Provision a channel clear of local Wi-Fi; 11-26, default 15. |

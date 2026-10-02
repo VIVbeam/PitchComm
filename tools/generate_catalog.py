@@ -6,9 +6,9 @@ data: M pitches, R rows, C columns, R*C locations in row-major order, N plays,
 and the coach plus the enrolled units. Play targets are group names
 (`battery`, `infield`, `outfield`, `all`) or explicit roster keys, resolved
 against the enrolled units only. The dictionary hash is FNV-1a over the
-canonical JSON of the vocabulary plus the enrolled unit keys and capabilities
-(EUIs never enter it), so any vocabulary or enrollment edit changes it and
-forces a rebuild on every unit.
+canonical JSON of the vocabulary plus the enrolled unit keys and their
+call-routing capabilities (EUIs and the relay build flag never enter it), so
+any vocabulary or enrollment edit changes it and forces a rebuild on every unit.
 """
 import json
 import os
@@ -30,7 +30,7 @@ GROUPS = {'battery': ('pitcher', 'catcher'),
           'infield': ('first', 'second', 'third', 'shortstop'),
           'outfield': ('left', 'center', 'right'),
           'all': STANDARD_KEYS}
-UNIT_FIELDS = ('key', 'label', 'short', 'audio', 'display', 'controls', 'pitches')
+UNIT_FIELDS = ('key', 'label', 'short', 'relay', 'audio', 'display', 'controls', 'pitches')
 KEY_PATTERN = re.compile(r'[A-Za-z_][A-Za-z0-9_]*\Z')
 
 
@@ -141,7 +141,7 @@ def load_roster(root=None):
         _text(unit,'label',where)
         _short(unit,'short',where)
         _bool(unit,'enrolled',where)
-        for field in ('audio','display','controls','pitches'):
+        for field in ('relay','audio','display','controls','pitches'):
             _bool(unit,field,where)
     enrolled=[unit for unit in units if unit['enrolled']]
     if not enrolled:
@@ -201,6 +201,9 @@ def _dictionary(data,units):
              'plays':[{field:play[field] for field in
                        ('key','label','shortstop','centerfield','speech','targets','file')}
                       for play in data['plays']],
+             # Relay stays out of the dictionary: it is a network-layer build
+             # choice, not a call-routing capability, so the hash must not move
+             # when only a unit's relay flag changes.
              'units':[{field:unit[field] for field in
                        ('key','audio','display','controls','pitches')}
                       for unit in enrolled]}

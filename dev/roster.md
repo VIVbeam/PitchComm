@@ -22,7 +22,7 @@ Rules:
 
 - Standard keys available to enroll: `pitcher`, `catcher`, `first`, `second`, `third`, `shortstop`, `left`, `center`, `right`. Custom keys are allowed and are added by hand to `config/roster.json` (`tools/roster.py` toggles the units already listed); `label` is the GUI name and `short` is at most 4 characters for the catcher menu and status lines.
 - `enrolled` marks the units the team actually has. Only enrolled units appear in the desk, the generated catalog, and the audio plan.
-- Capabilities: `audio` (earbud), `display` (OLED), `controls` (catcher-style menu), `pitches` (receives pitch calls). Plays are not a capability: each play resolves its own targets.
+- Capabilities: `audio` (earbud), `display` (OLED), `controls` (catcher-style menu), `pitches` (receives pitch calls), `relay` (Full Thread Device: stays receive-on and forwards for the mesh; costs battery). Plays are not a capability: each play resolves its own targets.
 - The committed default enrolls only the four current field units, so today's bench builds and tests behave exactly as before. Enrolling more is a config edit plus one EUI, not firmware surgery.
 
 ## Enrollment
@@ -46,8 +46,8 @@ Rules:
 `tools/roster.py` edits `config/roster.json` and regenerates the catalog in one step:
 
 - `python tools/roster.py list` prints every unit, its index when enrolled, capabilities, and whether an EUI exists.
-- `python tools/roster.py enable first` enrolls with the standard profile (pitcher: audio and pitches; catcher: display, controls and pitches; any other key: display). Capability flags such as `--audio`, `--no-pitches`, `--controls` override individual capabilities.
-- `python tools/roster.py disable first` un-enrolls; it refuses to remove the last unit with `pitches`.
+- `python tools/roster.py enable first` enrolls with the standard profile (pitcher: audio and pitches; catcher: display, controls and pitches; any other key: display; relay is off everywhere). Capability flags such as `--audio`, `--no-pitches`, `--controls`, `--relay` override individual capabilities. `relay` does not enter the dictionary; it is a build choice.
+- `python tools/roster.py disable first` un-enrolls; it refuses to remove the last unit with `pitches`. Both commands stage the edited roster with the real calls and validate it before writing, so a change that would leave a play with no enrolled recipient (for example disabling the only outfield unit) is refused with the file untouched.
 
 Both commands print the provisioning and build steps to run next. Disabling warns that `config/team.local.json` and `team_config.h` still hold the unit until provisioning reruns; preflight reports that drift.
 

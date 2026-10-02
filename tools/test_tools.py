@@ -100,13 +100,13 @@ def real_roster_units():
 
 
 def roster_unit(key, enrolled=True, audio=False, display=True, controls=False, pitches=False,
-                short=None, label=None):
+                short=None, label=None, relay=False):
     """One complete roster unit; capabilities default to a display-only field unit."""
     if short is None:
         short = key[:4].upper()
     if label is None:
         label = key.replace('_', ' ').title()
-    return {'key': key, 'label': label, 'short': short, 'enrolled': enrolled,
+    return {'key': key, 'label': label, 'short': short, 'enrolled': enrolled, 'relay': relay,
             'audio': audio, 'display': display, 'controls': controls, 'pitches': pitches}
 
 
@@ -888,6 +888,10 @@ class GenerateCatalogTests(unittest.TestCase):
         self.c_array(header, 'kUnitDisplay', [False] + [unit['display'] for unit in units], boolean=True)
         self.c_array(header, 'kUnitControls', [False] + [unit['controls'] for unit in units], boolean=True)
         self.c_array(header, 'kUnitPitches', [False] + [unit['pitches'] for unit in units], boolean=True)
+        # Relay is a network-layer build choice: the firmware header never
+        # carries it, so there is no kUnitRelay table.
+        self.assertNotIn('kUnitRelay', header)
+        self.assertNotIn('relay', header)
 
     def test_gui_catalog_carries_units_and_play_audiences(self):
         data, _ = self.load()
@@ -898,6 +902,8 @@ class GenerateCatalogTests(unittest.TestCase):
                          [{field: unit[field] for field in generate_catalog.UNIT_FIELDS}
                           for unit in data['units']])
         self.assertEqual(len(catalog['units']), 4)
+        self.assertTrue(all('relay' in unit for unit in catalog['units']))
+        self.assertEqual([unit['relay'] for unit in catalog['units']], [False, False, False, False])
         self.assertEqual(catalog['pitches'],
                          [{'key': p['key'], 'label': p['label'], 'short': p['short'],
                            'speech': p['speech']} for p in data['pitches']])
@@ -981,6 +987,8 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
 
     def test_malformed_roster(self):
         sixteen = [roster_unit(f'u{index:02d}', audio=True, pitches=True) for index in range(1, 17)]
+        missing_relay = roster_unit('pitcher', pitches=True)
+        del missing_relay['relay']
         cases = (
             ('config/roster.json must be a schema 1 object', real_roster_units(), None, 2),
             ('config/roster.json must be a schema 1 object', real_roster_units(), None, 1.0),
@@ -995,6 +1003,9 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
              [roster_unit('pitcher', pitches=True, short='ABCDE')], None, 1),
             ('units[1]: audio must be a boolean',
              [dict(roster_unit('pitcher', pitches=True), audio='yes')], None, 1),
+            ('units[1]: relay must be a boolean',
+             [dict(roster_unit('pitcher', pitches=True), relay='yes')], None, 1),
+            ('units[1]: relay must be a boolean', [missing_relay], None, 1),
             ('roster must enroll at least one unit',
              [roster_unit('pitcher', enrolled=False)], None, 1),
             ('roster must enroll at least one unit with the pitches capability',
@@ -1085,6 +1096,34 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
         _, changed_version = generate_catalog.load(self.tmp)
         self.assertNotEqual(changed_version, real_version)
         self.assertEqual(changed_version, generate_catalog.load(self.tmp)[1])
+
+    def test_relay_flag_stays_out_of_the_dictionary_and_header(self):
+        self.write(real_roster_units())
+        before_data, _ = generate_catalog.load(self.tmp)
+        before_clips = {name for name, _ in generate_catalog.clips(before_data)}
+        before_version, before_files = generate_catalog.rendered(self.tmp)
+        header_before = before_files['firmware/include/pc/catalog.h']
+        gui_before = json.loads(before_files['gui/catalog.json'])
+        self.assertEqual(before_version, 0x299314f6)
+        self.assertNotIn('kUnitRelay', header_before)
+        self.assertNotIn('relay', header_before)
+        self.assertTrue(all('relay' in unit for unit in gui_before['units']))
+        self.assertTrue(all(unit['relay'] is False for unit in gui_before['units']))
+
+        units = real_roster_units()
+        center = next(unit for unit in units if unit['key'] == 'center')
+        center['relay'] = True
+        self.write(units)
+
+        after_data, _ = generate_catalog.load(self.tmp)
+        after_version, after_files = generate_catalog.rendered(self.tmp)
+        self.assertEqual(after_version, 0x299314f6)
+        self.assertEqual(after_files['firmware/include/pc/catalog.h'], header_before)
+        self.assertNotIn('kUnitRelay', after_files['firmware/include/pc/catalog.h'])
+        gui_after = json.loads(after_files['gui/catalog.json'])
+        self.assertTrue(next(unit for unit in gui_after['units']
+                             if unit['key'] == 'center')['relay'])
+        self.assertEqual({name for name, _ in generate_catalog.clips(after_data)}, before_clips)
 
 
 class GenerateCatalogInvalidTests(TempRepoTestCase):
@@ -1313,7 +1352,8 @@ class RosterCliTests(TempRepoTestCase):
         first = self.unit_by_key('first')
         self.assertTrue(first['enrolled'])
         self.assertEqual({field: first[field] for field in roster.CAPABILITY_FIELDS},
-                         {'audio': False, 'display': True, 'controls': False, 'pitches': False})
+                         {'audio': False, 'display': True, 'controls': False,
+                          'pitches': False, 'relay': False})
         data, version = generate_catalog.load(self.tmp)
         self.assertNotEqual(version, 0x299314f6)
         by_key = {play['key']: play['audience'] for play in data['plays']}
@@ -1397,6 +1437,145 @@ class RosterCliTests(TempRepoTestCase):
         self.assertEqual(err, '')
         self.assertEqual(self.roster_path.read_bytes(), first_bytes)
         self.assertEqual((self.tmp / 'firmware/include/pc/catalog.h').read_bytes(), first_header)
+        self.assert_no_side_outputs()
+
+    def test_relay_flags_flip_and_default_profiles_are_false(self):
+        for key in ('pitcher', 'catcher', 'first', 'center', 'custom'):
+            with self.subTest(key=key):
+                self.assertFalse(roster.default_profile(key)['relay'])
+        code, out, err = self.run_roster('enable', 'center', '--relay')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertTrue(self.unit_by_key('center')['relay'])
+        code, out, err = self.run_roster('enable', 'center', '--no-relay')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertFalse(self.unit_by_key('center')['relay'])
+        # A default profile enable resets every capability, including relay.
+        self.run_roster('enable', 'center', '--relay')
+        self.assertTrue(self.unit_by_key('center')['relay'])
+        code, out, err = self.run_roster('enable', 'center')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        center = self.unit_by_key('center')
+        self.assertFalse(center['relay'])
+        self.assertTrue(center['enrolled'])
+        self.assertTrue(center['display'])
+        self.assert_no_side_outputs()
+
+    def test_list_shows_relay_in_the_capabilities_column(self):
+        self.run_roster('enable', 'center', '--relay')
+        code, out, err = self.run_roster('list')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        rows = {row.split()[1]: row for row in out.splitlines()[1:] if row.split()}
+        self.assertIn('display, relay', rows['center'])
+        self.assertNotIn('relay', rows['pitcher'])
+        self.assertNotIn('relay', rows['coach'])
+        self.assert_no_side_outputs()
+
+    def test_relay_only_enable_prints_no_steps_and_keeps_enrollment(self):
+        before = json.loads(self.roster_path.read_text(encoding='utf-8'))['units']
+        code, out, err = self.run_roster('enable', 'center', '--relay')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        after = json.loads(self.roster_path.read_text(encoding='utf-8'))['units']
+        self.assertEqual([unit['key'] for unit in after if unit['enrolled']],
+                         [unit['key'] for unit in before if unit['enrolled']])
+        center_before = next(unit for unit in before if unit['key'] == 'center')
+        center_after = next(unit for unit in after if unit['key'] == 'center')
+        self.assertTrue(center_after['enrolled'])
+        self.assertEqual({field: center_after[field] for field in roster.CAPABILITY_FIELDS},
+                         {**{field: center_before[field] for field in roster.CAPABILITY_FIELDS},
+                          'relay': True})
+        self.assertIn("Enabled unit 'center'.", out)
+        self.assertNotIn('Next steps:', out)
+        self.assertNotIn('python tools/provision.py', out)
+        self.assertNotIn('build_firmware.ps1', out)
+        self.assertNotIn('python tools/import_demo_audio.py', out)
+        _, version = generate_catalog.load(self.tmp)
+        self.assertEqual(version, 0x299314f6)
+        self.assert_no_side_outputs()
+
+    def test_disable_keeps_the_stored_relay_bit(self):
+        self.run_roster('enable', 'first', '--relay')
+        self.assertTrue(self.unit_by_key('first')['relay'])
+        code, out, err = self.run_roster('disable', 'first')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        first = self.unit_by_key('first')
+        self.assertFalse(first['enrolled'])
+        self.assertTrue(first['relay'])
+        self.assertIn("Disabled unit 'first'.", out)
+        catalog = (self.tmp / 'firmware/include/pc/catalog.h').read_text(encoding='utf-8')
+        self.assertIn('constexpr unsigned kUnitCount = 5;', catalog)
+        self.assert_no_side_outputs()
+
+    def test_cli_rejects_a_missing_relay_with_the_capability_message(self):
+        units = json.loads(self.roster_path.read_text(encoding='utf-8'))['units']
+        del units[0]['relay']
+        (self.tmp / 'config/roster.json').write_text(
+            json.dumps({'schema': 1, 'units': units}), encoding='utf-8')
+        self.assert_roster_error(['list'], 'units[1]: relay must be a boolean')
+
+    def test_disable_center_is_refused_and_leaves_every_artifact_untouched(self):
+        header_path = self.tmp / 'firmware/include/pc/catalog.h'
+        gui_path = self.tmp / 'gui/catalog.json'
+        before = (self.roster_path.read_bytes(), header_path.read_bytes(), gui_path.read_bytes())
+        _, stderr = self.run_roster_error('disable', 'center')
+        self.assertEqual(stderr,
+                         'roster: the change would leave the vocabulary invalid: '
+                         'plays[18]: targets reach no enrolled unit\n')
+        self.assertEqual(
+            (self.roster_path.read_bytes(), header_path.read_bytes(), gui_path.read_bytes()),
+            before)
+        self.assert_no_side_outputs()
+
+    def test_disable_center_succeeds_once_another_outfielder_is_enrolled(self):
+        code, out, err = self.run_roster('enable', 'left')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertTrue(self.unit_by_key('left')['enrolled'])
+
+        code, out, err = self.run_roster('disable', 'center')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertFalse(self.unit_by_key('center')['enrolled'])
+        self.assertIn("Disabled unit 'center'.", out)
+
+        # The catalog regenerated for the surviving roster is valid and matches
+        # the files the generator would produce for it.
+        data, _ = generate_catalog.load(self.tmp)
+        version, files = generate_catalog.rendered(self.tmp)
+        self.assertEqual((self.tmp / 'firmware/include/pc/catalog.h').read_text(encoding='utf-8'),
+                         files['firmware/include/pc/catalog.h'])
+        self.assertEqual((self.tmp / 'gui/catalog.json').read_text(encoding='utf-8'),
+                         files['gui/catalog.json'])
+        self.assertEqual(json.loads((self.tmp / 'gui/catalog.json').read_text(encoding='utf-8'))
+                         ['dictionary'], f'{version:08x}')
+        by_key = {play['key']: play['audience'] for play in data['plays']}
+        self.assertEqual(by_key[18], ['left'])
+        self.assertEqual(by_key[19], ['left'])
+        catalog = (self.tmp / 'firmware/include/pc/catalog.h').read_text(encoding='utf-8')
+        self.assertIn('constexpr unsigned kUnitCount = 5;', catalog)
+        self.assertIn('#define PC_UNIT_center 0', catalog)
+        self.assert_no_side_outputs()
+
+    def test_validate_document_refuses_an_invalid_candidate_without_writing(self):
+        header_path = self.tmp / 'firmware/include/pc/catalog.h'
+        gui_path = self.tmp / 'gui/catalog.json'
+        before = (self.roster_path.read_bytes(), header_path.read_bytes(), gui_path.read_bytes())
+        document = json.loads(self.roster_path.read_text(encoding='utf-8'))
+        center = next(unit for unit in document['units'] if unit['key'] == 'center')
+        center['enrolled'] = False
+        with self.assertRaises(ValueError) as ctx:
+            roster.validate_document(self.tmp, document)
+        self.assertEqual(str(ctx.exception),
+                         'the change would leave the vocabulary invalid: '
+                         'plays[18]: targets reach no enrolled unit')
+        self.assertEqual(
+            (self.roster_path.read_bytes(), header_path.read_bytes(), gui_path.read_bytes()),
+            before)
         self.assert_no_side_outputs()
 
 

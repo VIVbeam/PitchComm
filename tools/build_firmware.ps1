@@ -11,10 +11,12 @@ firmware/build/<key>:
     -DEXTRA_CPPFLAGS=-DPC_UNIT=PC_UNIT_<key>
 
 config/roster.json is the enrollment and capability source of truth: the file
-list is derived from each unit's audio/display/controls flags, and a unit whose
-generated PC_UNIT_ macro in firmware/include/pc/catalog.h is 0 (not enrolled) is
-rejected. -Roles is kept as an alias for -Units and maps centerfield to center.
-proof is not a roster key and keeps its fixed proof fragments.
+list is derived from each unit's audio/display/controls/relay flags, and a unit
+whose generated PC_UNIT_ macro in firmware/include/pc/catalog.h is 0 (not
+enrolled) is rejected. -Roles is kept as an alias for -Units and maps
+centerfield to center. -RosterPath selects a different roster file (default
+config/roster.json) for staged or test rosters. proof is not a roster key and
+keeps its fixed proof fragments.
 
 The NCS version pin in firmware/ncs_version.txt is authoritative. Without
 -NcsVersion, west is used directly and the pinned version is printed for
@@ -50,6 +52,10 @@ tools\build_firmware.ps1
 Builds the default enrolled team: coach, pitcher, catcher, shortstop, center.
 
 .EXAMPLE
+tools\build_firmware.ps1 -RosterPath C:\temp\relay-roster.json -Units center -DryRun
+Plans center from a staged roster that marks it as a Thread relay.
+
+.EXAMPLE
 tools\build_firmware.ps1 -Units pitcher -MinSize -StrictSize -Pristine
 Fits the pitcher image with the minimum-size fragment and fails if it does not.
 
@@ -69,6 +75,7 @@ Launches the pinned v3.4.0 toolchain through nrfutil instead of using a shell's 
 param(
     [string[]]$Units = @('coach', 'pitcher', 'catcher', 'shortstop', 'center'),
     [string[]]$Roles = @(),
+    [string]$RosterPath = 'config/roster.json',
     [switch]$Pristine,
     [switch]$MinSize,
     [switch]$StrictSize,
@@ -106,9 +113,14 @@ $requested = @($requested | ForEach-Object { if ($_ -eq 'centerfield') { 'center
 if (-not $requested.Count) { throw 'No units requested. Pass -Units with roster keys plus proof.' }
 
 # --- roster and generated catalog -------------------------------------------
-$rosterPath = Join-Path $root 'config/roster.json'
+# -RosterPath defaults to config/roster.json and may be relative to the repo
+# root or absolute; a test can stage a modified roster in the temp directory.
+$rosterPath = $RosterPath
+if (-not [System.IO.Path]::IsPathRooted($rosterPath)) {
+    $rosterPath = Join-Path $root $rosterPath
+}
 if (-not (Test-Path -LiteralPath $rosterPath)) {
-    throw 'config/roster.json is missing; it is the enrollment and capability source of truth.'
+    throw "$RosterPath is missing; it is the enrollment and capability source of truth."
 }
 $catalogPath = Join-Path $root 'firmware/include/pc/catalog.h'
 if (-not (Test-Path -LiteralPath $catalogPath)) {
@@ -166,6 +178,21 @@ function Get-CapabilityConf {
     if ($Info.display) {
         $lines.Add('CONFIG_DISPLAY=y')
         $lines.Add('CONFIG_SSD1306=y')
+    }
+    # Thread device type. A relay is a Full Thread Device: routers stay
+    # receive-on to forward Thread traffic, so it omits the sleepy-only symbols
+    # and uses a larger stack. Everything else is a sleepy end device.
+    $lines.Add('')
+    if ($Info.relay) {
+        $lines.Add('CONFIG_OPENTHREAD_FTD=y')
+        $lines.Add('CONFIG_OPENTHREAD_MTD=n')
+        $lines.Add('CONFIG_OPENTHREAD_THREAD_STACK_SIZE=8192')
+    } else {
+        $lines.Add('CONFIG_OPENTHREAD_FTD=n')
+        $lines.Add('CONFIG_OPENTHREAD_MTD=y')
+        $lines.Add('CONFIG_OPENTHREAD_MTD_SED=y')
+        $lines.Add('CONFIG_OPENTHREAD_POLL_PERIOD=200')
+        $lines.Add('CONFIG_OPENTHREAD_THREAD_STACK_SIZE=4096')
     }
     return $lines
 }

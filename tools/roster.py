@@ -19,10 +19,14 @@ standard profile exactly:
     catcher                                          display + controls + pitches
     every other standard key, and every custom key   display
 
+Relay is off in every standard profile. It is a network-layer build choice and
+does not enter the dictionary, so a relay-only enable regenerates the catalog
+without changing the dictionary hash.
+
 With capability flags (--audio/--no-audio, --display/--no-display,
---controls/--no-controls, --pitches/--no-pitches) only the named capabilities
-change and the rest keep their current values. A controls unit always needs
-display, the same rule tools/build_firmware.ps1 enforces.
+--controls/--no-controls, --pitches/--no-pitches, --relay/--no-relay) only the
+named capabilities change and the rest keep their current values. A controls
+unit always needs display, the same rule tools/build_firmware.ps1 enforces.
 
 `disable` refuses to unenroll the last unit that receives pitch calls. Neither
 command touches config/team.local.json, data/audio or firmware/build.
@@ -33,7 +37,9 @@ until then.
 import argparse
 import inspect
 import json
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 TOOLS = Path(__file__).resolve().parent
@@ -42,12 +48,12 @@ if str(TOOLS) not in sys.path:
 
 import generate_catalog
 
-CAPABILITY_FIELDS = ('audio', 'display', 'controls', 'pitches')
+CAPABILITY_FIELDS = ('audio', 'display', 'controls', 'pitches', 'relay')
 DEFAULT_PROFILES = {
-    'pitcher': {'audio': True, 'display': False, 'controls': False, 'pitches': True},
-    'catcher': {'audio': False, 'display': True, 'controls': True, 'pitches': True},
+    'pitcher': {'audio': True, 'display': False, 'controls': False, 'pitches': True, 'relay': False},
+    'catcher': {'audio': False, 'display': True, 'controls': True, 'pitches': True, 'relay': False},
 }
-FIELD_PROFILE = {'audio': False, 'display': True, 'controls': False, 'pitches': False}
+FIELD_PROFILE = {'audio': False, 'display': True, 'controls': False, 'pitches': False, 'relay': False}
 HEADERS = ('UNIT', 'KEY', 'LABEL', 'SHORT', 'ENROLLED', 'CAPABILITIES', 'EUI')
 
 
@@ -206,6 +212,24 @@ def resolve_root(args):
     return Path(args.root) if args.root is not None else Path(generate_catalog.ROOT)
 
 
+def validate_document(root, document):
+    """Stage the edited roster with the real calls and refuse a change the generator would reject.
+
+    The roster is written only after this passes, so a rejected edit leaves the
+    checkout exactly as it was. Disabling the only outfield unit, for example,
+    fails here instead of after the write.
+    """
+    with tempfile.TemporaryDirectory(prefix='pitchcomm-roster-') as staging:
+        config = Path(staging) / 'config'
+        config.mkdir(parents=True)
+        shutil.copyfile(Path(root) / 'config/calls.json', config / 'calls.json')
+        (config / 'roster.json').write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
+        try:
+            generate_catalog.load(Path(staging))
+        except ValueError as error:
+            raise ValueError(f'the change would leave the vocabulary invalid: {error}') from error
+
+
 def command_list(args):
     root = resolve_root(args)
     _, units = load_units(root)
@@ -229,6 +253,7 @@ def command_enable(args):
     unit = find_unit(units, args.key)
     if unit is None:
         raise ValueError(unknown_key_error(units, args.key))
+    was_enrolled = unit['enrolled']
     before = clip_names(root)
     flags = {field: getattr(args, field) for field in CAPABILITY_FIELDS
              if getattr(args, field) is not None}
@@ -241,17 +266,22 @@ def command_enable(args):
             unit[field] = profile[field]
     unit['enrolled'] = True
     validate_units(units)
+    validate_document(root, document)
     write_document(root, document)
     regenerate_or_explain(root)
     audio_grew = bool(clip_names(root) - before)
     print(f'Enabled unit {unit["key"]!r}.')
-    print('Next steps:')
-    print(f'  python tools/provision.py --coach <EUI-64> --unit {unit["key"]}=<EUI-64>')
-    print(f'  tools\\build_firmware.ps1 -Units {unit["key"]}')
+    steps = []
+    if not was_enrolled:
+        steps.append(f'  python tools/provision.py --coach <EUI-64> --unit {unit["key"]}=<EUI-64>')
+        steps.append(f'  tools\\build_firmware.ps1 -Units {unit["key"]}')
     if audio_grew:
-        print('  python tools/import_demo_audio.py   # from College Demo Tracks/, or')
-        print('  powershell tools/generate_audio.ps1  # text-to-speech fallback')
-        print('  python tools/build_audio_fs.py')
+        steps.append('  python tools/import_demo_audio.py   # from College Demo Tracks/, or')
+        steps.append('  powershell tools/generate_audio.ps1  # text-to-speech fallback')
+        steps.append('  python tools/build_audio_fs.py')
+    if steps:
+        print('Next steps:')
+        print('\n'.join(steps))
 
 
 def command_disable(args):
@@ -266,6 +296,7 @@ def command_disable(args):
                          'pitches capability; enroll another pitches unit first')
     unit['enrolled'] = False
     validate_units(units)
+    validate_document(root, document)
     write_document(root, document)
     regenerate_or_explain(root)
     print(f'Disabled unit {unit["key"]!r}.')
