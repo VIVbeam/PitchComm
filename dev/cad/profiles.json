@@ -475,66 +475,64 @@
   },
   "keypad": {
     "role": "catcher",
-    "width": 41.0,
-    "length": 78.0,
+    "width": 43.0,
+    "length": 64.9,
     "wall_height": 14.9,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
       [
-        36,
-        5
+        30.0,
+        5.0
       ],
       [
-        5,
-        73
+        5.0,
+        48.0
       ],
       [
-        36,
-        73
+        5.0,
+        58.6
       ]
     ],
     "cell": "protected_100mah_cell",
     "board": {
       "x": 2.0,
       "y": 2.0,
-      "antenna_end": "y_max",
-      "usb_end": "y_min"
+      "antenna_end": "x_min",
+      "usb_end": "x_max"
     },
     "deck": {
-      "y0": 1.5,
-      "y1": 33.5,
+      "y0": 12.5,
+      "y1": 44.5,
       "pull_notch": [
         12.0,
         10.0
       ]
     },
     "dashboard": {
-      "tilt_deg": 18.0,
-      "plateau": {
-        "x": 18.0,
-        "y": 2.0,
-        "width": 20.0,
-        "length": 54.0,
-        "height": 1.5
-      },
+      "tilt_deg": 0.0,
+      "plateau": null,
       "head": {
-        "x": 2.0,
-        "y": 55.25,
-        "width": 36.0,
-        "length": 16.0
+        "x": 8.0,
+        "y": 21.2,
+        "width": 16.0,
+        "length": 34.0
       }
     },
     "oled": {
-      "x": 2.0,
-      "y": 57.0
+      "x": 9.5,
+      "y": 20.0,
+      "window": [
+        7.6,
+        26.0
+      ]
     },
     "bezel": true,
     "buttons": [
       {
         "id": "call_1",
-        "x": 20.1,
-        "y": 3.5,
+        "x": 23.9,
+        "y": 9.1,
         "switch": "switch_call_1",
         "head": "numbered",
         "digit": "1",
@@ -542,8 +540,8 @@
       },
       {
         "id": "call_2",
-        "x": 20.1,
-        "y": 17.2,
+        "x": 23.9,
+        "y": 22.8,
         "switch": "switch_call_2",
         "head": "numbered",
         "digit": "2",
@@ -551,8 +549,8 @@
       },
       {
         "id": "call_3",
-        "x": 20.1,
-        "y": 30.9,
+        "x": 23.9,
+        "y": 36.5,
         "switch": "switch_call_3",
         "head": "numbered",
         "digit": "3",
@@ -560,8 +558,8 @@
       },
       {
         "id": "call_4",
-        "x": 20.1,
-        "y": 44.6,
+        "x": 23.9,
+        "y": 50.2,
         "switch": "switch_call_4",
         "head": "numbered",
         "digit": "4",
@@ -570,14 +568,14 @@
     ],
     "sidebar": {
       "id": "back",
-      "x": 18.0,
+      "x": 11.0,
       "z": 7.4,
       "face": "y_max",
       "head": "back",
       "switch": "switch_back"
     },
     "charge": {
-      "face": "y_min",
+      "face": "x_max",
       "y_center": 10.9
     },
     "mounts": [
@@ -588,12 +586,12 @@
         "loop_length": 27.0,
         "centers": [
           [
-            20.0,
-            18.0
+            21.5,
+            16.0
           ],
           [
-            20.0,
-            54.0
+            21.5,
+            48.9
           ]
         ]
       }
@@ -610,22 +608,22 @@
         "name": "xiao_nrf54l15",
         "x": 2.0,
         "y": 2.0,
-        "width": 17.8,
-        "length": 21.0,
-        "source": "PCB 1.6 + 2.0 components above, USB end at the y_min wall"
+        "width": 21.0,
+        "length": 17.8,
+        "source": "PCB 1.6 + 2.0 components above; the 21 mm axis runs along x: USB end at the x_max charge wall, antenna end at x_min facing the side wall"
       },
       {
         "name": "xiao_antenna_keepout",
-        "x": 2.0,
-        "y": 23.0,
-        "width": 17.8,
-        "length": 10.0,
-        "source": "metal-free band outward from the antenna end between the deck top and the lid"
+        "x": -8.0,
+        "y": 2.0,
+        "width": 10.0,
+        "length": 17.8,
+        "source": "metal-free band outward from the antenna end; the antenna faces the x_min wall, so the band runs through the wall with no metal inside the case"
       },
       {
         "name": "protected_100mah_cell",
-        "x": 2.6,
-        "y": 2.0,
+        "x": 3.0,
+        "y": 13.0,
         "width": 11.5,
         "length": 31.0,
         "source": "Adafruit 1570 class"
@@ -633,64 +631,65 @@
       {
         "name": "deck_plate",
         "x": 1.9,
-        "y": 1.5,
-        "width": 37.2,
+        "y": 12.5,
+        "width": 39.2,
         "length": 32.0,
         "source": "cell cover, 0.7 thick"
       },
       {
         "name": "oled_display",
-        "x": 2.0,
-        "y": 57.0,
-        "width": 36.0,
-        "length": 12.5,
-        "source": "nested 2.5 mm from the sloped surface, screen under the bezel window"
+        "x": 9.5,
+        "y": 20.0,
+        "width": 12.5,
+        "length": 36.0,
+        "source": "0.91 inch module rotated 90 deg so the 128-pixel axis runs along the pod; window 7.6 x 26; nests 2.5 mm from the flat face, header at the y_min front end, pixel top edge toward x_min"
       },
       {
         "name": "switch_call_1",
-        "x": 20.1,
-        "y": 3.5,
+        "x": 23.9,
+        "y": 9.1,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_call_2",
-        "x": 20.1,
-        "y": 17.2,
+        "x": 23.9,
+        "y": 22.8,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_call_3",
-        "x": 20.1,
-        "y": 30.9,
+        "x": 23.9,
+        "y": 36.5,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_call_4",
-        "x": 20.1,
-        "y": 44.6,
+        "x": 23.9,
+        "y": 50.2,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_back",
-        "x": 18.0,
-        "y": 70.0,
+        "x": 11.0,
+        "y": 56.9,
         "width": 12.0,
         "length": 6.5,
-        "source": "side-entry switch in the y_max wall"
+        "source": "side-entry Back switch in the y_max wall, bare-hand reach"
       },
       {
         "name": "charge_opening",
-        "x": 5.9,
-        "y": 2.0,
-        "width": 10.0,
-        "length": 2.0,
-        "source": "USB-C slot through the y_min wall and lid edge"
+        "x": 41.0,
+        "y": 5.9,
+        "width": 2.0,
+        "length": 10.0,
+        "source": "USB-C slot through the x_max wall and lid edge"
       }
-    ]
+    ],
+    "note": "Landscape catcher pod worn across the front of the leg guard. The four call switches form a column along the pod length at x 23.9; the 0.91 inch OLED is rotated 90 deg and sits beside the column at x 9.5. Flat face (tilt 0) under a bezel and hood; the USB-C port is in the x_max long wall next to the call column."
   },
   "oled64": {
     "name": "0.96 inch 128x64 SSD1306 module",

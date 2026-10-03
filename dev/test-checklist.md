@@ -112,7 +112,7 @@ Observations:
 
 ## Phase 4b: wear check (with the first printed shells)
 
-- [ ] Catcher, in a crouch and standing: the screen is readable without lifting or unstrapping the unit.
+- [ ] Catcher, in a crouch and standing: the pod sits across the front of the leg guard, the screen reads left to right looking down, without lifting or unstrapping the unit.
 - [ ] Catcher, bare hand: all four calls and Back reachable without looking away, with the glove on the other hand; no accidental presses while blocking or sliding; the mount does not catch on the opposite leg.
 - [ ] Fielder watch: a 20 mm NATO threads under both printed bars without tools, lies flat, does not cover the screen or the plunger, and the case cannot pull free.
 - [ ] Fielder watch, standing and bent forward: the screen reads at a glance and the face plunger is reachable with the bare hand or glove heel without looking.

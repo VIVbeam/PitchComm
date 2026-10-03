@@ -240,6 +240,18 @@ def prepare_export(mesh):
     return best
 
 
+def retry_io(fn, attempts=12, delay=0.25):
+    """OneDrive and antivirus filters can transiently refuse a fresh file
+    handle on Windows; retry a few times before giving up."""
+    for k in range(attempts):
+        try:
+            return fn()
+        except OSError:
+            if k == attempts - 1:
+                raise
+            time.sleep(delay)
+
+
 def probe_violation(shape, solids, pitch=2.0):
     if not isinstance(solids, (list, tuple)):
         solids = [solids]
@@ -474,7 +486,11 @@ class Case:
 
     def oled_params(self):
         o = self.p.get('oled') or {}
-        return self.g[o.get('module', 'oled')]
+        base = dict(self.g[o.get('module', 'oled')])
+        for key, val in o.items():
+            if key not in ('x', 'y', 'module'):
+                base[key] = val
+        return base
 
 
 # ==========================================================================
@@ -1097,7 +1113,7 @@ def write_3mf(path, items):
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
             '<Relationship Target="/3D/3dmodel.model" Id="rel0" '
             'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
-    with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
+    with retry_io(lambda: zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED)) as z:
         z.writestr('[Content_Types].xml', ct)
         z.writestr('_rels/.rels', rels)
         z.writestr('3D/3dmodel.model', ''.join(out))
@@ -1224,7 +1240,7 @@ def render_part_sheet(cells, path, cols=4, cell=(360, 300)):
         draw.text((x0 + W / 2 - tw / 2, y0 + Hc - 74), label, fill=(25, 25, 25), font=font_m)
         tw, _ = text_size(draw, caption, font_s)
         draw.text((x0 + W / 2 - tw / 2, y0 + Hc - 52), caption, fill=(100, 100, 100), font=font_s)
-    img.save(path)
+    retry_io(lambda: img.save(path))
     return len(cells)
 
 
@@ -1313,8 +1329,8 @@ def build_style(profiles, style, outdir, palette):
     for stem, (pm, _asm) in prints.items():
         out = prepare_export(pm)
         path = os.path.join(outdir, stem + ".stl")
-        out.export(path, file_type='stl')
-        disk = trimesh.load(path, force='mesh')
+        retry_io(lambda: out.export(path, file_type='stl'))
+        disk = retry_io(lambda: trimesh.load(path, force='mesh'))
         rep = mesh_report(disk, stem + ".stl")
         report['parts'][stem] = rep
         if not rep['watertight']:
@@ -1638,8 +1654,8 @@ def main(argv=None):
         for stem, rep in report['parts'].items():
             dims['parts'][stem] = rep
         for stem, (pm, _asm) in prints.items():
-            prepare_export(pm).export(os.path.join(EXPORTS_DIR, stem + "_color.stl"),
-                                      file_type='stl')
+            retry_io(lambda: prepare_export(pm).export(
+                os.path.join(EXPORTS_DIR, stem + "_color.stl"), file_type='stl'))
         write_3mf(os.path.join(EXPORTS_DIR, f"{style}_colored.3mf"),
                   [(stem, asm if asm is not None else pm, colors[stem])
                    for stem, (pm, asm) in prints.items()])
@@ -1661,7 +1677,8 @@ def main(argv=None):
 
     coupon = build_fit_coupon(profiles)
     coupon = prepare_export(coupon)
-    coupon.export(os.path.join(EXPORTS_DIR, "fit_coupon.stl"), file_type='stl')
+    retry_io(lambda: coupon.export(os.path.join(EXPORTS_DIR, "fit_coupon.stl"),
+                                   file_type='stl'))
     rep = mesh_report(coupon, "fit_coupon.stl")
     dims['fit_coupon'] = rep
     if not rep['watertight']:
@@ -1683,8 +1700,13 @@ def main(argv=None):
         pal['assemblies'][style] = {"file": f"{style}_colored.3mf",
                                     "lid_print_file": f"{style}_lid_colored.3mf",
                                     "parts": parts, "stl_color_support": False}
-    with open(os.path.join(EXPORTS_DIR, "palette.json"), 'w', encoding='utf-8') as fh:
-        json.dump(pal, fh, indent=2)
+    def write_json(path, obj):
+        def go():
+            with open(path, 'w', encoding='utf-8') as fh:
+                json.dump(obj, fh, indent=2)
+        retry_io(go)
+
+    write_json(os.path.join(EXPORTS_DIR, "palette.json"), pal)
 
     dims['validation'] = {
         "all_parts_watertight": all(v['watertight'] for v in dims['parts'].values()),
@@ -1706,7 +1728,8 @@ def main(argv=None):
                 m.apply_translation((off, 0.0, 0.0))
                 scene.append((m, col))
             off += C.w + gap
-        render_mesh_array(scene, 1560, 700, ss=2).save(os.path.join(PREVIEW_DIR, "preview.png"))
+        retry_io(lambda: render_mesh_array(scene, 1560, 700, ss=2).save(
+            os.path.join(PREVIEW_DIR, "preview.png")))
         render_part_sheet(sheet, os.path.join(PREVIEW_DIR, "parts-preview.png"), cols=4)
         mount_cells = []
         for C, _items, prints_ in scene_units:
@@ -1724,8 +1747,7 @@ def main(argv=None):
             "render_seconds": round(time.time() - tp, 2)}
         print(f"[preview] sheets written in {time.time() - tp:.1f}s")
 
-    with open(DIMS_PATH, 'w', encoding='utf-8') as fh:
-        json.dump(dims, fh, indent=2)
+    write_json(DIMS_PATH, dims)
     print(f"wrote dev/cad/dimensions.json in {time.time() - t0:.1f}s")
     if failures:
         print("FAILURES:")
