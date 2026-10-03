@@ -2,7 +2,8 @@
 #include "pc/newcatcher_menu.h"
 
 namespace board {
-// 128x32 SSD1306 over the default I2C bus (D4/D5).
+// SSD1306 over the default I2C bus (D4/D5): 128x32 on the catcher, 128x64 on
+// a display64 fielder watch. The board overlay selects the geometry.
 class Display {
  public:
   bool begin();

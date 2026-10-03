@@ -38,7 +38,7 @@ Hardware-only items stay here; everything resolvable without a board is in `dev/
 - **LE Audio wake-up latency and idle strategy.** The source keeps the ISO stream alive and sends silence between calls; measure battery cost vs restart latency (phase 1/3).
 - **JY300 codec preset.** The proof prefers 16 kHz and falls back through advertised PAC records to 48 kHz; the stream context is one line away from `MEDIA`. Confirm on hardware (phase 1).
 - **App size in the 712 KB MCUboot slot.** The build script now measures and guards the image; `-MinSize` and a no-MCUboot recipe are prepared in `dev/build.md`. Measurement needs the toolchain.
-- **Smallest cell that lasts a game.** Start at 500 mAh for display units and 850 mAh for the pitcher, then shrink (phase 5).
+- **Smallest cell that lasts a game.** Decided: a protected 100 mAh pouch, Adafruit 1570 class, covers every field unit for one game with derating margin (`dev/power.md`). The cases are sized for it; the larger cells need the older shell set.
 - **SED battery vs call latency.** 200 ms poll is the starting point; measure a full game (phase 3/5).
 - **Thread channel at the field.** 11-26, default 15; pick a channel clear of local Wi-Fi (phase 2).
 - **One enclosure per unit type, or shared?** Decided: three (pitcher, catcher, fielder). The fielder is one pod with a wrist carrier and a belt carrier; mounting options and protection notes are in `dev/case-design.md`. The fit coupon confirms before a full set.

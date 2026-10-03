@@ -1,0 +1,23 @@
+/*
+ * PitchComm fielder watch: 128x64 SSD1306 overlay (target
+ * xiao_nrf54l15/nrf54l15/cpuapp).
+ *
+ * Applied on top of boards/xiao_nrf54l15_nrf54l15_cpuapp.overlay for units
+ * whose config/roster.json entry has display64 true. It overrides only the
+ * panel geometry and the COM pin layout of the ssd1306@3c node; width,
+ * address, bus, pull-ups, segment remap, scan direction, offsets, precharge
+ * and the zephyr,display choice stay exactly as the base overlay set them.
+ *
+ * The common 128x64 module uses the alternative COM pin layout
+ * (SSD1306_SET_PADS_HW_ALTERNATIVE, 0x12), while the 128x32 catcher panel
+ * uses sequential COM pins (0x02). The base overlay sets com-sequential for
+ * the 32-row panel, so this overlay deletes it; the Zephyr driver then writes
+ * 0x12 (drivers/display/ssd1306.c: com-sequential selects SEQUENTIAL,
+ * otherwise ALTERNATIVE).
+ */
+
+&ssd1306 {
+	height = <64>;
+	multiplex-ratio = <0x3f>; /* 64 rows - 1 */
+	/delete-property/ com-sequential;
+};

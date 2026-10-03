@@ -13,10 +13,12 @@ firmware/build/<key>:
 config/roster.json is the enrollment and capability source of truth: the file
 list is derived from each unit's audio/display/controls/relay flags, and a unit
 whose generated PC_UNIT_ macro in firmware/include/pc/catalog.h is 0 (not
-enrolled) is rejected. -Roles is kept as an alias for -Units and maps
-centerfield to center. -RosterPath selects a different roster file (default
-config/roster.json) for staged or test rosters. proof is not a roster key and
-keeps its fixed proof fragments.
+enrolled) is rejected. A unit with display64 true (the fielder watch) also
+appends -DEXTRA_DTC_OVERLAY_FILE=boards/display64.overlay for the 128x64 panel;
+the catcher's 128x32 panel keeps the base overlay. -Roles is kept as an alias
+for -Units and maps centerfield to center. -RosterPath selects a different
+roster file (default config/roster.json) for staged or test rosters. proof is
+not a roster key and keeps its fixed proof fragments.
 
 The NCS version pin in firmware/ncs_version.txt is authoritative. Without
 -NcsVersion, west is used directly and the pinned version is printed for
@@ -40,8 +42,9 @@ fallback layout is -NoBootloader -BuildSuffix nb.
 -DryRun validates the requested units exactly like a real run (roster keys,
 enrollment, the NCS pin, BuildSuffix, and the NoBootloader/MinSize fragments)
 but does not require west or nrfutil, writes no build directory, and prints for
-each unit the key, the PC_UNIT define, the full -DEXTRA_CONF_FILE list and the
-generated capability conf body.
+each unit the key, the PC_UNIT define, the full -DEXTRA_CONF_FILE list, the
+-DEXTRA_DTC_OVERLAY_FILE list when a display64 or no-bootloader overlay
+applies, and the generated capability conf body.
 
 .EXAMPLE
 tools\build_firmware.ps1 -Units pitcher,catcher -DryRun
@@ -205,12 +208,14 @@ function Get-BuildPlan {
     $pcDefine = $null
     $capabilityLines = $null
     $capabilityPath = $null
+    $display64 = $false
     if ($Key -eq 'proof') {
         $fragmentList = 'roles/audio-proof.conf;roles/audio-unit.conf'
     } elseif ($Key -eq 'coach') {
         $fragmentList = 'roles/coach.conf'
     } else {
         $info = $rosterUnits[$Key]
+        $display64 = [bool]$info.display64
         $capabilityLines = Get-CapabilityConf -Key $Key -Info $info
         $capabilityPath = Join-Path $generatedDir "$Key.conf"
         $fragmentList = @($capabilityPath, 'roles/field-common.conf')
@@ -221,6 +226,13 @@ function Get-BuildPlan {
     if ($NoBootloader) { $fragmentList += ';boards/no_bootloader.conf' }
     if ($MinSize) { $fragmentList += ';roles/min-size.conf' }
 
+    # A single -DEXTRA_DTC_OVERLAY_FILE per build: the watch panel overlay
+    # first, then the no-bootloader partition overlay when that fallback is
+    # selected. Units with neither keep the base board overlay only.
+    $overlayFiles = @()
+    if ($display64) { $overlayFiles += 'boards/display64.overlay' }
+    if ($NoBootloader) { $overlayFiles += 'boards/no_bootloader.overlay' }
+
     $buildName = if ($BuildSuffix) { "$Key-$BuildSuffix" } else { $Key }
     [pscustomobject]@{
         Key = $Key
@@ -229,6 +241,8 @@ function Get-BuildPlan {
         FragmentList = $fragmentList
         CapabilityLines = $capabilityLines
         CapabilityPath = $capabilityPath
+        Display64 = $display64
+        OverlayFiles = $overlayFiles
     }
 }
 
@@ -271,6 +285,9 @@ if ($DryRun) {
         Write-Host "  build directory: firmware/build/$($plan.BuildName) (not created)"
         Write-Host "  PC_UNIT define:  $(if ($plan.PcDefine) { $plan.PcDefine } else { '(none)' })"
         Write-Host "  -DEXTRA_CONF_FILE=$($plan.FragmentList)"
+        if ($plan.OverlayFiles.Count -gt 0) {
+            Write-Host "  -DEXTRA_DTC_OVERLAY_FILE=$($plan.OverlayFiles -join ';')"
+        }
         if ($plan.CapabilityLines) {
             Write-Host "  generated capability conf ($($plan.CapabilityPath)):"
             foreach ($line in $plan.CapabilityLines) {
@@ -313,8 +330,10 @@ try {
         $cmakeArgs = @("-DEXTRA_CONF_FILE=$($plan.FragmentList)")
         if ($plan.PcDefine) { $cmakeArgs += "-DEXTRA_CPPFLAGS=-D$($plan.PcDefine)" }
         if ($NoBootloader) {
-            $cmakeArgs += @('-DSB_CONFIG_BOOTLOADER_MCUBOOT=n',
-                            '-DEXTRA_DTC_OVERLAY_FILE=boards/no_bootloader.overlay')
+            $cmakeArgs += '-DSB_CONFIG_BOOTLOADER_MCUBOOT=n'
+        }
+        if ($plan.OverlayFiles.Count -gt 0) {
+            $cmakeArgs += "-DEXTRA_DTC_OVERLAY_FILE=$($plan.OverlayFiles -join ';')"
         }
         $arguments += @('--') + $cmakeArgs
         if ($NcsVersion) {

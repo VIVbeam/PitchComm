@@ -98,7 +98,7 @@ The full item-by-item register is `dev/verification.md`. The short list:
 
 1. `west build` for each unit; the build script reports `IMAGE <unit>: bytes / 729088`.
 2. Check that every remaining `VERIFY:` comment is either confirmed or corrected (search `VERIFY:`); most API/Kconfig items are already source-verified.
-3. Confirm the `solomon,ssd1306` binding accepts 128x32 and the overlay pinctrl matches `i2c22`.
+3. Confirm the `solomon,ssd1306` binding accepts both 128x32 and 128x64 and the overlay pinctrl matches `i2c22`.
 4. Confirm `BT_LL_SOFTDEVICE` vs the nRF54L15 controller selection and that BT + 802.15.4 link without a coexistence option.
 5. Confirm MCUboot is built by sysbuild and `slot1` is not needed by the bootloader configuration in use.
 6. Check the no-MCUboot fallback below once the normal build passes.

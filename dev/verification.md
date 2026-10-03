@@ -24,7 +24,7 @@ Status key: **closed** (no further action), **build** (first toolchain contact),
 | Startup vref is 900 mV | `battery.cpp` | bench | Compare `status` battery against a meter; fallback 900 is coded. |
 | `ADC_CONFIGURABLE_INPUTS` and AIN7 | `battery.cpp` | build | `ADC_NRFX_SAADC` selects it; `NRF_SAADC_AIN7` used. |
 | P1.15 divider enable | `battery.cpp` | bench | Board DTS `vbat_pwr` is active high and boot-on; code leaves it on. |
-| SSD1306 binding properties and 128x32 | overlay | closed (source), bench | Upstream binding marks width/height/segment-remap/com-invdir/com-sequential/prechargep required; all set. Bench: panel probes at 0x3C and refreshes. |
+| SSD1306 binding properties, 128x32 and 128x64 | overlay | closed (source), bench | Upstream binding marks width/height/segment-remap/com-invdir/com-sequential/prechargep required; the base overlay sets the 128x32 values and `boards/display64.overlay` overrides the 64-row panel. Bench: each panel probes at 0x3C and refreshes. |
 | C++ standard selection | `Kconfig`/`CMakeLists.txt` | closed | `CONFIG_STD_CPP17=y` owns the standard; the redundant CMake override was removed. |
 | `CONFIG_PITCHCOMM_*` symbol coverage | all sources | closed | Static audit: every `CONFIG_PITCHCOMM_*` reference is defined in `Kconfig` or a role conf; no zero-length array declarations. |
 

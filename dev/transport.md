@@ -47,7 +47,7 @@ No border router and no phone are needed. The coach is the leader (`CONFIG_OPENT
 
 - Every unit relays by default, so any unit can forward for another. A Sleepy End Device (`relay: false`) parents to a router instead.
 - Set `relay: false` in `config/roster.json` or run `python tools/roster.py enable <key> --no-relay` for a sleepy build. The build planner emits the right fragment; the dictionary and the call protocol do not change.
-- Cost: a relay keeps its radio receive-on, roughly 5 mA against the polled sleep of a Sleepy End Device. On a 500 mAh cell that is still about 30 games of three hours, comfortably more than one game, so the default is relay; use `--no-relay` where season-long sleep matters. The pitcher relay also shares its radio with LE Audio; that combination is the phase 3 coexistence risk to measure.
+- Cost: a relay keeps its radio receive-on, roughly 5 mA against the polled sleep of a Sleepy End Device. On the standard 100 mAh cell that is about 1.8 games by estimate, which clears the one-game requirement; `--no-relay` buys a longer interval where coverage allows. The pitcher relay also shares its radio with LE Audio; that combination is the phase 3 coexistence risk to measure.
 - Placement: shortstop or center field covers both outfielders; the catcher and pitcher sit closest to the coach and benefit least.
 
 ### Provisioning: pre-shared dataset

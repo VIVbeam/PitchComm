@@ -31,9 +31,9 @@ The audio link reads the call clips, decodes them to PCM, encodes LC3, and strea
 | Unit | Board | Controls | Display | Audio out | Power |
 |---|---|---|---|---|---|
 | Coach | XIAO nRF54L15 | Laptop over USB | Laptop | None | USB |
-| Catcher | XIAO nRF54L15 | Four numbered buttons, Back | 128 x 32 OLED | None | 850 mAh cell |
-| Pitcher | XIAO nRF54L15 | Recall / volume button | None | LE Audio earbud | 850 mAh cell |
-| Shortstop / center field | XIAO nRF54L15 | Recall button | 128 x 32 OLED | None | 500 mAh cell |
+| Catcher | XIAO nRF54L15 | Four numbered buttons, Back | 128 x 32 OLED | None | 100 mAh cell |
+| Pitcher | XIAO nRF54L15 | Recall / volume button | None | LE Audio earbud | 100 mAh cell |
+| Shortstop / center field | XIAO nRF54L15 | Recall button | 128 x 64 OLED watch | None | 100 mAh cell |
 
 The vocabulary is 9 pitch types x 3 rows x 3 columns, so 81 pitch calls, plus 21 plays. Firmware joins two clips per pitch call: the pitch type and the location phrase. Positions are a roster (`dev/roster.md`); plays route to the enrolled units their targets resolve to, and any unit can optionally carry audio.
 

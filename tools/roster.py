@@ -17,16 +17,19 @@ standard profile exactly:
 
     pitcher                                          audio + pitches
     catcher                                          display + controls + pitches
-    every other standard key, and every custom key   display
+    every other standard key, and every custom key   display + display64
 
-Relay is off in every standard profile. It is a network-layer build choice and
-does not enter the dictionary, so a relay-only enable regenerates the catalog
+Relay is on in every standard profile. display64 selects the 128x64 fielder
+panel and is off for the pitcher and catcher, which have no panel or the
+128x32 panel. Relay and display64 are build choices and do not enter the
+dictionary, so a relay-only or display64-only enable regenerates the catalog
 without changing the dictionary hash.
 
 With capability flags (--audio/--no-audio, --display/--no-display,
---controls/--no-controls, --pitches/--no-pitches, --relay/--no-relay) only the
-named capabilities change and the rest keep their current values. A controls
-unit always needs display, the same rule tools/build_firmware.ps1 enforces.
+--controls/--no-controls, --pitches/--no-pitches, --relay/--no-relay,
+--display64/--no-display64) only the named capabilities change and the rest
+keep their current values. A controls unit always needs display, the same rule
+tools/build_firmware.ps1 enforces.
 
 `disable` refuses to unenroll the last unit that receives pitch calls. Neither
 command touches config/team.local.json, data/audio or firmware/build.
@@ -48,12 +51,15 @@ if str(TOOLS) not in sys.path:
 
 import generate_catalog
 
-CAPABILITY_FIELDS = ('audio', 'display', 'controls', 'pitches', 'relay')
+CAPABILITY_FIELDS = ('audio', 'display', 'controls', 'pitches', 'relay', 'display64')
 DEFAULT_PROFILES = {
-    'pitcher': {'audio': True, 'display': False, 'controls': False, 'pitches': True, 'relay': True},
-    'catcher': {'audio': False, 'display': True, 'controls': True, 'pitches': True, 'relay': True},
+    'pitcher': {'audio': True, 'display': False, 'controls': False, 'pitches': True, 'relay': True,
+                'display64': False},
+    'catcher': {'audio': False, 'display': True, 'controls': True, 'pitches': True, 'relay': True,
+                'display64': False},
 }
-FIELD_PROFILE = {'audio': False, 'display': True, 'controls': False, 'pitches': False, 'relay': True}
+FIELD_PROFILE = {'audio': False, 'display': True, 'controls': False, 'pitches': False, 'relay': True,
+                 'display64': True}
 HEADERS = ('UNIT', 'KEY', 'LABEL', 'SHORT', 'ENROLLED', 'CAPABILITIES', 'EUI')
 
 
@@ -240,7 +246,7 @@ def command_list(args):
     for unit in units:
         if unit['enrolled']:
             index += 1
-        capabilities = ', '.join(field for field in CAPABILITY_FIELDS if unit[field]) or '-'
+        capabilities = ', '.join(field for field in CAPABILITY_FIELDS if unit.get(field, False)) or '-'
         rows.append((str(index if unit['enrolled'] else 0), unit['key'], unit['label'], unit['short'],
                      'yes' if unit['enrolled'] else 'no', capabilities,
                      'yes' if unit['key'] in euis else 'no'))

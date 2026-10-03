@@ -11,17 +11,17 @@ Estimated, not measured. The requirement is one game, taken as three hours of pl
 | Sleepy + OLED (`--no-relay`) | polled sleep plus the same display load | about 13 mA | about 39 mAh |
 | Sleepy, no display | polled sleep only | about 1 mA | about 3 mAh |
 
-The OLED dominates every display unit; the radio is about a third of the load. The only way materially below a 100 mAh cell is to blank the OLED when no call is recent, which changes first-call behavior and is not implemented.
+The OLED dominates every display unit; the radio is about a third of the load. The fielder watch uses the 128x64 panel but its strip UI stays sparse, so the same estimate stands. The only way materially below a 100 mAh cell is to blank the OLED when no call is recent, which changes first-call behavior and is not implemented.
 
 ## Recommended cells
 
 | Use | Cell | Size | Weight | Notes |
 |---|---|---|---|---|
-| Standard one-game build, every field unit | Adafruit 1317, 150 mAh | 19.75 x 26.02 x 3.8 mm | 4.65 g | About 2.8 games for a catcher, 3.3 for the pitcher by estimate, before cold and aging derating |
-| Floor, pitcher or a build with display blanking | Adafruit 1570, 100 mAh | 11.5 x 31 x 3.8 mm | 3 g | Charge at 100 mA or less |
-| Multi-game weekends | Adafruit 1578, 500 mAh, and SparkFun PRT-13854, 850 mAh | current cells | | Roughly 25 to 50 games by estimate; the current cases are designed around these |
+| Standard smallest build, every field unit | Adafruit 1570, 100 mAh | 11.5 x 31 x 3.8 mm | 3 g | About 1.8 catcher games and 2.2 pitcher games by nameplate, about 1.4 to 1.8 after derating. The slim cases are sized for this cell. |
+| More margin | Adafruit 1317, 150 mAh | 19.75 x 26 x 3.8 mm | 4.65 g | About 1.5x the runtime, but it does not fit the slim cases; use the older shell set. |
+| Multi-game weekends | Adafruit 1578, 500 mAh, and SparkFun PRT-13854, 850 mAh | larger | | Older shell set only; roughly 25 to 50 games by estimate. |
 
-The XIAO's onboard charger runs at about 100 mA, which suits the 150 mAh cell (0.67C) and is at the limit for the 100 mAh cell. Keep an external charger only as a spare.
+The XIAO's onboard charger runs at about 100 mA, which is 1C for the 100 mAh cell, the top of its rating. Verify the board's actual charge current on the bench; if it is higher, charge through an external 50 to 100 mA charger or add a series resistor. If the one-game margin feels thin, blanking the OLED when no call is recent is the highest-value change: the display is about two thirds of the load.
 
 ## Size impact
 

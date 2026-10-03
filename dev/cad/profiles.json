@@ -67,6 +67,12 @@
       "length": 36.0,
       "height": 4.75,
       "source": "Adafruit 1578 class"
+    },
+    "protected_100mah": {
+      "width": 11.5,
+      "length": 31.0,
+      "height": 3.8,
+      "source": "Adafruit 1570 class"
     }
   },
   "switch": {
@@ -117,14 +123,14 @@
   "deck": {
     "thickness": 0.7,
     "foam": 0.2,
-    "ledge_width": 1.2,
+    "ledge_width": 0.6,
     "rail": [
       0.8,
       1.0
     ],
     "pull_notch": [
       12.0,
-      18.0
+      10.0
     ],
     "note": "Separate thin plate over the cell with boss notches, collar notches, a pull-tab pocket and clearance for the charge plug."
   },
@@ -216,9 +222,9 @@
   },
   "receiver": {
     "role": "pitcher",
-    "width": 42.0,
-    "length": 63.5,
-    "wall_height": 12.85,
+    "width": 30.0,
+    "length": 48.6,
+    "wall_height": 10.2,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
@@ -227,31 +233,27 @@
         5
       ],
       [
-        37,
+        25,
         5
       ],
       [
         5,
-        58.5
-      ],
-      [
-        37,
-        58.5
+        42.9
       ]
     ],
-    "cell": "protected_850mah_cell",
+    "cell": "protected_100mah_cell",
     "board": {
-      "x": 11.1,
-      "y": 40.5,
+      "x": 9.6,
+      "y": 25.6,
       "antenna_end": "y_min",
       "usb_end": "y_max"
     },
     "deck": {
-      "y0": 15.5,
-      "y1": 61.2,
+      "y0": 15.1,
+      "y1": 46.6,
       "pull_notch": [
         12.0,
-        32.0
+        10.0
       ]
     },
     "dashboard": null,
@@ -260,8 +262,8 @@
     "buttons": [
       {
         "id": "recall",
-        "x": 21.0,
-        "y": 8.7,
+        "x": 9.0,
+        "y": 2.7,
         "switch": "switch_recall",
         "head": "plain",
         "operating_hand": "either, sized for a glove"
@@ -270,7 +272,7 @@
     "sidebar": null,
     "charge": {
       "face": "y_max",
-      "y_center": 49.0
+      "y_center": 16.8
     },
     "mounts": [
       {
@@ -280,12 +282,12 @@
         "loop_length": 12.0,
         "centers": [
           [
-            10.0,
-            32.25
+            8.5,
+            24.3
           ],
           [
-            32.0,
-            32.25
+            21.5,
+            24.3
           ]
         ]
       }
@@ -296,48 +298,48 @@
     "components": [
       {
         "name": "xiao_nrf54l15",
-        "x": 11.1,
-        "y": 40.5,
+        "x": 9.6,
+        "y": 25.6,
         "width": 17.8,
         "length": 21.0,
-        "source": "PCB 1.6 + 2.0 components above, mounted on the lid inner face, USB end at the y_max wall"
+        "source": "PCB 1.6 + 2.0 components above, USB end at the y_max wall"
       },
       {
         "name": "xiao_antenna_keepout",
-        "x": 11.1,
-        "y": 30.5,
+        "x": 9.6,
+        "y": 15.6,
         "width": 17.8,
         "length": 10.0,
         "source": "metal-free band outward from the antenna end between the deck top and the lid"
       },
       {
-        "name": "protected_850mah_cell",
-        "x": 2.75,
-        "y": 15.9,
-        "width": 34.5,
-        "length": 45.0,
-        "source": "SparkFun PRT-13854 class"
+        "name": "protected_100mah_cell",
+        "x": 2.6,
+        "y": 15.6,
+        "width": 11.5,
+        "length": 31.0,
+        "source": "Adafruit 1570 class"
       },
       {
         "name": "deck_plate",
-        "x": 2.4,
-        "y": 15.5,
-        "width": 36.2,
-        "length": 45.0,
+        "x": 1.9,
+        "y": 15.1,
+        "width": 26.2,
+        "length": 31.5,
         "source": "cell cover, 0.7 thick"
       },
       {
         "name": "switch_recall",
-        "x": 15.0,
+        "x": 9.0,
         "y": 2.7,
         "width": 12.0,
         "length": 12.0,
-        "source": "face switch under the flat lid, clear of the cell"
+        "source": "face switch under the flat lid, clear of the board"
       },
       {
         "name": "charge_opening",
-        "x": 15.0,
-        "y": 61.5,
+        "x": 13.5,
+        "y": 46.6,
         "width": 10.0,
         "length": 2.0,
         "source": "USB-C slot through the y_max wall and lid edge"
@@ -346,70 +348,58 @@
   },
   "wrist": {
     "role": "fielder",
-    "width": 46.0,
-    "length": 56.0,
-    "wall_height": 12.5,
+    "width": 45.8,
+    "length": 50.1,
+    "wall_height": 10.2,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
       [
-        5,
-        5
-      ],
-      [
-        41,
+        40.8,
         5
       ],
       [
         5,
-        51
-      ],
-      [
-        41,
-        51
+        45.1
       ]
     ],
-    "cell": "protected_500mah_cell",
+    "cell": "protected_100mah_cell",
     "board": {
       "x": 2.0,
-      "y": 16.5,
+      "y": 2.0,
       "antenna_end": "x_max",
       "usb_end": "x_min"
     },
     "deck": {
-      "y0": 15.0,
-      "y1": 53.5,
+      "y0": 1.5,
+      "y1": 33.5,
       "pull_notch": [
-        10.0,
-        30.0
+        12.0,
+        10.0
       ]
     },
     "dashboard": {
-      "tilt_deg": 18.0,
-      "plateau": {
-        "x": 21.8,
-        "y": 2.0,
-        "width": 16.0,
-        "length": 15.5,
-        "height": 2.0
-      },
+      "tilt_deg": 0.0,
+      "plateau": null,
       "head": {
-        "x": 2.0,
-        "y": 33.3,
-        "width": 42.0,
-        "length": 16.0
+        "x": 15.8,
+        "y": 22.5,
+        "width": 28.5,
+        "length": 23.0
       }
     },
     "oled": {
-      "x": 5.0,
-      "y": 34.8
+      "x": 16.4,
+      "y": 20.3,
+      "module": "oled64"
     },
     "bezel": true,
+    "bars": true,
     "buttons": [
       {
         "id": "recall",
-        "x": 29.8,
-        "y": 9.75,
+        "x": 3.5,
+        "y": 20.4,
         "switch": "switch_recall",
         "head": "plain",
         "operating_hand": "bare hand or glove heel"
@@ -418,42 +408,9 @@
     "sidebar": null,
     "charge": {
       "face": "x_min",
-      "y_center": 25.4
+      "y_center": 10.9
     },
-    "mounts": [
-      {
-        "name": "wrist",
-        "strap_width": 25.0,
-        "layout": "in_line_y",
-        "loop_length": 27.0,
-        "centers": [
-          [
-            23.0,
-            14.0
-          ],
-          [
-            23.0,
-            42.0
-          ]
-        ]
-      },
-      {
-        "name": "belt",
-        "strap_width": 45.0,
-        "layout": "in_line_x",
-        "loop_length": 12.0,
-        "centers": [
-          [
-            11.5,
-            28.0
-          ],
-          [
-            34.5,
-            28.0
-          ]
-        ]
-      }
-    ],
+    "mounts": [],
     "menu_keys": {
       "recall": "recall / volume (D1)"
     },
@@ -461,7 +418,7 @@
       {
         "name": "xiao_nrf54l15",
         "x": 2.0,
-        "y": 16.5,
+        "y": 2.0,
         "width": 21.0,
         "length": 17.8,
         "source": "PCB 1.6 + 2.0 components above, USB end at the x_min wall"
@@ -469,47 +426,47 @@
       {
         "name": "xiao_antenna_keepout",
         "x": 23.0,
-        "y": 16.5,
+        "y": 2.0,
         "width": 10.0,
         "length": 17.8,
         "source": "metal-free band outward from the antenna end between the deck top and the lid"
       },
       {
-        "name": "protected_500mah_cell",
-        "x": 6.5,
-        "y": 16.1,
-        "width": 29.0,
-        "length": 36.0,
-        "source": "Adafruit 1578 class"
+        "name": "protected_100mah_cell",
+        "x": 16.5,
+        "y": 2.0,
+        "width": 11.5,
+        "length": 31.0,
+        "source": "Adafruit 1570 class"
       },
       {
         "name": "deck_plate",
-        "x": 2.4,
-        "y": 15.0,
-        "width": 41.2,
-        "length": 38.5,
+        "x": 1.9,
+        "y": 1.5,
+        "width": 42.0,
+        "length": 32.0,
         "source": "cell cover, 0.7 thick"
       },
       {
         "name": "oled_display",
-        "x": 5.0,
-        "y": 34.8,
-        "width": 36.0,
-        "length": 12.5,
-        "source": "nested 2.5 mm from the sloped surface, screen under the bezel window"
+        "x": 16.4,
+        "y": 20.3,
+        "width": 27.3,
+        "length": 27.8,
+        "source": "nested 1.0 mm from the flat face, screen under the bezel window"
       },
       {
         "name": "switch_recall",
-        "x": 23.8,
-        "y": 3.75,
+        "x": 3.5,
+        "y": 20.4,
         "width": 12.0,
         "length": 12.0,
-        "source": "face switch under the button pad"
+        "source": "face switch beside the display head"
       },
       {
         "name": "charge_opening",
         "x": 2.0,
-        "y": 20.4,
+        "y": 5.9,
         "width": 2.0,
         "length": 10.0,
         "source": "USB-C slot through the x_min wall and lid edge"
@@ -518,26 +475,26 @@
   },
   "keypad": {
     "role": "catcher",
-    "width": 48.0,
-    "length": 80.0,
-    "wall_height": 15.0,
+    "width": 41.0,
+    "length": 78.0,
+    "wall_height": 14.9,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
       [
-        43,
+        36,
         5
       ],
       [
         5,
-        75
+        73
       ],
       [
-        43,
-        75
+        36,
+        73
       ]
     ],
-    "cell": "protected_850mah_cell",
+    "cell": "protected_100mah_cell",
     "board": {
       "x": 2.0,
       "y": 2.0,
@@ -545,39 +502,39 @@
       "usb_end": "y_min"
     },
     "deck": {
-      "y0": 6.5,
-      "y1": 55.0,
+      "y0": 1.5,
+      "y1": 33.5,
       "pull_notch": [
         12.0,
-        40.0
+        10.0
       ]
     },
     "dashboard": {
       "tilt_deg": 18.0,
       "plateau": {
-        "x": 20.0,
+        "x": 18.0,
         "y": 2.0,
-        "width": 26.0,
-        "length": 57.0,
+        "width": 20.0,
+        "length": 54.0,
         "height": 1.5
       },
       "head": {
         "x": 2.0,
-        "y": 57.5,
-        "width": 44.0,
+        "y": 55.25,
+        "width": 36.0,
         "length": 16.0
       }
     },
     "oled": {
-      "x": 6.0,
-      "y": 58.5
+      "x": 2.0,
+      "y": 57.0
     },
     "bezel": true,
     "buttons": [
       {
         "id": "call_1",
-        "x": 30.5,
-        "y": 9.1,
+        "x": 20.1,
+        "y": 3.5,
         "switch": "switch_call_1",
         "head": "numbered",
         "digit": "1",
@@ -585,8 +542,8 @@
       },
       {
         "id": "call_2",
-        "x": 30.5,
-        "y": 23.1,
+        "x": 20.1,
+        "y": 17.2,
         "switch": "switch_call_2",
         "head": "numbered",
         "digit": "2",
@@ -594,8 +551,8 @@
       },
       {
         "id": "call_3",
-        "x": 30.5,
-        "y": 37.1,
+        "x": 20.1,
+        "y": 30.9,
         "switch": "switch_call_3",
         "head": "numbered",
         "digit": "3",
@@ -603,8 +560,8 @@
       },
       {
         "id": "call_4",
-        "x": 30.5,
-        "y": 51.1,
+        "x": 20.1,
+        "y": 44.6,
         "switch": "switch_call_4",
         "head": "numbered",
         "digit": "4",
@@ -613,8 +570,8 @@
     ],
     "sidebar": {
       "id": "back",
-      "x": 24.0,
-      "z": 9.0,
+      "x": 18.0,
+      "z": 7.4,
       "face": "y_max",
       "head": "back",
       "switch": "switch_back"
@@ -631,12 +588,12 @@
         "loop_length": 27.0,
         "centers": [
           [
-            24.0,
-            20.0
+            20.0,
+            18.0
           ],
           [
-            24.0,
-            56.0
+            20.0,
+            54.0
           ]
         ]
       }
@@ -666,61 +623,61 @@
         "source": "metal-free band outward from the antenna end between the deck top and the lid"
       },
       {
-        "name": "protected_850mah_cell",
-        "x": 6.75,
-        "y": 8.0,
-        "width": 34.5,
-        "length": 45.0,
-        "source": "SparkFun PRT-13854 class"
+        "name": "protected_100mah_cell",
+        "x": 2.6,
+        "y": 2.0,
+        "width": 11.5,
+        "length": 31.0,
+        "source": "Adafruit 1570 class"
       },
       {
         "name": "deck_plate",
-        "x": 2.4,
-        "y": 6.5,
-        "width": 43.2,
-        "length": 48.5,
+        "x": 1.9,
+        "y": 1.5,
+        "width": 37.2,
+        "length": 32.0,
         "source": "cell cover, 0.7 thick"
       },
       {
         "name": "oled_display",
-        "x": 6.0,
-        "y": 58.5,
+        "x": 2.0,
+        "y": 57.0,
         "width": 36.0,
         "length": 12.5,
         "source": "nested 2.5 mm from the sloped surface, screen under the bezel window"
       },
       {
         "name": "switch_call_1",
-        "x": 24.5,
-        "y": 3.0999999999999996,
+        "x": 20.1,
+        "y": 3.5,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_call_2",
-        "x": 24.5,
-        "y": 17.1,
+        "x": 20.1,
+        "y": 17.2,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_call_3",
-        "x": 24.5,
-        "y": 31.1,
+        "x": 20.1,
+        "y": 30.9,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_call_4",
-        "x": 24.5,
-        "y": 45.1,
+        "x": 20.1,
+        "y": 44.6,
         "width": 12.0,
         "length": 12.0
       },
       {
         "name": "switch_back",
         "x": 18.0,
-        "y": 72.0,
+        "y": 70.0,
         "width": 12.0,
         "length": 6.5,
         "source": "side-entry switch in the y_max wall"
@@ -734,5 +691,29 @@
         "source": "USB-C slot through the y_min wall and lid edge"
       }
     ]
+  },
+  "oled64": {
+    "name": "0.96 inch 128x64 SSD1306 module",
+    "width": 27.3,
+    "length": 27.8,
+    "height": 4.5,
+    "active": [
+      21.74,
+      10.86
+    ],
+    "window": [
+      23.7,
+      12.9
+    ],
+    "seat_depth": 1.0,
+    "note": "Generic 0.96 inch 128x64 I2C OLED: PCB 27.3 x 27.8, about 4.5 thick with its 4-pin header, glass 26.7 x 19.26, active 21.74 x 10.86 centred horizontally. The window is a through-cut centred on the module; the module nests 1.0 mm from the flat face."
+  },
+  "watch_bars": {
+    "bar": 4.0,
+    "standoff": 2.2,
+    "clear_width": 20.0,
+    "arm_width": 4.0,
+    "bite": 1.5,
+    "note": "Two printed fixed bars for a 20 mm NATO: 4 mm bars standing 2.2 mm off the case back plane, a 20 mm clear channel between the 4 mm lug arms, bar ends buried 1.5 mm into the case ends. No metal in the strap path."
   }
 }

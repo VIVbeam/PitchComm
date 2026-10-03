@@ -1,16 +1,19 @@
 /*
- * PitchComm - 128x32 SSD1306 OLED for the XIAO nRF54L15 (Zephyr / NCS).
+ * PitchComm - SSD1306 OLED for the XIAO nRF54L15 (Zephyr / NCS).
  *
- * The panel is a generic 0.91" 128x32 module at address 0x3C on i2c22
- * (SDA = P1.10 / D4, SCL = P1.11 / D5), see docs/wiring.md.
+ * The panel is the 128x32 0.91" catcher module or the 128x64 fielder watch
+ * module at address 0x3C on i2c22 (SDA = P1.10 / D4, SCL = P1.11 / D5), see
+ * docs/wiring.md. The board overlay selects the geometry: the base overlay is
+ * 128x32 and boards/display64.overlay raises a watch unit to 128x64.
  *
  * Primary backend: the in-tree Zephyr SSD1306 display driver
  * (compatible = "solomon,ssd1306", CONFIG_SSD1306). Fallback backend: raw
  * I2C page writes, used only if CONFIG_SSD1306 is not enabled.
  *
- * Rendering goes into a 512-byte page-major frame buffer (bit 0 of each byte
- * is the top row of its 8-pixel page, matching SCREEN_INFO_MONO_VTILED), then
- * the whole frame is pushed in one pass, which is what the proven V1
+ * Rendering goes into a page-major frame buffer (kWidth * kHeight / 8 bytes:
+ * 512 for a 32-row panel, 1024 for a 64-row panel; bit 0 of each byte is the
+ * top row of its 8-pixel page, matching SCREEN_INFO_MONO_VTILED), then the
+ * whole frame is pushed in one pass, which is what the proven V1
  * Adafruit_SSD1306 code did (clearDisplay / print / display).
  *
  * Timeouts: Zephyr's synchronous I2C and display APIs take no per-transfer
@@ -45,9 +48,15 @@
 namespace board {
 namespace {
 
-constexpr uint16_t kWidth = 128;
-constexpr uint16_t kHeight = 32;
-constexpr uint16_t kFrameBytes = kWidth * kHeight / 8; /* 512 bytes */
+/* Panel geometry comes from the overlay: the base ssd1306 node is 128x32 and
+ * boards/display64.overlay raises it to 128x64 for a fielder watch. */
+constexpr uint16_t kWidth = DT_PROP(DT_NODELABEL(ssd1306), width);
+constexpr uint16_t kHeight = DT_PROP(DT_NODELABEL(ssd1306), height);
+constexpr uint16_t kFrameBytes = kWidth * kHeight / 8; /* 512 or 1024 bytes */
+
+/* Both text layouts are authored for a 32-row panel; a 64-row panel centers
+ * the same content in the middle instead of the top. */
+constexpr uint16_t kLayoutOffset = (kHeight - 32) / 2;
 
 constexpr uint8_t kGlyphColumns = 5;
 constexpr uint8_t kGlyphRows = 7;
@@ -271,21 +280,26 @@ bool flush() {
 
 #else /* Raw SSD1306 I2C fallback, only if the in-tree driver is unavailable. */
 
-/* Standard SSD1306 128x32 power-up sequence; values follow the datasheet and
- * the settings requested in the overlay (segment remap, reversed COM scan,
- * sequential COM pins, precharge 0xF1). */
+/* SSD1306 power-up sequence for the panel the overlay describes; values
+ * follow the datasheet and the settings requested in the overlay (segment
+ * remap, reversed COM scan, precharge 0xF1). */
 bool rawInit() {
+  /* The in-tree driver picks the COM pin layout from com-sequential: the
+   * 128x32 panel uses sequential (0x02) and the standard 128x64 module uses
+   * the alternative layout (0x12). board/display64.overlay deletes
+   * com-sequential, so follow the height here. */
+  constexpr uint8_t kComPins = (kHeight > 32) ? 0x12 : 0x02;
   static const uint8_t kInit[] = {
       0xae,             /* display off while configuring */
       0xd5, 0x80,       /* clock divide ratio / oscillator frequency */
-      0xa8, 0x1f,       /* multiplex ratio: 32 rows */
+      0xa8, static_cast<uint8_t>(kHeight - 1), /* multiplex ratio: rows - 1 */
       0xd3, 0x00,       /* display offset 0 */
       0x40,             /* display start line 0 */
       0x8d, 0x14,       /* charge pump enabled */
       0x20, 0x02,       /* page addressing mode */
       0xa1,             /* segment remap */
       0xc8,             /* COM output scan direction reversed */
-      0xda, 0x02,       /* COM pins: sequential, no left/right remap */
+      0xda, kComPins,   /* COM pins: 32-row sequential, 64-row alternative */
       0x81, 0x8f,       /* contrast */
       0xd9, 0xf1,       /* pre-charge period */
       0xdb, 0x40,       /* VCOMH deselect level */
@@ -350,7 +364,7 @@ bool Display::begin() {
   struct display_capabilities caps{};
   display_get_capabilities(gPanel, &caps);
   if (caps.x_resolution != kWidth || caps.y_resolution != kHeight) {
-    return false; /* the overlay must describe the 128x32 panel */
+    return false; /* the overlay geometry must match what this build compiled */
   }
 #else
   if (!rawInit()) {
@@ -415,10 +429,10 @@ bool Display::menu(const pc::CatcherMenu::Frame& frame) {
     return false;
   }
   clearFrame();
-  drawText(0, 0, frame.header, 1, kGlyphAdvance);
-  drawText(0, 8, frame.rows[0], 1, kGlyphAdvance);
-  drawText(0, 16, frame.rows[1], 1, kGlyphAdvance);
-  drawText(0, 24, frame.footer, 1, kGlyphAdvance);
+  drawText(0, kLayoutOffset, frame.header, 1, kGlyphAdvance);
+  drawText(0, kLayoutOffset + 8, frame.rows[0], 1, kGlyphAdvance);
+  drawText(0, kLayoutOffset + 16, frame.rows[1], 1, kGlyphAdvance);
+  drawText(0, kLayoutOffset + 24, frame.footer, 1, kGlyphAdvance);
   return flush();
 }
 
@@ -440,13 +454,13 @@ bool Display::strip(const char* label, const char* status) {
      * reduce only the blank inter-character advance from 12 to 11 px. */
     uint16_t x = 0;
     for (const char* p = label; *p != '\0'; ++p) {
-      drawGlyph(x, 0, *p, 2);
+      drawGlyph(x, kLayoutOffset, *p, 2);
       x += kLabelAdvance11;
     }
   } else {
-    drawText(0, 0, label, 2, kLabelAdvance);
+    drawText(0, kLayoutOffset, label, 2, kLabelAdvance);
   }
-  drawText(0, 16, status, 1, kGlyphAdvance);
+  drawText(0, kLayoutOffset + 16, status, 1, kGlyphAdvance);
   return flush();
 }
 

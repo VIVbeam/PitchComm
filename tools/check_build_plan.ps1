@@ -13,6 +13,8 @@ capability rules that a host-only machine cannot compile:
   - the catcher fragment enables the menu and the display driver and leaves the
     recall button off, because the five-button menu owns those pins
   - a display unit enables the OLED and keeps audio off
+  - the center plan carries the 128x64 display64 overlay and the catcher plan
+    keeps the 128x32 base panel
   - the proof uses the proof fragments
   - an unenrolled unit is rejected by name
   - a staged roster with center relay off plans a Sleepy End Device with MTD
@@ -102,6 +104,10 @@ Assert-Check -Name 'catcher enables the display driver' -Condition ($catcher -ma
 Assert-Check -Name 'catcher leaves the recall button to the menu' -Condition ($catcher -match 'CONFIG_PITCHCOMM_FIELD_BUTTON=n')
 Assert-Check -Name 'center enables the display and not audio' `
     -Condition (($center -match 'CONFIG_PITCHCOMM_DISPLAY=y') -and ($center -match 'CONFIG_PITCHCOMM_AUDIO=n'))
+Assert-Check -Name 'center plans the 64-row display64 overlay' `
+    -Condition ($center -match 'EXTRA_DTC_OVERLAY_FILE=boards/display64\.overlay')
+Assert-Check -Name 'catcher keeps the 32-row base panel (no display64 overlay)' `
+    -Condition ($catcher -notmatch 'display64')
 Assert-Check -Name 'proof uses the proof fragments' -Condition ($proof -match 'roles/audio-proof\.conf;roles/audio-unit\.conf')
 
 $rejected = Invoke-DryRun 'first'

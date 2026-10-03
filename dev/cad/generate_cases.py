@@ -472,6 +472,10 @@ class Case:
         return (float(c['x']) + float(c['width']) / 2.0,
                 float(c['y']) + float(c['length']) / 2.0)
 
+    def oled_params(self):
+        o = self.p.get('oled') or {}
+        return self.g[o.get('module', 'oled')]
+
 
 # ==========================================================================
 # body
@@ -603,6 +607,25 @@ def build_body(C: Case):
                                  float(comp['width']),
                                  (float(comp['x']), wall,
                                   sz - float(comp['width']) / 2.0)))
+
+    # printed fixed NATO bars (two bars, lug arms, no metal)
+    wb = g.get('watch_bars')
+    if C.p.get('bars') and wb:
+        bd = float(wb['bar'])
+        stand = float(wb['standoff'])
+        clear = float(wb['clear_width'])
+        arm = float(wb['arm_width'])
+        bite = float(wb['bite'])
+        cx = C.w / 2.0
+        ztop = stand + bd
+        xa = cx - clear / 2.0 - arm
+        xb = cx + clear / 2.0 + arm
+        for yc, sgn in ((0.0, -1.0), (C.l, 1.0)):
+            ybar = yc + sgn * (bd / 2.0 - bite)
+            body = uni(body, cyl(bd, xb - xa, 'x', (cx, ybar, stand + bd / 2.0)))
+            for ax in (xa, cx + clear / 2.0):
+                ya, yb = sorted((yc - sgn * 2.0, ybar + sgn * bd / 2.0))
+                body = uni(body, box(arm, yb - ya, ztop, (ax, ya, 0.0)))
     return body
 
 
@@ -667,7 +690,7 @@ def build_lid(C: Case):
 
     # OLED window + seat in the sloped head
     if C.p.get('oled'):
-        oled = g['oled']
+        oled = C.oled_params()
         ox0, oy0, ox1, oy1 = C.oled_rect()
         ccx, ccy = (ox0 + ox1) / 2.0, (oy0 + oy1) / 2.0
         F = C.frame(ccx, ccy)
@@ -969,7 +992,7 @@ def build_label_local(C, b):
 
 def build_bezel_local(C):
     g = C.g
-    bz, oled = g['bezel'], g['oled']
+    bz, oled = g['bezel'], C.oled_params()
     bw, bl = oled['window']
     # no window insert: the opening hugs the lid's window with a 0.3 reveal
     ri = (bw + 0.6, bl + 0.6)
@@ -1369,7 +1392,7 @@ def build_style(profiles, style, outdir, palette):
     metal_hits += probe_violation(cell_shape, keepout)[0]
 
     if p.get('oled'):
-        oled = g['oled']
+        oled = C.oled_params()
         ox0, oy0, ox1, oy1 = C.oled_rect()
         ccx, ccy = (ox0 + ox1) / 2.0, (oy0 + oy1) / 2.0
         F = C.frame(ccx, ccy)
@@ -1512,11 +1535,12 @@ def build_style(profiles, style, outdir, palette):
     # ---- control deck / protection ----------------------------------------
     bz = g['bezel']
     tilt = float(C.dash['tilt_deg']) if C.dash else 0.0
+    op = C.oled_params() if p.get('oled') else None
     control_deck = {
         "tilt_deg": tilt if C.dash else None,
         "flat_case_height_mm": round(C.lid_top(), 2),
         "max_height_mm": report['max_height_mm'],
-        "screen_recess_mm": round(float(g['oled']['seat_depth']) + bz['height'], 2) if p.get('oled') else None,
+        "screen_recess_mm": round(float(op['seat_depth']) + bz['height'], 2) if op else None,
         "bezel_height_mm": bz['height'] if p.get('oled') else None,
         "hood_height_mm": bz['hood_height'] if p.get('oled') else None,
         "plunger_top_vs_surface_mm": {},
@@ -1532,6 +1556,22 @@ def build_style(profiles, style, outdir, palette):
     for m in C.mounts():
         report['mounts'].append({"name": m['name'], "strap_width_mm": float(m['strap_width']),
                                  "layout": m.get('layout'), "loop_count": len(m['centers'])})
+
+    wb = g.get('watch_bars')
+    if p.get('bars') and wb:
+        bd, stand, bite = float(wb['bar']), float(wb['standoff']), float(wb['bite'])
+        report['watch_bars'] = {
+            "bar_mm": bd,
+            "standoff_mm": stand,
+            "clear_width_mm": float(wb['clear_width']),
+            "arm_width_mm": float(wb['arm_width']),
+            "bite_mm": bite,
+            "bar_axis_spacing_mm": round(C.l + bd - 2.0 * bite, 2),
+            "overall_length_mm": round(C.l + 2.0 * (bd - bite), 2),
+            "max_strap_thickness_mm": round(stand - 0.2, 2),
+            "strap_width_mm": float(wb['clear_width']),
+            "note": wb.get('note', ''),
+        }
 
     report['checks']['failures'] = failures
     report['checks']['warnings'] = warnings

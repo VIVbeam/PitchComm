@@ -9,7 +9,7 @@ Two boards are enough, but one of them must be the coach: it is the Thread leade
 | Goal | Minimum hardware |
 |---|---|
 | Link, console, retry, range | 2x XIAO nRF54L15, 2x USB-C data cables, laptop with NCS, 2 USB ports (or a powered hub) |
-| Clean pitch-call display | the above + 1x 128x32 SSD1306 OLED (3V3, GND, D4, D5) and the catcher build |
+| Clean pitch-call display | the above + 1x 128x32 SSD1306 OLED (3V3, GND, D4, D5) and the catcher build; the fielder watch uses the 128x64 panel and can follow once the linker path works |
 | Catcher request/menu | the above + 5x momentary switches (D0-D3 calls, D13 Back, each to GND) |
 | Spoken call | the above + 1x JY300 and the pitcher build |
 | Recall/volume | 1x momentary switch on D1 to GND |
@@ -30,7 +30,7 @@ Already verified on this machine:
 - [x] `python tools/build_audio_fs.py` -> LittleFS image and Intel HEX created (37 clips, `236550`/`729088` clip plus manifest bytes, image `729088` bytes at `0x0C2000`), verified by `tools/verify_audio_fs.py`; the PCM variant is refused over budget.
 - [x] `python tools/preflight.py --audio` -> audio ready, repo audit passes.
 - [x] `python tools/audit_repo.py` -> 6/6 checks pass.
-- [x] `python tools/test_tools.py` -> 173 tests, 0 failures (catalog, roster variants and relay, enrollment CLI atomicity, provisioning, preflight drift checks, audio budgets, packaging, audit).
+- [x] `python tools/test_tools.py` -> 180 tests, 0 failures (catalog, roster variants, relay and display64 flags, enrollment CLI atomicity, provisioning, preflight drift checks, audio budgets, packaging, audit).
 - [x] `python dev/cad/generate_cases.py --no-preview` -> all checks passed; STLs written to `cad/unbranded/exports/`.
 - [x] `powershell tools/build_print_pack.ps1` and `-Bench` -> both packs written and verified by `-Verify`.
 - [x] `powershell tools/check_toolchain.ps1` -> only `west` and `nrfutil` missing on this bench, as expected.
@@ -114,11 +114,11 @@ Observations:
 
 - [ ] Catcher, in a crouch and standing: the screen is readable without lifting or unstrapping the unit.
 - [ ] Catcher, bare hand: all four calls and Back reachable without looking away, with the glove on the other hand; no accidental presses while blocking or sliding; the mount does not catch on the opposite leg.
-- [ ] Fielder on a wrist: the screen reads at a glance and the recall button falls under the thumb.
-- [ ] Fielder on a belt, standing and bent forward: the screen reads without unclipping the unit; the recall button works without looking.
+- [ ] Fielder watch: a 20 mm NATO threads under both printed bars without tools, lies flat, does not cover the screen or the plunger, and the case cannot pull free.
+- [ ] Fielder watch, standing and bent forward: the screen reads at a glance and the face plunger is reachable with the bare hand or glove heel without looking.
 - [ ] Pitcher: recall works through the glove; the collar does not snag; the button cannot be pressed accidentally when the unit lies on a bench.
 - [ ] Screen recess and window: the glass sits below the bezel lip and a knocked-on bezel does not touch it.
-- [ ] Carriers: straps slide through both loops, the case cannot pull free, and the strap does not cover the screen or buttons.
+- [ ] Carriers: the pitcher belt carrier and catcher guard straps slide through their loops, the case cannot pull free, and the strap does not cover the screen or buttons.
 - [ ] Antenna keepout stays metal-free with the cell and wiring installed.
 
 
@@ -127,12 +127,12 @@ Observations:
 - [ ] End-to-end latency from button press to earbud speech and OLED update, over 20 calls.
 - [ ] Range at shortstop/center-field depth and with the catcher crouched.
 - [ ] Runtime: one full game on one charge per unit; record start/end voltage.
-- [ ] Fit: catcher leg guard, pitcher belt, fielder wrist/belt; readability in sunlight.
+- [ ] Fit: catcher leg guard, pitcher belt, fielder NATO watch; readability in sunlight.
 - [ ] Catcher screen readable in a crouch and standing; Back not hit by accident.
-- [ ] Fielder screen readable on the belt while bent forward and on the wrist at a glance; recall reachable with the bare hand.
+- [ ] Watch screen readable at a glance and while bent forward; plunger reachable with the bare hand or glove heel.
 - [ ] Drop and rain: 1.5 m drop onto grass/dirt, light rain; inspect after.
 - [ ] Impact: throw a baseball at the display face and the pitcher collar from playing distance; inspect bezel, window and switch action.
-- [ ] Abuse: fielder dives/slides on the unit, catcher blocks with it on, strap is tugged hard; case, carrier and strap stay put.
+- [ ] Abuse: fielder dives/slides on the watch, catcher blocks with it on, the NATO strap and printer bars are tugged hard; case, bars and strap stay put.
 - [ ] Recharge and repeat.
 
 ## Results log

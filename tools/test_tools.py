@@ -100,14 +100,15 @@ def real_roster_units():
 
 
 def roster_unit(key, enrolled=True, audio=False, display=True, controls=False, pitches=False,
-                short=None, label=None, relay=False):
+                short=None, label=None, relay=False, display64=False):
     """One complete roster unit; capabilities default to a display-only field unit."""
     if short is None:
         short = key[:4].upper()
     if label is None:
         label = key.replace('_', ' ').title()
     return {'key': key, 'label': label, 'short': short, 'enrolled': enrolled, 'relay': relay,
-            'audio': audio, 'display': display, 'controls': controls, 'pitches': pitches}
+            'audio': audio, 'display': display, 'display64': display64,
+            'controls': controls, 'pitches': pitches}
 
 
 def write_roster(root, units, schema=1):
@@ -889,9 +890,20 @@ class GenerateCatalogTests(unittest.TestCase):
         self.c_array(header, 'kUnitControls', [False] + [unit['controls'] for unit in units], boolean=True)
         self.c_array(header, 'kUnitPitches', [False] + [unit['pitches'] for unit in units], boolean=True)
         # Relay is a network-layer build choice: the firmware header never
-        # carries it, so there is no kUnitRelay table.
+        # carries it, so there is no kUnitRelay table. display64 is a display
+        # layout choice and is likewise absent.
         self.assertNotIn('kUnitRelay', header)
         self.assertNotIn('relay', header)
+        self.assertNotIn('display64', header)
+
+    def test_committed_roster_display64_values(self):
+        by_key = {unit['key']: unit['display64']
+                  for unit in generate_catalog.load_roster(REAL_ROOT)}
+        self.assertEqual(by_key, {
+            'pitcher': False, 'catcher': False,
+            'first': True, 'second': True, 'third': True,
+            'shortstop': True, 'left': True, 'center': True, 'right': True,
+        })
 
     def test_gui_catalog_carries_units_and_play_audiences(self):
         data, _ = self.load()
@@ -905,6 +917,7 @@ class GenerateCatalogTests(unittest.TestCase):
         self.assertTrue(all('relay' in unit for unit in catalog['units']))
         self.assertTrue(all(unit['relay'] is True for unit in catalog['units']))
         self.assertEqual([unit['relay'] for unit in catalog['units']], [True, True, True, True])
+        self.assertTrue(all('display64' not in unit for unit in catalog['units']))
         self.assertEqual(catalog['pitches'],
                          [{'key': p['key'], 'label': p['label'], 'short': p['short'],
                            'speech': p['speech']} for p in data['pitches']])
@@ -1007,6 +1020,8 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
             ('units[1]: relay must be a boolean',
              [dict(roster_unit('pitcher', pitches=True), relay='yes')], None, 1),
             ('units[1]: relay must be a boolean', [missing_relay], None, 1),
+            ('units[1]: display64 must be a boolean',
+             [dict(roster_unit('pitcher', pitches=True), display64='yes')], None, 1),
             ('roster must enroll at least one unit',
              [roster_unit('pitcher', enrolled=False)], None, 1),
             ('roster must enroll at least one unit with the pitches capability',
@@ -1124,6 +1139,41 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
         gui_after = json.loads(after_files['gui/catalog.json'])
         center_after = next(unit for unit in gui_after['units'] if unit['key'] == 'center')
         self.assertFalse(center_after['relay'])
+        self.assertEqual({name for name, _ in generate_catalog.clips(after_data)}, before_clips)
+
+    def test_display64_is_optional_and_defaults_false(self):
+        units = real_roster_units()
+        for unit in units:
+            unit.pop('display64', None)
+        self.write(units)
+        loaded = generate_catalog.load_roster(self.tmp)
+        self.assertTrue(all(unit['display64'] is False for unit in loaded))
+        data, version = generate_catalog.load(self.tmp)
+        self.assertEqual(version, 0x299314f6)
+        self.assertTrue(all('display64' not in unit for unit in data['units']))
+        self.assertTrue(all('display64' not in unit for unit in data['allUnits']))
+
+    def test_display64_flag_stays_out_of_the_dictionary_header_and_gui(self):
+        self.write(real_roster_units())
+        before_data, _ = generate_catalog.load(self.tmp)
+        before_clips = {name for name, _ in generate_catalog.clips(before_data)}
+        before_version, before_files = generate_catalog.rendered(self.tmp)
+        self.assertEqual(before_version, 0x299314f6)
+        self.assertNotIn('display64', before_files['firmware/include/pc/catalog.h'])
+        self.assertTrue(all('display64' not in unit
+                            for unit in json.loads(before_files['gui/catalog.json'])['units']))
+
+        units = real_roster_units()
+        pitcher = next(unit for unit in units if unit['key'] == 'pitcher')
+        self.assertFalse(pitcher['display64'])
+        pitcher['display64'] = True
+        self.write(units)
+
+        after_data, _ = generate_catalog.load(self.tmp)
+        after_version, after_files = generate_catalog.rendered(self.tmp)
+        self.assertEqual(after_version, 0x299314f6)
+        self.assertEqual(after_files, before_files)
+        self.assertNotIn('display64', after_files['firmware/include/pc/catalog.h'])
         self.assertEqual({name for name, _ in generate_catalog.clips(after_data)}, before_clips)
 
 
@@ -1354,7 +1404,7 @@ class RosterCliTests(TempRepoTestCase):
         self.assertTrue(first['enrolled'])
         self.assertEqual({field: first[field] for field in roster.CAPABILITY_FIELDS},
                          {'audio': False, 'display': True, 'controls': False,
-                          'pitches': False, 'relay': True})
+                          'pitches': False, 'relay': True, 'display64': True})
         data, version = generate_catalog.load(self.tmp)
         self.assertNotEqual(version, 0x299314f6)
         by_key = {play['key']: play['audience'] for play in data['plays']}
@@ -1483,6 +1533,41 @@ class RosterCliTests(TempRepoTestCase):
         self.assertNotIn('relay', rows['coach'])
         self.assert_no_side_outputs()
 
+    def test_list_shows_display64_in_the_capabilities_column(self):
+        code, out, err = self.run_roster('list')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        rows = {row.split()[1]: row for row in out.splitlines()[1:] if row.split()}
+        self.assertIn('display, relay, display64', rows['center'])
+        self.assertIn('display, relay, display64', rows['shortstop'])
+        self.assertNotIn('display64', rows['pitcher'])
+        self.assertNotIn('display64', rows['catcher'])
+        self.assert_no_side_outputs()
+
+    def test_display64_flags_flip_and_default_profiles_match(self):
+        self.assertFalse(roster.default_profile('pitcher')['display64'])
+        self.assertFalse(roster.default_profile('catcher')['display64'])
+        self.assertTrue(roster.default_profile('first')['display64'])
+        self.assertTrue(roster.default_profile('center')['display64'])
+        # center starts true; --no-display64 selects the 128x32 panel.
+        code, out, err = self.run_roster('enable', 'center', '--no-display64')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertFalse(self.unit_by_key('center')['display64'])
+        code, out, err = self.run_roster('enable', 'center', '--display64')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertTrue(self.unit_by_key('center')['display64'])
+        # A no-flag enable applies the field profile: display64 true.
+        self.run_roster('enable', 'center', '--no-display64')
+        self.assertFalse(self.unit_by_key('center')['display64'])
+        self.run_roster('enable', 'center')
+        self.assertTrue(self.unit_by_key('center')['display64'])
+        # A no-flag enable applies the catcher profile: display64 false.
+        self.run_roster('enable', 'catcher')
+        self.assertFalse(self.unit_by_key('catcher')['display64'])
+        self.assert_no_side_outputs()
+
     def test_relay_only_enable_prints_no_steps_and_keeps_enrollment(self):
         before = json.loads(self.roster_path.read_text(encoding='utf-8'))['units']
         code, out, err = self.run_roster('enable', 'center', '--relay')
@@ -1585,6 +1670,56 @@ class RosterCliTests(TempRepoTestCase):
         self.assertEqual(
             (self.roster_path.read_bytes(), header_path.read_bytes(), gui_path.read_bytes()),
             before)
+        self.assert_no_side_outputs()
+
+    def strip_display64(self):
+        """Rewrite the staged roster with the optional display64 field removed."""
+        document = json.loads(self.roster_path.read_text(encoding='utf-8'))
+        for unit in document['units']:
+            unit.pop('display64', None)
+        self.roster_path.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
+        return self.roster_path.read_bytes()
+
+    def test_list_accepts_a_roster_without_the_optional_display64_field(self):
+        legacy_bytes = self.strip_display64()
+        code, out, err = self.run_roster('list')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        lines = out.splitlines()
+        self.assertEqual(lines[0].split(), list(roster.HEADERS))
+        rows = lines[1:]
+        self.assertEqual([row.split()[1] for row in rows],
+                         ['coach'] + [unit['key'] for unit in real_roster_units()])
+        self.assertTrue(all('display64' not in row for row in rows))
+        self.assertEqual(self.roster_path.read_bytes(), legacy_bytes)
+        self.assert_no_side_outputs()
+
+    def test_disable_accepts_a_roster_without_the_optional_display64_field(self):
+        legacy_bytes = self.strip_display64()
+        code, out, err = self.run_roster('disable', 'catcher')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertIn("Disabled unit 'catcher'.", out)
+        document = json.loads(self.roster_path.read_text(encoding='utf-8'))
+        catcher = next(unit for unit in document['units'] if unit['key'] == 'catcher')
+        self.assertFalse(catcher['enrolled'])
+        self.assertTrue(all('display64' not in unit for unit in document['units']))
+        self.assertNotEqual(self.roster_path.read_bytes(), legacy_bytes)
+
+        data, _ = generate_catalog.load(self.tmp)
+        self.assertEqual([unit['key'] for unit in data['units']],
+                         ['pitcher', 'shortstop', 'center'])
+        by_key = {play['key']: play['audience'] for play in data['plays']}
+        self.assertEqual(by_key[1], ['pitcher', 'shortstop'])
+        self.assertEqual(by_key[18], ['center'])
+        catalog = (self.tmp / 'firmware/include/pc/catalog.h').read_text(encoding='utf-8')
+        self.assertIn('constexpr unsigned kUnitCount = 4;', catalog)
+
+        # The rewritten roster still omits the optional field and still lists.
+        code, out, err = self.run_roster('list')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
+        self.assertNotIn('display64', out)
         self.assert_no_side_outputs()
 
 

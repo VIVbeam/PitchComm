@@ -143,6 +143,14 @@ def load_roster(root=None):
         _bool(unit,'enrolled',where)
         for field in ('relay','audio','display','controls','pitches'):
             _bool(unit,field,where)
+        # display64 selects the 128x64 fielder panel. It is a build/layout
+        # choice, not a call-routing capability, so it stays out of UNIT_FIELDS,
+        # gui/catalog.json, the firmware header and the dictionary hash. Old
+        # rosters and fixtures without the field load with the 32-row default.
+        if 'display64' in unit:
+            _bool(unit,'display64',where)
+        else:
+            unit['display64']=False
     enrolled=[unit for unit in units if unit['enrolled']]
     if not enrolled:
         raise ValueError('roster must enroll at least one unit')
@@ -201,9 +209,10 @@ def _dictionary(data,units):
              'plays':[{field:play[field] for field in
                        ('key','label','shortstop','centerfield','speech','targets','file')}
                       for play in data['plays']],
-             # Relay stays out of the dictionary: it is a network-layer build
-             # choice, not a call-routing capability, so the hash must not move
-             # when only a unit's relay flag changes.
+             # Relay and display64 stay out of the dictionary: they are
+             # network-layer/build-layout choices, not call-routing
+             # capabilities, so the hash must not move when only a unit's relay
+             # flag or panel size changes.
              'units':[{field:unit[field] for field in
                        ('key','audio','display','controls','pitches')}
                       for unit in enrolled]}

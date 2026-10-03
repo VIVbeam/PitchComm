@@ -30,10 +30,10 @@ Five units in the base set, one Seeed XIAO nRF54L15 each (21 x 17.8 mm; Nordic n
 
 ## I2C bus (catcher, shortstop, center field)
 
-The XIAO header I2C pins are D4 (SDA, P1.10) and D5 (SCL, P1.11). In the Zephyr devicetree this is `i2c22`; the firmware overlay attaches one SSD1306 panel at 0x3C. Do not add an I/O expander.
+The XIAO header I2C pins are D4 (SDA, P1.10) and D5 (SCL, P1.11). In the Zephyr devicetree this is `i2c22`; the firmware overlay attaches one SSD1306 panel at 0x3C. The catcher uses the 0.91" 128x32 module and the fielder watch uses the 0.96" 128x64 module; both are the same 4-pin SSD1306 wiring. Do not add an I/O expander.
 
-| XIAO | OLED 0.91" |
-|------|------------|
+| XIAO | OLED (both panels) |
+|------|--------------------|
 | 3V3  | VCC        |
 | GND  | GND        |
 | D4   | SDA        |
@@ -56,7 +56,7 @@ OLED on D4/D5. Five buttons, all direct GPIO. Each button is wired pin to GND; t
 | Call 3 | D2   | P1.06 | D2 -> GND     |
 | Call 4 | D3   | P1.07 | D3 -> GND     |
 | Back   | D13  | P2.10 | D13 -> GND    |
-| Battery| BAT+ / BAT- | - | 850 mAh cell |
+| Battery| BAT+ / BAT- | - | 100 mAh cell |
 
 The catcher uses 7 GPIOs (2 I2C + 5 buttons).
 
@@ -65,7 +65,7 @@ The catcher uses 7 GPIOs (2 I2C + 5 buttons).
 | Signal  | Silk | Port  | Device            |
 |---------|------|-------|-------------------|
 | Recall  | D1   | P1.05 | D1 -> GND         |
-| Battery | BAT+ / BAT- | - | 850 mAh protected cell |
+| Battery | BAT+ / BAT- | - | 100 mAh protected cell |
 
 ## Shortstop / center field
 
@@ -76,7 +76,7 @@ The catcher uses 7 GPIOs (2 I2C + 5 buttons).
 | OLED SDA | D4   | P1.10 |                   |
 | OLED SCL | D5   | P1.11 |                   |
 | Recall   | D1   | P1.05 | D1 -> GND         |
-| Battery  | BAT+ / BAT- | - | 500 mAh protected cell |
+| Battery  | BAT+ / BAT- | - | 100 mAh protected cell |
 
 ## GPIOs to avoid
 

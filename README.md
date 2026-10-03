@@ -16,9 +16,9 @@ Baseball pitch-call system. A coach console sends pitch and play calls to worn u
 | Unit | Carries | Output |
 |---|---|---|
 | Coach | one XIAO nRF54L15, laptop over USB | coach console |
-| Catcher | XIAO nRF54L15, OLED, five buttons, 850 mAh cell | OLED |
-| Pitcher | XIAO nRF54L15, recall button, 850 mAh cell | JY300 earpiece |
-| Shortstop / center field / other fielders | XIAO nRF54L15, OLED, recall button, 500 mAh cell | OLED |
+| Catcher | XIAO nRF54L15, 128x32 OLED, five buttons, 100 mAh cell | OLED |
+| Pitcher | XIAO nRF54L15, recall button, 100 mAh cell | JY300 earbud |
+| Shortstop / center field / other fielders | XIAO nRF54L15, 128x64 OLED watch, recall button, NATO strap, 100 mAh cell | OLED |
 
 Vocabulary: 81 pitch calls (9 pitch types x 3 rows x 3 columns) plus 21 play calls. Any number of positions can be enrolled and audio is optional per unit; see `dev/roster.md`.
 
