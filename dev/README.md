@@ -7,7 +7,7 @@ Conventions: no generated SVG assets. Diagrams are hand-made or omitted; use tab
 | File | Contents |
 |---|---|
 | `architecture.md` | single-chip layout, both radio links, flash map |
-| `build.md` | NCS toolchain, roles, image size, no-bootloader fallback, CAD regeneration |
+| `build.md` | NCS toolchain, units, image size, no-bootloader fallback, CAD regeneration |
 | `case-design.md` | why the pods are shaped the way they are |
 | `le-audio-proof.md` | JY300 bring-up runbook and platform caveats |
 | `roadmap.md` | build order and hardware-only open items |
@@ -16,4 +16,5 @@ Conventions: no generated SVG assets. Diagrams are hand-made or omitted; use tab
 | `verification.md` | every `VERIFY` item and what proves it |
 | `vocabulary.md` | calls.json schema 3, generated catalog, demo audio import |
 | `roster.md` | enrollable positions, per-unit audio, targets, budget sizing |
+| `power.md` | one-game power budget, cell choice and slim size targets |
 | `host_compile/` | host syntax-check harness with Zephyr stub headers |

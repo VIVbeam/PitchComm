@@ -20,7 +20,8 @@ Actual sizes: pitcher 42 x 63.5 mm, flat 14.7 mm; fielder 46 x 56 mm, flat 14.3 
 - The 850 mAh cell (34.5 x 45 x 6.2 mm) plus the five switches and the OLED set the catcher; the call caps run along the long side to keep the width small.
 - The pitcher is 1.5 mm over its 62 mm target because the 45 mm cell, a 12 mm switch, and the walls do not compress further.
 
-If the owner later accepts a smaller cell, the fielder pod can shrink toward a true watch.
+- The current cases are sized for those cells. With one game as the requirement, a 150 mAh cell (19.75 x 26 x 3.8 mm, 4.65 g) covers every field unit with about 2.8x margin before cold and aging derating (`dev/power.md`), and the electronics become the size floor: the board, the OLED module, the five catcher buttons and the antenna keepout.
+- Rough slim targets with that cell: pitcher about 36 x 50 x 13 mm, fielder about 42 x 46 x 13.5 mm, catcher about 42 x 62 x 14 mm, roughly 35 to 50 percent less case volume. The current cases still fit the smaller cell with a foam spacer. Reshaping them means regenerating the STL and 3MF exports, which is on hold until the owner approves a CAD change.
 
 ## Damage resistance
 

@@ -8,24 +8,25 @@ Five nodes, each one Seeed XIAO nRF54L15 (21 x 17.8 mm; Nordic nRF54L15; Bluetoo
 |---|---|---|---|
 | Seeed XIAO nRF54L15 | 5 | $9.90 | https://www.seeedstudio.com/XIAO-nRF54L15-p-6493.html |
 | 0.91" 128x32 I2C OLED, SSD1306, addr 0x3C | 3 | $5.55 | https://www.addicore.com/products/oled-display-128x32-0-91in-monochrome |
-| Protected Li-ion cell, 850 mAh, JST-PH (SparkFun PRT-13854) | 2 | $13.61 | https://www.sparkfun.com/lithium-ion-battery-850mah.html |
-| Protected Li-ion cell, 500 mAh, JST-PH (Adafruit 1578) | 2 | $7.95 | https://www.adafruit.com/product/1578 |
+| Protected Li-ion cell, 150 mAh, JST-PH (Adafruit 1317) | 4 | $5.95 | https://www.adafruit.com/product/1317 |
 | 12 mm tactile push buttons, 20-pack (Adafruit 367) | 1 | $2.50 | https://www.adafruit.com/product/367 |
 | Single-cell Li-ion charger, Micro-Lipo (Adafruit 1304) | 1 | $5.95 | https://www.adafruit.com/product/1304 |
 
-Electronics subtotal: about $118 before the headset.
+Electronics subtotal: about $98 before the headset.
 
-Cheaper sources: XIAO nRF54L15 $7.90 at 10+ on Seeed; generic 0.91" SSD1306 OLED about $3 on AliExpress (https://www.aliexpress.com/w/wholesale-0.91-oled-ssd1306.html); generic protected 850/500 mAh cells about $3 to $5 on AliExpress. Adafruit STEMMA QT OLED (https://www.adafruit.com/product/4440, $12.50) if a Qwiic cable is preferred; the 4-pin module matches the wiring doc.
+One game needs about 150 mAh on every field unit (`dev/power.md`). For multi-game weekends use the 850 mAh cell (SparkFun PRT-13854, pitcher and catcher) and the 500 mAh cell (Adafruit 1578, fielders) instead; the current cases fit both sizes.
+
+Cheaper sources: XIAO nRF54L15 $7.90 at 10+ on Seeed; generic 0.91" SSD1306 OLED about $3 on AliExpress (https://www.aliexpress.com/w/wholesale-0.91-oled-ssd1306.html); generic protected 150 mAh cells about $2 on AliExpress; generic protected 850/500 mAh cells about $3 to $5 for a weekend build. Adafruit STEMMA QT OLED (https://www.adafruit.com/product/4440, $12.50) if a Qwiic cable is preferred; the 4-pin module matches the wiring doc.
 
 ## Quantity mapping
 
 | Unit | Board | OLED | Buttons | Cell |
 |---|---|---|---|---|
 | Coach | 1 | 0 | 0 | USB |
-| Catcher | 1 | 1 | 5 | 850 mAh |
-| Pitcher | 1 | 0 | 1 | 850 mAh |
-| Shortstop | 1 | 1 | 1 | 500 mAh |
-| Center field | 1 | 1 | 1 | 500 mAh |
+| Catcher | 1 | 1 | 5 | 150 mAh |
+| Pitcher | 1 | 0 | 1 | 150 mAh |
+| Shortstop | 1 | 1 | 1 | 150 mAh |
+| Center field | 1 | 1 | 1 | 150 mAh |
 
 Every XIAO nRF54L15 has an onboard Li-ion charger; the external charger is a bench/spare charger for the field cells. No I/O expander is needed: the catcher uses 2 I2C pins and 5 button pins out of the 16 exposed GPIOs. Optional positions (first, second, third, left, right) use the same board, OLED, one button and cell as shortstop; enroll only what you buy.
 
@@ -66,7 +67,7 @@ The full parts list above is still the right order for a finished team.
 
 ## Cost summary
 
-- Electronics: about $118.
+- Electronics: about $98.
 - Loose parts: about $20 to $40.
 - Headset: about $40 for one JY300.
-- Total: about $180 to $200.
+- Total: about $160 to $180.
