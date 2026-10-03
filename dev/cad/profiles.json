@@ -21,11 +21,11 @@
     "clearance": 2.8,
     "head_diameter": 5.6,
     "head_depth": 1.0,
-    "boss_diameter": 6.6,
+    "boss_diameter": 5.4,
     "inset": 5.0,
-    "top_gap": 1.6,
-    "pilot_depth": 4.5,
-    "note": "M2.5 self-tapping into a 2.2 mm pilot. Bosses hang from the rim so the cell and deck pass underneath."
+    "boss_gap": 0.2,
+    "pilot_depth": 4.0,
+    "note": "M2.5 x 8 self-tapping. Screws enter from the case back: a 5.6 mm head counterbore 1.0 deep plus a 2.8 mm through hole in the body floor, then a blind 2.2 mm pilot in a 5.4 mm boss hanging from the lid inner face. The boss stops at the deck top plus boss_gap and clears the cavity walls by 0.3 mm."
   },
   "board": {
     "name": "Seeed XIAO nRF54L15",
@@ -77,21 +77,21 @@
   },
   "switch": {
     "body": [
-      12.0,
-      12.0,
-      5.0
+      6.0,
+      6.0,
+      3.5
     ],
     "actuator": [
-      4.0,
-      1.5
+      3.5,
+      0.8
     ],
-    "collar_interior": 12.4,
+    "collar_interior": 6.4,
     "collar_wall": 0.5,
-    "legs_note": "Trim through-hole legs flush. The collar tube captures the switch body with a printed roof over it so the actuator presses the plunger flange."
+    "legs_note": "Trim through-hole legs flush. The collar tube captures the switch body with the lid plate as its roof so the actuator presses the plunger flange."
   },
   "plunger": {
     "shaft": 3.2,
-    "flange": 6.0,
+    "flange": 5.6,
     "flange_height": 0.7,
     "lid_hole": 3.8,
     "head_numbered": [
@@ -117,8 +117,9 @@
     "note": "Flange is wider than the 3.8 mm lid hole so the cap stays captive; the switch actuator pushes the shaft. Numbered caps take a press-in label. Heads are low so caps sit 0.2 mm below the control surface."
   },
   "well": {
-    "diameter": 13.6,
-    "depth": 1.4
+    "diameter": 13.0,
+    "depth": 1.4,
+    "note": "Finger recess around each cap; per-style override where the cap is smaller."
   },
   "deck": {
     "thickness": 0.7,
@@ -262,8 +263,8 @@
     "buttons": [
       {
         "id": "recall",
-        "x": 9.0,
-        "y": 2.7,
+        "x": 12.0,
+        "y": 5.7,
         "switch": "switch_recall",
         "head": "plain",
         "operating_hand": "either, sized for a glove"
@@ -314,7 +315,7 @@
       },
       {
         "name": "protected_100mah_cell",
-        "x": 2.6,
+        "x": 7.5,
         "y": 15.6,
         "width": 11.5,
         "length": 31.0,
@@ -330,11 +331,11 @@
       },
       {
         "name": "switch_recall",
-        "x": 9.0,
-        "y": 2.7,
-        "width": 12.0,
-        "length": 12.0,
-        "source": "face switch under the flat lid, clear of the board"
+        "x": 12.0,
+        "y": 5.7,
+        "width": 6.0,
+        "length": 6.0,
+        "source": "6 mm face switch under the flat lid, clear of the board"
       },
       {
         "name": "charge_opening",
@@ -398,8 +399,8 @@
     "buttons": [
       {
         "id": "recall",
-        "x": 3.5,
-        "y": 20.4,
+        "x": 6.5,
+        "y": 23.4,
         "switch": "switch_recall",
         "head": "plain",
         "operating_hand": "bare hand or glove heel"
@@ -457,11 +458,11 @@
       },
       {
         "name": "switch_recall",
-        "x": 3.5,
-        "y": 20.4,
-        "width": 12.0,
-        "length": 12.0,
-        "source": "face switch beside the display head"
+        "x": 6.5,
+        "y": 23.4,
+        "width": 6.0,
+        "length": 6.0,
+        "source": "6 mm face switch beside the display head"
       },
       {
         "name": "charge_opening",
@@ -475,23 +476,23 @@
   },
   "keypad": {
     "role": "catcher",
-    "width": 43.0,
-    "length": 64.9,
-    "wall_height": 14.9,
+    "width": 37.0,
+    "length": 58.2,
+    "wall_height": 11.2,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
       [
-        30.0,
-        5.0
+        5.0,
+        23.0
       ],
       [
         5.0,
-        48.0
+        38.1
       ],
       [
         5.0,
-        58.6
+        53.2
       ]
     ],
     "cell": "protected_100mah_cell",
@@ -522,6 +523,7 @@
     "oled": {
       "x": 9.5,
       "y": 20.0,
+      "seat_depth": 0.5,
       "window": [
         7.6,
         26.0
@@ -532,7 +534,7 @@
       {
         "id": "call_1",
         "x": 23.9,
-        "y": 9.1,
+        "y": 8.0,
         "switch": "switch_call_1",
         "head": "numbered",
         "digit": "1",
@@ -541,7 +543,7 @@
       {
         "id": "call_2",
         "x": 23.9,
-        "y": 22.8,
+        "y": 20.2,
         "switch": "switch_call_2",
         "head": "numbered",
         "digit": "2",
@@ -550,7 +552,7 @@
       {
         "id": "call_3",
         "x": 23.9,
-        "y": 36.5,
+        "y": 32.4,
         "switch": "switch_call_3",
         "head": "numbered",
         "digit": "3",
@@ -559,7 +561,7 @@
       {
         "id": "call_4",
         "x": 23.9,
-        "y": 50.2,
+        "y": 44.6,
         "switch": "switch_call_4",
         "head": "numbered",
         "digit": "4",
@@ -568,9 +570,9 @@
     ],
     "sidebar": {
       "id": "back",
-      "x": 11.0,
-      "z": 7.4,
-      "face": "y_max",
+      "x": 23.1,
+      "z": 5.0,
+      "face": "y_min",
       "head": "back",
       "switch": "switch_back"
     },
@@ -586,12 +588,12 @@
         "loop_length": 27.0,
         "centers": [
           [
-            21.5,
-            16.0
+            18.5,
+            14.0
           ],
           [
-            21.5,
-            48.9
+            18.5,
+            44.2
           ]
         ]
       }
@@ -622,7 +624,7 @@
       },
       {
         "name": "protected_100mah_cell",
-        "x": 3.0,
+        "x": 7.5,
         "y": 13.0,
         "width": 11.5,
         "length": 31.0,
@@ -632,7 +634,7 @@
         "name": "deck_plate",
         "x": 1.9,
         "y": 12.5,
-        "width": 39.2,
+        "width": 33.2,
         "length": 32.0,
         "source": "cell cover, 0.7 thick"
       },
@@ -647,49 +649,53 @@
       {
         "name": "switch_call_1",
         "x": 23.9,
-        "y": 9.1,
-        "width": 12.0,
-        "length": 12.0
+        "y": 8.0,
+        "width": 6.0,
+        "length": 6.0
       },
       {
         "name": "switch_call_2",
         "x": 23.9,
-        "y": 22.8,
-        "width": 12.0,
-        "length": 12.0
+        "y": 20.2,
+        "width": 6.0,
+        "length": 6.0
       },
       {
         "name": "switch_call_3",
         "x": 23.9,
-        "y": 36.5,
-        "width": 12.0,
-        "length": 12.0
+        "y": 32.4,
+        "width": 6.0,
+        "length": 6.0
       },
       {
         "name": "switch_call_4",
         "x": 23.9,
-        "y": 50.2,
-        "width": 12.0,
-        "length": 12.0
+        "y": 44.6,
+        "width": 6.0,
+        "length": 6.0
       },
       {
         "name": "switch_back",
-        "x": 11.0,
-        "y": 56.9,
-        "width": 12.0,
-        "length": 6.5,
-        "source": "side-entry Back switch in the y_max wall, bare-hand reach"
+        "x": 23.1,
+        "y": 2.7,
+        "width": 6.0,
+        "length": 4.3,
+        "source": "6 mm side-entry Back switch in the y_min wall, bare-hand reach"
       },
       {
         "name": "charge_opening",
-        "x": 41.0,
+        "x": 35.0,
         "y": 5.9,
         "width": 2.0,
         "length": 10.0,
         "source": "USB-C slot through the x_max wall and lid edge"
       }
     ],
-    "note": "Landscape catcher pod worn across the front of the leg guard. The four call switches form a column along the pod length at x 23.9; the 0.91 inch OLED is rotated 90 deg and sits beside the column at x 9.5. Flat face (tilt 0) under a bezel and hood; the USB-C port is in the x_max long wall next to the call column."
+    "note": "Landscape catcher pod worn across the front of the leg guard. Four 6 mm call switches form a column along the pod length at x 23.9 on a 12.2 mm pitch; the 0.91 inch OLED is rotated 90 deg and sits beside the column at x 9.5. The 6 mm Back switch sits in the y_min wall. Flat face (tilt 0) with bezel and hood; the USB-C port is in the x_max long wall next to the call column.",
+    "well": {
+      "diameter": 11.4,
+      "depth": 1.4
+    }
   },
   "oled64": {
     "name": "0.96 inch 128x64 SSD1306 module",

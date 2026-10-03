@@ -10,7 +10,7 @@ Five nodes, each one Seeed XIAO nRF54L15 (21 x 17.8 mm; Nordic nRF54L15; Bluetoo
 | 0.91" 128x32 I2C OLED, SSD1306, addr 0x3C (catcher) | 1 | $5.55 | https://www.addicore.com/products/oled-display-128x32-0-91in-monochrome |
 | 0.96" 128x64 I2C OLED, SSD1306, addr 0x3C (fielder watch) | 2 | about $4.50 | https://www.aliexpress.com/w/wholesale-0.96-oled-128x64.html |
 | Protected Li-ion cell, 100 mAh, JST-PH (Adafruit 1570) | 4 | $5.95 | https://www.adafruit.com/product/1570 |
-| 12 mm tactile push buttons, 20-pack (Adafruit 367) | 1 | $2.50 | https://www.adafruit.com/product/367 |
+| 6 x 6 x 4.3 mm tactile switches, Omron B3F-1000 class | 8 | about $0.35 | https://www.digikey.com/en/products/detail/omron-electronics-inc-emc-div/B3F-1000/78996 |
 | Single-cell Li-ion charger, Micro-Lipo (Adafruit 1304) | 1 | $5.95 | https://www.adafruit.com/product/1304 |
 
 Electronics subtotal: about $96 before the headset and straps.
@@ -47,7 +47,7 @@ Audio is a per-unit option: add one JY300 per position you want hearing calls. T
 - JST-PH battery pigtails (2-pin) and matching connectors.
 - Heat shrink tubing, small.
 - 3D printer filament or enclosures, PETG or ASA for the outdoor field units.
-- M2 or M2.5 screws and standoffs.
+- M2.5 x 8 mm self-tapping screws (about 10 for a full team).
 - Elastic straps for the pitcher belt and catcher guard.
 - 20 mm NATO watch straps for the fielder watches, about $10 each.
 - Solder and solder wick.
@@ -61,7 +61,7 @@ To bring the system up on a bench before buying the full set, you do not need ce
 |---|---|
 | Seeed XIAO nRF54L15 | 3 |
 | 0.91" 128x32 SSD1306 OLED (catcher) | 1 |
-| 12 mm tactile push buttons | 1 pack (5 used) |
+| 6 x 6 mm tactile switches | 8 |
 | HomeSpot JY300 neckband | 1 |
 | USB-C data cables | 3 |
 

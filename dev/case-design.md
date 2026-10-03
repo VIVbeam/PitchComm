@@ -11,15 +11,16 @@ The pitcher pod sits flat against a belt or a pocket, so a flat face points side
 - Catcher: four numbered calls in a column beside the screen and the Back cap are operated with the bare throwing hand. The mitt hand holds the mitt and operates nothing; no control is placed where only the glove can reach it. Back is recessed 1 mm deeper than the call caps so a brush does not cancel a draft. The pod is worn across the front of the leg guard; the screen reads left to right looking down the leg.
 - Pitcher: one recall/volume cap on the flat face, sized to hit with a glove.
 - Fielder watch: one recall cap beside the display on the flat face, pressed with the bare hand or bumped with the glove heel. The case takes any 20 mm NATO strap through the printed fixed bars; no carrier, no tools.
+- Every switch is the 6 x 6 x 4.3 mm Omron B3F-1000 class under a printed captive plunger: call caps 10.5 mm, recall caps 12 mm, Back 7 mm. The small switch body is what let every collar and the catcher wall shrink.
 
 ## Size
 
-Actual sizes with the one-game 100 mAh cell (`dev/cad/dimensions.json`): pitcher 30.0 x 48.6 mm, flat 12.0 mm; watch 45.8 x 50.1 mm, flat 12.0 mm, 12.4 mm at the deck, 55.1 mm lug to lug; catcher 43.0 x 64.9 mm, flat 16.7 mm, 17.1 mm at the hood, worn landscape across the leg.
+Actual sizes with the one-game 100 mAh cell and 6 mm switches (`dev/cad/dimensions.json`): pitcher 30.0 x 48.6 mm, flat 12.0 mm; watch 45.8 x 50.1 mm, flat 12.0 mm, 12.4 mm at the deck, 55.1 mm lug to lug; catcher 37.0 x 58.2 mm, flat 13.0 mm, 13.4 mm at the hood, worn landscape across the leg.
 
-- The pitcher shrank 55 percent by envelope. Its width is set by the board and the recall collar between the screw bosses, and its length by the recall collar, the 31 mm cell and the 45 mm belt loop channel.
-- The watch grew 5 percent in envelope against the smallest fielder because the 0.96 inch module reserves a 27.3 x 27.8 mm box against the old strip's 36 x 12.5, but it prints with half the plastic, drops the maximum height from 17.6 to 12.4 mm, and needs no separate wrist or belt carrier.
-- The catcher turned landscape: the display moved from the end of the pod to beside the 1-to-4 button column, cutting the length from 78.0 to 64.9 mm and the maximum height from 23.8 to 17.1 mm, at a 12.7 percent envelope cut. Width 43.0 is check-bound: the 21 mm board must sit beside the 13.4 mm button collars because putting it under them collides with the switch pedestals and crosses the antenna keepout; length is bound by the four collars, the front screw boss and the Back switch wall. Flat 16.7 is the 12 mm Back switch body between the floor and the lid lip. A 2x2 button cluster could reach about 41 x 44 mm, but the owner chose the column layout.
-- Electronics are the floor everywhere now: the 21 x 17.8 mm board, the OLED module, the switch bodies and the antenna keepout. The 500 and 850 mAh cells do not fit these shells; a multi-game build would need the older, larger case set.
+- The pitcher shrank 55 percent by envelope; the watch 25 percent against the original shells, printing 60 percent less plastic and dropping its maximum height from 19.9 to 12.4 mm with no separate wrist or belt carrier. Both are board and cell-stack bound at 12.0 mm flat.
+- The catcher turned landscape, then dropped the switch class: the display moved beside the 1-to-4 column and the 6 mm switch replaced the 12 mm part, so the pod went from 41.0 x 78.0 mm at 16.7 mm flat to 37.0 x 58.2 mm at 13.0 mm flat, a 57 percent envelope cut against the original. Width 37.0 is check-bound by the 21 mm board beside the 7.4 mm collars and the USB-C shell allowance; length by the 36 mm module over the column at a 12.2 mm pitch and the Back switch wall; flat 13.0 by the rotated module stack over the deck, with 0.2 mm to spare. The old 12 mm Back switch body no longer sets the wall.
+- The 6 mm switch and the 100 mAh cell are what make the game-size build possible; the remaining floor is the 21 x 17.8 mm board, the two OLED modules, the switch bodies and the antenna keepout. The 500 and 850 mAh cells do not fit these shells; a multi-game build would need the older, larger case set.
+- Fasteners: three M2.5 x 8 mm self-tapping screws each for the pitcher and catcher, two for the watch, all inserted from the attachment side into blind pilots in lid bosses. The control face has no holes, and the carrier or NATO strap comes off before the case opens. The pitcher and catcher cell bays shifted in x to clear the screw columns.
 
 ## Damage resistance
 
@@ -38,5 +39,5 @@ Actual sizes with the one-game 100 mAh cell (`dev/cad/dimensions.json`): pitcher
 ## Checks before a full print set
 
 1. Fit coupon: screws, strap webbing, lid lip.
-2. Caliper pass on the board, both OLED modules (0.91 inch 128x32 and 0.96 inch 128x64), the cell, and the switch bodies against `dev/cad/profiles.json`.
+2. Caliper pass on the board, both OLED modules (0.91 inch 128x32 and 0.96 inch 128x64), the cell, the 6 x 6 x 4.3 mm switch bodies, and the printed caps against `dev/cad/profiles.json`.
 3. One body/lid pair carried where you intend to wear it, then dropped and rained on, before printing the rest.

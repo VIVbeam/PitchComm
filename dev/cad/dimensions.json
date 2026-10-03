@@ -21,8 +21,8 @@
         48.6,
         10.2
       ],
-      "volume_mm3": 4838.845,
-      "triangles": 3190,
+      "volume_mm3": 4245.34,
+      "triangles": 2732,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -37,15 +37,15 @@
         0.0,
         30.0,
         48.6,
-        9.15
+        6.95
       ],
       "size_mm": [
         30.0,
         48.6,
-        9.15
+        6.95
       ],
-      "volume_mm3": 2658.984,
-      "triangles": 5120,
+      "volume_mm3": 2835.305,
+      "triangles": 4940,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -67,8 +67,8 @@
         31.5,
         0.7
       ],
-      "volume_mm3": 365.392,
-      "triangles": 1474,
+      "volume_mm3": 375.814,
+      "triangles": 1256,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -136,7 +136,7 @@
         12.0,
         2.5
       ],
-      "volume_mm3": 159.878,
+      "volume_mm3": 157.334,
       "triangles": 768,
       "watertight": true,
       "winding_consistent": true,
@@ -159,8 +159,8 @@
         55.1,
         10.2
       ],
-      "volume_mm3": 7089.18,
-      "triangles": 3144,
+      "volume_mm3": 6596.851,
+      "triangles": 2918,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -175,15 +175,15 @@
         0.0,
         45.8,
         50.1,
-        9.6
+        7.4
       ],
       "size_mm": [
         45.8,
         50.1,
-        9.6
+        7.4
       ],
-      "volume_mm3": 3208.316,
-      "triangles": 4610,
+      "volume_mm3": 3296.591,
+      "triangles": 4500,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -205,8 +205,8 @@
         32.0,
         0.7
       ],
-      "volume_mm3": 599.417,
-      "triangles": 1372,
+      "volume_mm3": 695.698,
+      "triangles": 1266,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -251,7 +251,7 @@
         12.0,
         2.5
       ],
-      "volume_mm3": 159.878,
+      "volume_mm3": 157.334,
       "triangles": 768,
       "watertight": true,
       "winding_consistent": true,
@@ -288,17 +288,17 @@
         0.0,
         0.0,
         0.0,
-        43.0,
-        64.9,
-        14.9
+        37.0,
+        58.2,
+        11.2
       ],
       "size_mm": [
-        43.0,
-        64.9,
-        14.9
+        37.0,
+        58.2,
+        11.2
       ],
-      "volume_mm3": 13234.916,
-      "triangles": 5466,
+      "volume_mm3": 6582.014,
+      "triangles": 4998,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -311,17 +311,17 @@
         0.0,
         0.0,
         0.0,
-        43.0,
-        64.9,
-        9.6
+        37.0,
+        58.2,
+        7.4
       ],
       "size_mm": [
-        43.0,
-        64.9,
-        9.6
+        37.0,
+        58.2,
+        7.4
       ],
-      "volume_mm3": 5067.898,
-      "triangles": 9164,
+      "volume_mm3": 3334.571,
+      "triangles": 9618,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -334,17 +334,17 @@
         0.0,
         0.0,
         0.0,
-        39.2,
+        33.2,
         32.0,
         0.7
       ],
       "size_mm": [
-        39.2,
+        33.2,
         32.0,
         0.7
       ],
-      "volume_mm3": 520.005,
-      "triangles": 1096,
+      "volume_mm3": 540.021,
+      "triangles": 1434,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -380,17 +380,17 @@
         0.0,
         0.0,
         0.0,
-        43.0,
-        64.9,
+        37.0,
+        58.2,
         5.3
       ],
       "size_mm": [
-        43.0,
-        64.9,
+        37.0,
+        58.2,
         5.3
       ],
-      "volume_mm3": 7153.563,
-      "triangles": 2196,
+      "volume_mm3": 5684.139,
+      "triangles": 2200,
       "watertight": true,
       "winding_consistent": true,
       "components": 1,
@@ -412,7 +412,7 @@
         10.5,
         2.5
       ],
-      "volume_mm3": 125.619,
+      "volume_mm3": 123.075,
       "triangles": 894,
       "watertight": true,
       "winding_consistent": true,
@@ -458,7 +458,7 @@
         10.5,
         2.5
       ],
-      "volume_mm3": 124.666,
+      "volume_mm3": 122.123,
       "triangles": 942,
       "watertight": true,
       "winding_consistent": true,
@@ -504,7 +504,7 @@
         10.5,
         2.5
       ],
-      "volume_mm3": 124.666,
+      "volume_mm3": 122.123,
       "triangles": 942,
       "watertight": true,
       "winding_consistent": true,
@@ -550,7 +550,7 @@
         10.5,
         2.5
       ],
-      "volume_mm3": 125.301,
+      "volume_mm3": 122.758,
       "triangles": 910,
       "watertight": true,
       "winding_consistent": true,
@@ -596,7 +596,7 @@
         7.0,
         2.7
       ],
-      "volume_mm3": 72.201,
+      "volume_mm3": 69.657,
       "triangles": 768,
       "watertight": true,
       "winding_consistent": true,
@@ -655,8 +655,8 @@
             48.6,
             10.2
           ],
-          "volume_mm3": 4838.845,
-          "triangles": 3190,
+          "volume_mm3": 4245.34,
+          "triangles": 2732,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -671,15 +671,15 @@
             0.0,
             30.0,
             48.6,
-            9.15
+            6.95
           ],
           "size_mm": [
             30.0,
             48.6,
-            9.15
+            6.95
           ],
-          "volume_mm3": 2658.984,
-          "triangles": 5120,
+          "volume_mm3": 2835.305,
+          "triangles": 4940,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -701,8 +701,8 @@
             31.5,
             0.7
           ],
-          "volume_mm3": 365.392,
-          "triangles": 1474,
+          "volume_mm3": 375.814,
+          "triangles": 1256,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -770,7 +770,7 @@
             12.0,
             2.5
           ],
-          "volume_mm3": 159.878,
+          "volume_mm3": 157.334,
           "triangles": 768,
           "watertight": true,
           "winding_consistent": true,
@@ -824,10 +824,10 @@
         },
         "protected_cell": {
           "bounds_mm": [
-            2.6,
+            7.5,
             15.6,
             1.6,
-            14.1,
+            19.0,
             46.6,
             5.4
           ],
@@ -839,11 +839,11 @@
         },
         "switch_recall": {
           "bounds_mm": [
-            8.9,
-            2.6,
-            2.8,
-            21.1,
-            14.8,
+            11.9,
+            5.6,
+            5.0,
+            18.1,
+            11.8,
             9.7
           ],
           "enclosure_collision_mm3": 0.0,
@@ -864,22 +864,31 @@
         "usb_opening_ray_hits": 0,
         "button_recall_ray_hits": 0,
         "pilot_5_5_z": [
-          0.0,
-          1.4,
-          3.2,
-          4.2
+          10.5,
+          12.0
+        ],
+        "screw_5_5_z": [],
+        "head_5_5_z": [
+          1.0,
+          1.4
         ],
         "pilot_25_5_z": [
-          0.0,
-          1.4,
-          3.2,
-          4.2
+          10.5,
+          12.0
+        ],
+        "screw_25_5_z": [],
+        "head_25_5_z": [
+          1.0,
+          1.4
         ],
         "pilot_5_42.9_z": [
-          0.0,
-          1.4,
-          4.6,
-          5.6
+          10.5,
+          12.0
+        ],
+        "screw_5_42.9_z": [],
+        "head_5_42.9_z": [
+          1.0,
+          2.4
         ],
         "lid_body_collision_mm3": 0.0,
         "failures": [],
@@ -933,8 +942,8 @@
             55.1,
             10.2
           ],
-          "volume_mm3": 7089.18,
-          "triangles": 3144,
+          "volume_mm3": 6596.851,
+          "triangles": 2918,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -949,15 +958,15 @@
             0.0,
             45.8,
             50.1,
-            9.6
+            7.4
           ],
           "size_mm": [
             45.8,
             50.1,
-            9.6
+            7.4
           ],
-          "volume_mm3": 3208.316,
-          "triangles": 4610,
+          "volume_mm3": 3296.591,
+          "triangles": 4500,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -979,8 +988,8 @@
             32.0,
             0.7
           ],
-          "volume_mm3": 599.417,
-          "triangles": 1372,
+          "volume_mm3": 695.698,
+          "triangles": 1266,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -1025,7 +1034,7 @@
             12.0,
             2.5
           ],
-          "volume_mm3": 159.878,
+          "volume_mm3": 157.334,
           "triangles": 768,
           "watertight": true,
           "winding_consistent": true,
@@ -1132,11 +1141,11 @@
         },
         "switch_recall": {
           "bounds_mm": [
-            3.4,
-            20.3,
-            2.8,
-            15.6,
-            32.5,
+            6.4,
+            23.3,
+            5.0,
+            12.6,
+            29.5,
             9.7
           ],
           "enclosure_collision_mm3": 0.0,
@@ -1162,16 +1171,22 @@
         "window_ray_hits": 0,
         "button_recall_ray_hits": 0,
         "pilot_40.8_5_z": [
-          0.0,
-          1.4,
-          4.6,
-          5.6
+          10.5,
+          12.0
+        ],
+        "screw_40.8_5_z": [],
+        "head_40.8_5_z": [
+          1.0,
+          1.4
         ],
         "pilot_5_45.1_z": [
-          0.0,
-          1.4,
-          1.6,
-          4.1
+          10.5,
+          12.0
+        ],
+        "screw_5_45.1_z": [],
+        "head_5_45.1_z": [
+          1.0,
+          1.4
         ],
         "lid_body_collision_mm3": 0.0,
         "failures": [],
@@ -1208,11 +1223,11 @@
       "style": "keypad",
       "role": "catcher",
       "outer_mm": [
-        43.0,
-        64.9,
-        16.7
+        37.0,
+        58.2,
+        13.0
       ],
-      "flat_case_mm": 16.7,
+      "flat_case_mm": 13.0,
       "dashboard_tilt_deg": 0.0,
       "parts": {
         "keypad_body": {
@@ -1221,17 +1236,17 @@
             0.0,
             0.0,
             0.0,
-            43.0,
-            64.9,
-            14.9
+            37.0,
+            58.2,
+            11.2
           ],
           "size_mm": [
-            43.0,
-            64.9,
-            14.9
+            37.0,
+            58.2,
+            11.2
           ],
-          "volume_mm3": 13234.916,
-          "triangles": 5466,
+          "volume_mm3": 6582.014,
+          "triangles": 4998,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -1244,17 +1259,17 @@
             0.0,
             0.0,
             0.0,
-            43.0,
-            64.9,
-            9.6
+            37.0,
+            58.2,
+            7.4
           ],
           "size_mm": [
-            43.0,
-            64.9,
-            9.6
+            37.0,
+            58.2,
+            7.4
           ],
-          "volume_mm3": 5067.898,
-          "triangles": 9164,
+          "volume_mm3": 3334.571,
+          "triangles": 9618,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -1267,17 +1282,17 @@
             0.0,
             0.0,
             0.0,
-            39.2,
+            33.2,
             32.0,
             0.7
           ],
           "size_mm": [
-            39.2,
+            33.2,
             32.0,
             0.7
           ],
-          "volume_mm3": 520.005,
-          "triangles": 1096,
+          "volume_mm3": 540.021,
+          "triangles": 1434,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -1313,17 +1328,17 @@
             0.0,
             0.0,
             0.0,
-            43.0,
-            64.9,
+            37.0,
+            58.2,
             5.3
           ],
           "size_mm": [
-            43.0,
-            64.9,
+            37.0,
+            58.2,
             5.3
           ],
-          "volume_mm3": 7153.563,
-          "triangles": 2196,
+          "volume_mm3": 5684.139,
+          "triangles": 2200,
           "watertight": true,
           "winding_consistent": true,
           "components": 1,
@@ -1345,7 +1360,7 @@
             10.5,
             2.5
           ],
-          "volume_mm3": 125.619,
+          "volume_mm3": 123.075,
           "triangles": 894,
           "watertight": true,
           "winding_consistent": true,
@@ -1391,7 +1406,7 @@
             10.5,
             2.5
           ],
-          "volume_mm3": 124.666,
+          "volume_mm3": 122.123,
           "triangles": 942,
           "watertight": true,
           "winding_consistent": true,
@@ -1437,7 +1452,7 @@
             10.5,
             2.5
           ],
-          "volume_mm3": 124.666,
+          "volume_mm3": 122.123,
           "triangles": 942,
           "watertight": true,
           "winding_consistent": true,
@@ -1483,7 +1498,7 @@
             10.5,
             2.5
           ],
-          "volume_mm3": 125.301,
+          "volume_mm3": 122.758,
           "triangles": 910,
           "watertight": true,
           "winding_consistent": true,
@@ -1529,7 +1544,7 @@
             7.0,
             2.7
           ],
-          "volume_mm3": 72.201,
+          "volume_mm3": 69.657,
           "triangles": 768,
           "watertight": true,
           "winding_consistent": true,
@@ -1579,10 +1594,10 @@
         },
         "xiao_usb_shell": {
           "bounds_mm": [
-            37.0,
+            31.0,
             6.9,
             8.25,
-            40.5,
+            34.5,
             14.9,
             11.45
           ],
@@ -1599,17 +1614,17 @@
             5.8,
             2.0,
             19.8,
-            14.9
+            11.2
           ],
           "note": "metal-free band between the deck top and the lid, in front of the board antenna end",
           "hardware_measured": false
         },
         "protected_cell": {
           "bounds_mm": [
-            3.0,
+            7.5,
             13.0,
             1.6,
-            14.5,
+            19.0,
             44.0,
             5.4
           ],
@@ -1623,10 +1638,10 @@
           "bounds_mm": [
             9.5,
             20.0,
-            8.2,
+            6.5,
             22.0,
             56.0,
-            14.2
+            12.5
           ],
           "enclosure_collision_mm3": 0.0,
           "max_penetration_mm": 0.0,
@@ -1637,11 +1652,11 @@
         "switch_call_1": {
           "bounds_mm": [
             23.8,
-            9.0,
-            7.5,
-            36.0,
-            21.2,
-            14.4
+            7.9,
+            6.0,
+            30.0,
+            14.1,
+            10.7
           ],
           "enclosure_collision_mm3": 0.0,
           "max_penetration_mm": 0.0,
@@ -1652,11 +1667,11 @@
         "switch_call_2": {
           "bounds_mm": [
             23.8,
-            22.7,
-            7.5,
-            36.0,
-            34.9,
-            14.4
+            20.1,
+            6.0,
+            30.0,
+            26.3,
+            10.7
           ],
           "enclosure_collision_mm3": 0.0,
           "max_penetration_mm": 0.0,
@@ -1667,11 +1682,11 @@
         "switch_call_3": {
           "bounds_mm": [
             23.8,
-            36.4,
-            7.5,
-            36.0,
-            48.6,
-            14.4
+            32.3,
+            6.0,
+            30.0,
+            38.5,
+            10.7
           ],
           "enclosure_collision_mm3": 0.0,
           "max_penetration_mm": 0.0,
@@ -1682,11 +1697,11 @@
         "switch_call_4": {
           "bounds_mm": [
             23.8,
-            50.1,
-            7.5,
-            36.0,
-            62.3,
-            14.4
+            44.5,
+            6.0,
+            30.0,
+            50.7,
+            10.7
           ],
           "enclosure_collision_mm3": 0.0,
           "max_penetration_mm": 0.0,
@@ -1696,12 +1711,12 @@
         },
         "switch_back": {
           "bounds_mm": [
-            11.0,
-            56.9,
-            1.4,
-            23.0,
-            63.4,
-            13.4
+            23.1,
+            2.7,
+            2.0,
+            29.1,
+            7.0,
+            8.0
           ],
           "enclosure_collision_mm3": 0.0,
           "max_penetration_mm": 0.0,
@@ -1758,23 +1773,32 @@
         "button_call_2_ray_hits": 0,
         "button_call_3_ray_hits": 0,
         "button_call_4_ray_hits": 0,
-        "pilot_30.0_5.0_z": [
-          0.0,
-          1.4,
-          7.9,
-          8.9
+        "pilot_5.0_23.0_z": [
+          10.5,
+          13.0
         ],
-        "pilot_5.0_48.0_z": [
-          0.0,
-          1.4,
-          1.6,
-          8.8
+        "screw_5.0_23.0_z": [],
+        "head_5.0_23.0_z": [
+          1.0,
+          2.4
         ],
-        "pilot_5.0_58.6_z": [
-          0.0,
-          1.4,
-          1.6,
-          8.8
+        "pilot_5.0_38.1_z": [
+          10.5,
+          13.0
+        ],
+        "screw_5.0_38.1_z": [],
+        "head_5.0_38.1_z": [
+          1.0,
+          2.4
+        ],
+        "pilot_5.0_53.2_z": [
+          10.5,
+          13.0
+        ],
+        "screw_5.0_53.2_z": [],
+        "head_5.0_53.2_z": [
+          1.0,
+          1.4
         ],
         "lid_body_collision_mm3": 0.0,
         "failures": [],
@@ -1783,9 +1807,9 @@
       },
       "control_deck": {
         "tilt_deg": 0.0,
-        "flat_case_height_mm": 16.7,
-        "max_height_mm": 17.1,
-        "screen_recess_mm": 4.1,
+        "flat_case_height_mm": 13.0,
+        "max_height_mm": 13.4,
+        "screen_recess_mm": 2.1,
         "bezel_height_mm": 1.6,
         "hood_height_mm": 0.4,
         "plunger_top_vs_surface_mm": {
@@ -1804,7 +1828,7 @@
           "loop_count": 2
         }
       ],
-      "max_height_mm": 17.1
+      "max_height_mm": 13.4
     }
   },
   "fit_coupon": {
@@ -1837,7 +1861,7 @@
       "parts-preview.png",
       "mounts-preview.png"
     ],
-    "render_seconds": 4.3
+    "render_seconds": 7.3
   },
   "validation": {
     "all_parts_watertight": true,

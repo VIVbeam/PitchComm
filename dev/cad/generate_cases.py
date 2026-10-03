@@ -4,8 +4,9 @@ PitchComm field-case generator (maintainer tool).
 
 Builds the three field pods from dev/cad/profiles.json with trimesh +
 manifold3d CSG.  The shell is a thin flat tapered tray (wide rim, inset-lip
-lid, hanging screw bosses, internal deck between cell and board, friction
-charge cap, two-loop strap carriers).  The controls live on a raised control
+lid, screw entries through the floor into blind pilot bosses on the lid inner
+face, internal deck between cell and board, friction charge cap, two-loop
+strap carriers).  The controls live on a raised control
 deck on the lid: a sloped display head plus, where used, a flat button
 plateau.  Only the control deck is tilted.
 
@@ -492,6 +493,11 @@ class Case:
                 base[key] = val
         return base
 
+    def well_params(self):
+        w = dict(self.g['well'])
+        w.update(self.p.get('well') or {})
+        return w
+
 
 # ==========================================================================
 # body
@@ -514,30 +520,12 @@ def build_body(C: Case):
     cavity = prism_axis(cav_poly, 'z', floor, C.hb + 1.0, offset=(wall, wall, 0.0))
     body = dif(body, cavity)
 
-    # hanging bosses (chamfered base) clear of the cell and the switch holders
-    rb = C.screw['boss_diameter'] / 2.0
-    deck_r = (C.wall - 0.1, C.deck_span()[0], C.w - C.wall + 0.1, C.deck_span()[1])
-    holder_r = C.sw['collar_interior'] / 2.0 + C.sw['collar_wall'] + 0.6
+    # screw entries from the case back: head counterbore plus a through hole in the floor
     for (sx, sy) in C.p['fasteners']:
-        b1 = C.hb - C.screw['top_gap']
-        over_deck = (sx + rb > deck_r[0] and sx - rb < deck_r[2] and
-                     sy + rb > deck_r[1] and sy - rb < deck_r[3])
-        near_holder = False
-        for b in C.buttons():
-            cx, cy = C.button_center(b)
-            if math.hypot(sx - cx, sy - cy) < rb + holder_r + 1.0:
-                near_holder = True
-        b0 = C.deck_z() + 0.3 if over_deck else C.floor + 0.2
-        if near_holder:
-            b0 = max(b0, C.hb - 7.0)
-        if b1 - b0 < 4.0:
-            b0 = max(C.floor + 0.2, b1 - 4.0)
-        height = b1 - b0
-        pilot_depth = max(2.2, min(C.screw['pilot_depth'], height - 1.0))
-        body = uni(body, cyl_at(C.screw['boss_diameter'], b0 + 1.2, b1, sx, sy))
-        cham_h = min(1.2, max(0.3, height - 1.2))
-        body = uni(body, cyl((rb + 0.5) * 2.0, cham_h, 'z', (sx, sy, b0 + cham_h / 2.0)))
-        body = dif(body, cyl_at(C.screw['pilot'], b1 - pilot_depth, b1 + 1.0, sx, sy))
+        body = dif(body, cyl_at(C.screw['clearance'], C.screw['head_depth'],
+                                C.floor + 0.6, sx, sy))
+        body = dif(body, cyl_at(C.screw['head_diameter'], -0.6, C.screw['head_depth'],
+                                sx, sy))
 
     # deck ledges (narrow enough to clear the cell), cell bay rails
     d = g['deck']
@@ -697,12 +685,12 @@ def build_lid(C: Case):
     plateau, head = dashboard_meshes(C)
     lid = uni(lid, plateau, head)
 
-    # screw clearance holes + counterbores
+    # blind pilot bosses on the inner face (screws enter from the case back)
+    b0 = C.deck_z() + C.g['deck']['thickness'] + float(C.screw['boss_gap'])
     for (sx, sy) in C.p['fasteners']:
-        lid = dif(lid, cyl_at(C.screw['clearance'], C.hb - 1.0, C.lid_top() + 0.5, sx, sy))
-        lid = dif(lid, cyl_at(C.screw['head_diameter'],
-                              C.lid_top() - C.screw['head_depth'], C.lid_top() + 0.5,
-                              sx, sy))
+        lid = uni(lid, cyl_at(C.screw['boss_diameter'], b0, C.hb + 0.1, sx, sy))
+        lid = dif(lid, cyl_at(C.screw['pilot'], b0 - 0.6,
+                              b0 + C.screw['pilot_depth'], sx, sy))
 
     # OLED window + seat in the sloped head
     if C.p.get('oled'):
@@ -725,7 +713,8 @@ def build_lid(C: Case):
         cx, cy = C.button_center(b)
         F = C.frame(cx, cy)
         L = C.local_depth(cx, cy)
-        well_d, well_h = g['well']['diameter'], g['well']['depth']
+        wp = C.well_params()
+        well_d, well_h = float(wp['diameter']), float(wp['depth'])
         well = cyl(well_d, well_h + 2.0, 'z', (0, 0, (2.0 - well_h) / 2.0))
         lid = dif(lid, xform(well, F))
         # plunger hole from the well floor down to the lid inner face
@@ -848,7 +837,8 @@ def build_deck(C: Case):
     plate = rbox(x1 - x0, dy1 - dy0, t, C.r_in, 0.4, (x0, dy0, z0))
     tools = []
     for (sx, sy) in C.p['fasteners']:
-        tools.append(cyl(7.2, t + 6.0, 'z', (sx, sy, z0 - 3.0)))
+        tools.append(cyl(C.screw['clearance'] + 0.6, t + 6.0, 'z',
+                         (sx, sy, z0 + t / 2.0)))
     pn = d['pull_notch']
     cyc = (C.cell_rect()[1] + C.cell_rect()[3]) / 2.0
     tools.append(box(pn[0], pn[1], t + 6.0, (x1 - pn[0], cyc - pn[1] / 2.0, z0 - 3.0)))
@@ -866,9 +856,14 @@ def build_deck(C: Case):
         ci = C.sw['collar_interior'] + 2 * C.sw['collar_wall'] + 0.2
         tools.append(box(ci, ci, t + 6.0, (cx - ci / 2.0, cy - ci / 2.0, z0 - 3.0)))
     if C.p.get('sidebar'):
-        tools.append(box(16.0, 14.0, t + 6.0,
-                         (float(C.p['sidebar']['x']) - 8.0,
-                          C.l - C.wall - 8.0, z0 - 3.0)))
+        sbp = C.p['sidebar']
+        sbc = C.comp(sbp['switch'])
+        cut_w = float(sbc['width']) + 4.0
+        cut_d = float(sbc['length']) + 4.0
+        cut_y = (C.wall - 2.0 if sbp.get('face', 'y_max') == 'y_min'
+                 else C.l - C.wall - cut_d + 2.0)
+        tools.append(box(cut_w, cut_d, t + 6.0,
+                         (float(sbp['x']) - 2.0, cut_y, z0 - 3.0)))
     return dif(plate, tools)
 
 
@@ -960,7 +955,7 @@ def build_plunger_local(C, b):
     pl = C.pl
     cx, cy = C.button_center(b)
     L = C.local_depth(cx, cy)
-    well_d = float(C.g['well']['depth'])
+    well_d = float(C.well_params()['depth'])
     z_top = -(well_d - hh)      # head bottom sits on the well floor
     z_head_bot = z_top - hh
     fl_top = -L
@@ -1316,7 +1311,7 @@ def build_style(profiles, style, outdir, palette):
     for b in C.buttons():
         cx, cy = C.button_center(b)
         _h, _hd, hh = plunger_head_sizes(C, b)
-        well_d = float(g['well']['depth'])
+        well_d = float(C.well_params()['depth'])
         max_z = max(max_z, C.surface_z(cx, cy) - (well_d - hh))
     if p.get('oled') and C.dash and C.dash.get('head'):
         h = C.dash['head']
@@ -1432,7 +1427,8 @@ def build_style(profiles, style, outdir, palette):
         sw_body = rbox(sw_w + 0.2, sw_l + 0.2, body_h + 0.2, 1.2, 1.0,
                        (-(sw_w + 0.2) / 2.0, -(sw_l + 0.2) / 2.0,
                         -L - fl_h - act_h - body_h - 0.2))
-        sw_act = box(4.6, 4.6, act_h + 0.4, (-2.3, -2.3, -L - fl_h - act_h - 0.2))
+        aw = float(g['switch']['actuator'][0]) + 0.6
+        sw_act = box(aw, aw, act_h + 0.4, (-aw / 2.0, -aw / 2.0, -L - fl_h - act_h - 0.2))
         sw = uni(sw_body, sw_act)
         check_shape(f"switch_{b['id']}", xform(sw, F))
         reserved[f"switch_{b['id']}"] = xform(sw, F)
@@ -1531,15 +1527,36 @@ def build_style(profiles, style, outdir, palette):
 
     pilot_ok = True
     for (sx, sy) in p['fasteners']:
-        loc, _, _ = body.ray.intersects_location(ray_origins=[[sx, sy, 300.0]],
-                                                 ray_directions=[[0, 0, -1]],
-                                                 multiple_hits=True)
+        # lid: the pilot must be blind, with a roof of material under the outer face
+        loc, _, _ = lid.ray.intersects_location(ray_origins=[[sx, sy, 300.0]],
+                                                ray_directions=[[0, 0, -1]],
+                                                multiple_hits=True)
         zs = sorted(float(v) for v in loc[:, 2]) if len(loc) else []
         report['checks'][f"pilot_{sx}_{sy}_z"] = [round(z, 2) for z in zs]
-        if not zs or zs[-1] < 0.5:
+        roof = (zs[-1] - zs[-2]) if len(zs) >= 2 else 0.0
+        if roof < 0.8 or zs[-1] < C.lid_top() - 0.05:
+            pilot_ok = False
+        # body: the floor must give the screw a clear path in from the back
+        loc, _, _ = body.ray.intersects_location(ray_origins=[[sx, sy, -300.0]],
+                                                 ray_directions=[[0, 0, 1]],
+                                                 multiple_hits=True)
+        bz = sorted(float(v) for v in loc[:, 2]) if len(loc) else []
+        report['checks'][f"screw_{sx}_{sy}_z"] = [round(z, 2) for z in bz]
+        if bz:
+            pilot_ok = False
+        # body: head counterbore land under the socket wall
+        ox = sx + (C.screw['clearance'] + C.screw['head_diameter']) / 4.0
+        loc, _, _ = body.ray.intersects_location(ray_origins=[[ox, sy, -300.0]],
+                                                 ray_directions=[[0, 0, 1]],
+                                                 multiple_hits=True)
+        hz = sorted(float(v) for v in loc[:, 2]) if len(loc) else []
+        report['checks'][f"head_{sx}_{sy}_z"] = [round(z, 2) for z in hz]
+        seat_ok = (len(hz) >= 2 and abs(hz[0] - C.screw['head_depth']) < 0.05
+                   and hz[-1] > hz[0] + 0.3)
+        if not seat_ok:
             pilot_ok = False
     if not pilot_ok:
-        failures.append(f"{style}: pilot not blind")
+        failures.append(f"{style}: pilot not blind or screw seat wrong")
 
     # lip engagement
     lip_probe = body.copy()

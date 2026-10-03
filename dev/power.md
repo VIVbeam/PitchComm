@@ -25,15 +25,13 @@ The XIAO's onboard charger runs at about 100 mA, which is 1C for the 100 mAh cel
 
 ## Size impact
 
-| Case | Today (from `dev/cad/dimensions.json`) | Cell space today | Rough slim target with a 150 mAh cell |
+| Case | Original | Shipped now (`dev/cad/dimensions.json`) | Cell |
 |---|---|---|---|
-| Receiver (pitcher) | 42 x 63.5 x 14.65 mm | 34.5 x 45 x 6.2 mm | about 36 x 50 x 13 mm |
-| Wrist (fielder) | 46 x 56 x 14.3 mm, 19.9 tilted | 29 x 36 x 4.75 mm | about 42 x 46 x 13.5 mm |
-| Keypad (catcher) | 48 x 80 x 16.8 mm, 23.9 tilted | 34.5 x 45 x 6.2 mm | about 42 x 62 x 14 mm |
+| Pitcher | 42.0 x 63.5 mm, flat 14.65 mm | 30.0 x 48.6 mm, flat 12.0 mm | 100 mAh, 11.5 x 31 x 3.8 mm |
+| Fielder watch | 46.0 x 56.0 mm, flat 14.3 mm, 19.9 mm max | 45.8 x 50.1 mm, flat 12.0 mm, 12.4 mm max, 55.1 mm lug to lug | 100 mAh |
+| Catcher | 48.0 x 80.0 mm, flat 16.8 mm, 23.9 mm max | 37.0 x 58.2 mm, flat 13.0 mm, 13.4 mm max, worn landscape | 100 mAh |
 
-That is roughly 35 to 50 percent less case volume, and about 12 g less carried weight on the pitcher and catcher. The floor is now the electronics: the 21 x 17.8 mm board, the 30 x 12 mm OLED module, the five catcher buttons and the antenna keepout. The current cases still fit the smaller cell with foam or a printed spacer.
-
-Slim cases require regenerating the STL and 3MF exports. That is on hold until the owner approves changing the CAD files; nothing in `cad/unbranded/exports/` changes for a small-cell build.
+Against the original shells that is roughly 25 to 57 percent less envelope and 44 to 60 percent less printed plastic, with the 6 mm switch class and the 100 mAh cell doing most of the catcher's cut. The old 500 and 850 mAh cells no longer fit any shell. The floor is now the electronics: the 21 x 17.8 mm board, the two OLED modules, the switch bodies and the antenna keepout.
 
 ## What to measure on hardware
 

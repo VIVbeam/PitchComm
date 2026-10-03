@@ -16,13 +16,13 @@ The STLs are in `exports/`. Not printed: `*_color.stl` (same meshes for colour p
 
 ## Fielder watch
 
-The fielder is a flat watch: 45.8 x 50.1 mm body, 12.0 mm flat, 55.1 mm lug to lug over two printed fixed bars (51.1 mm between bar axes). The bars are 4 mm and stand 2.2 mm off the case back, so a 20 mm NATO or single-pass strap threads under both; a standard 1.2 to 1.5 mm NATO fits with clearance, up to about 2.0 mm. There is no metal in the strap path. The 0.96 inch 128x64 SSD1306 module (PCB 27.3 x 27.8 mm) sits under the bezel window with its 21.74 x 10.86 mm active area centred; the recall cap is beside the display. Two M2.5 screws plus the lid lip close the watch.
+The fielder is a flat watch: 45.8 x 50.1 mm body, 12.0 mm flat, 55.1 mm lug to lug over two printed fixed bars (51.1 mm between bar axes). The bars are 4 mm and stand 2.2 mm off the case back, so a 20 mm NATO or single-pass strap threads under both; a standard 1.2 to 1.5 mm NATO fits with clearance, up to about 2.0 mm. There is no metal in the strap path. The 0.96 inch 128x64 SSD1306 module (PCB 27.3 x 27.8 mm) sits under the bezel window with its 21.74 x 10.86 mm active area centred; the 12 mm recall cap is beside the display on a 6 mm switch. Two M2.5 screws on the diagonal, driven from the case back, plus the lid lip close the watch.
 
 ## Catcher pod
 
-The catcher is a landscape pod worn across the front of the leg guard: 43.0 x 64.9 mm body, 16.7 mm flat, 17.1 mm over the hood. The four call switches run in a column along the pod length in 1-to-4 order, at x 23.9 (the call-1 end is y_min). The 0.91 inch 128x32 SSD1306 module is rotated 90 degrees so its 128-pixel axis runs along the pod, and sits beside the call column at x 9.5: glass window 7.6 x 26 mm under the bezel, module nested 2.5 mm from the flat face. The face is flat (tilt 0) with a printed hood bar just past the window's far edge. The USB-C port is in the x_max long wall, on the call-column side.
+The catcher is a landscape pod worn across the front of the leg guard: 37.0 x 58.2 mm body, 13.0 mm flat, 13.4 mm over the hood. The four 6 mm call switches run in a column along the pod length in 1-to-4 order, at x 23.9 on 12.2 mm centres (the call-1 end is y_min). The 0.91 inch 128x32 SSD1306 module is rotated 90 degrees so its 128-pixel axis runs along the pod, and sits beside the call column at x 9.5: glass window 7.6 x 26 mm under the bezel, module nested 0.5 mm from the flat face. The face is flat (tilt 0) with a printed hood bar just past the window's far edge. The USB-C port is in the x_max long wall, on the call-column side.
 
-Fit the module with the 4-pin header at the y_min (front) end and the pixel top edge toward the x_min long edge, away from the call buttons. Worn with that x_min edge up, the text reads left to right when looking down the leg. The 25 mm strap wraps the thigh and threads both `in_line_y` carrier loops, which sit along the pod length; the carrier plate matches the pod outline. The Back switch is a side-entry switch in the y_max wall, reachable by the bare throwing hand. Three M2.5 screws plus the lid lip close the pod.
+Fit the module with the 4-pin header at the y_min (front) end and the pixel top edge toward the x_min long edge, away from the call buttons. Worn with that x_min edge up, the text reads left to right when looking down the leg. The 25 mm strap wraps the thigh and threads both `in_line_y` carrier loops, which sit along the pod length; the carrier plate matches the pod outline. The 7 mm Back cap is a 6 mm side-entry switch in the y_min wall, reachable by the bare throwing hand. Three M2.5 screws along the x_min edge, driven from the case back, plus the lid lip close the pod.
 
 ## Print first
 
@@ -33,19 +33,20 @@ Fit the module with the 4-pin header at the y_min (front) end and the pixel top 
 - PETG; ASA for hot cars or full sun.
 - 0.2 mm layers, 0.25 mm first layer, 4 perimeters, 5 top/bottom layers, 25 % gyroid.
 - No supports. Bodies and carriers print as exported (floor/plate on the bed); the watch body prints with its printed bars on the bed. Lids print deck up. Charge caps print flange down. Plungers print flange up.
-- If the lid plate sags between the collars, add tree supports under the plate only.
+- If the lid plate sags between the collars or over the catcher display window, add tree supports under the plate only.
 
 ## Assemble one unit
 
 1. Solder the switch wires and trim the switch legs.
-2. Press each switch into its lid collar, then the cap onto the actuator.
+2. Press each face switch into its lid collar, then the cap onto the actuator. The catcher Back switch presses into the y_min wall pocket from inside, with its plunger and cap from outside.
 3. Tape the OLED into the lid recess, screen toward the bezel window. On the catcher, the header goes at the y_min end and the pixel top edge toward the x_min long edge.
 4. Tape the board to the lid standoffs, parts facing the cell.
 5. Tape the cell into the bay. Route the pigtail and protection board away from the board antenna end.
 6. Lay the deck on the ledges over the cell.
-7. Fit the lid and screws: three M2.5 x 8 to 10 mm for the pitcher and catcher, two for the fielder watch. Snug only.
+7. Fit the lid onto the body, turn the case over, and drive the screws from the back into the floor counterbores: three M2.5 x 8 mm for the pitcher and catcher, two for the fielder watch. Snug only.
 8. Push the charge cap into its opening.
 9. Strap up: slide the carrier onto the pitcher or catcher and thread the strap through both loops. The fielder watch takes a 20 mm NATO threaded under both printed bars.
+10. To open a case, take the carrier or NATO strap off first: the screws come out of the back, then the body lifts off the lid.
 
 ## Wear
 
@@ -63,8 +64,10 @@ The slim shells are sized for a protected 100 mAh pouch, Adafruit 1570 class, 11
 
 ## Check with calipers
 
-- Board 21 x 17.8 mm, OLED 36 x 12.5 mm (catcher) or 27.3 x 27.8 mm (fielder watch), cell 11.5 x 31 x 3.8 mm, and switches.
-- Catcher pod: 43.0 x 64.9 mm, 16.7 mm flat; call buttons on 13.7 mm centres, call 1 nearest the y_min end.
+- Board 21 x 17.8 mm, OLED 36 x 12.5 mm (catcher) or 27.3 x 27.8 mm (fielder watch), cell 11.5 x 31 x 3.8 mm.
+- Switches: 6 x 6 x 4.3 mm through-hole tactile, Omron B3F-1000 class, about 0.25 mm travel and 100 gf. Caps: call 10.5 mm, recall 12 mm, Back 7 mm.
+- Catcher pod: 37.0 x 58.2 mm, 13.0 mm flat; call buttons on 12.2 mm centres, call 1 nearest the y_min end.
 - Fielder watch: a 20 mm strap threads under both printed bars with the watch off the wrist.
+- Case screws: M2.5 x 8 mm, driven from the back. Pitcher 3 (two top corners, one bottom-left), catcher 3 along the x_min edge at y 23.0 / 38.1 / 53.2 mm, fielder watch 2 on the diagonal.
 - USB-C cable mates through the wall opening.
-- Screw heads fit the counterbores; webbing fits the coupon slots.
+- Screw heads fit the counterbores in the case back; webbing fits the coupon slots.
