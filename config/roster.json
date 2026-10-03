@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "units": [
-    {"key": "pitcher", "label": "Pitcher", "short": "P", "enrolled": true, "relay": false, "audio": true, "display": false, "controls": false, "pitches": true},
-    {"key": "catcher", "label": "Catcher", "short": "C", "enrolled": true, "relay": false, "audio": false, "display": true, "controls": true, "pitches": true},
-    {"key": "first", "label": "First base", "short": "1B", "enrolled": false, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false},
-    {"key": "second", "label": "Second base", "short": "2B", "enrolled": false, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false},
-    {"key": "third", "label": "Third base", "short": "3B", "enrolled": false, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false},
-    {"key": "shortstop", "label": "Shortstop", "short": "SS", "enrolled": true, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false},
-    {"key": "left", "label": "Left field", "short": "LF", "enrolled": false, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false},
-    {"key": "center", "label": "Center field", "short": "CF", "enrolled": true, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false},
-    {"key": "right", "label": "Right field", "short": "RF", "enrolled": false, "relay": false, "audio": false, "display": true, "controls": false, "pitches": false}
+    {"key": "pitcher", "label": "Pitcher", "short": "P", "enrolled": true, "relay": true, "audio": true, "display": false, "controls": false, "pitches": true},
+    {"key": "catcher", "label": "Catcher", "short": "C", "enrolled": true, "relay": true, "audio": false, "display": true, "controls": true, "pitches": true},
+    {"key": "first", "label": "First base", "short": "1B", "enrolled": false, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false},
+    {"key": "second", "label": "Second base", "short": "2B", "enrolled": false, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false},
+    {"key": "third", "label": "Third base", "short": "3B", "enrolled": false, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false},
+    {"key": "shortstop", "label": "Shortstop", "short": "SS", "enrolled": true, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false},
+    {"key": "left", "label": "Left field", "short": "LF", "enrolled": false, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false},
+    {"key": "center", "label": "Center field", "short": "CF", "enrolled": true, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false},
+    {"key": "right", "label": "Right field", "short": "RF", "enrolled": false, "relay": true, "audio": false, "display": true, "controls": false, "pitches": false}
   ]
 }

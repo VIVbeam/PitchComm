@@ -8,15 +8,15 @@ capability rules that a host-only machine cannot compile:
 
   - every default unit and the proof plan cleanly
   - the pitcher fragment enables audio and the recall button
-  - the pitcher fragment is a Thread sleepy end device (FTD off, MTD plus
-    MTD_SED) with the 4096-byte stack
+  - the pitcher fragment is a Thread relay (FTD on, MTD off) with the 8192-byte
+    stack
   - the catcher fragment enables the menu and the display driver and leaves the
     recall button off, because the five-button menu owns those pins
   - a display unit enables the OLED and keeps audio off
   - the proof uses the proof fragments
   - an unenrolled unit is rejected by name
-  - a staged roster with center as a relay plans a Full Thread Device with the
-    8192-byte stack and no sleepy-only symbols
+  - a staged roster with center relay off plans a Sleepy End Device with MTD
+    plus MTD_SED, the 200 ms poll and the 4096-byte stack
 
 No build directory is written and west is not required. Exits 1 and lists the
 failed checks when any rule breaks.
@@ -91,11 +91,12 @@ Assert-Check -Name 'coach uses the coach fragment and no unit define' `
 Assert-Check -Name 'pitcher enables audio' -Condition ($pitcher -match 'CONFIG_PITCHCOMM_AUDIO=y')
 Assert-Check -Name 'pitcher enables the recall button' -Condition ($pitcher -match 'CONFIG_PITCHCOMM_FIELD_BUTTON=y')
 Assert-Check -Name 'pitcher carries the unit define' -Condition ($pitcher -match 'PC_UNIT=PC_UNIT_pitcher')
-Assert-Check -Name 'pitcher is a Thread sleepy end device' `
-    -Condition (($pitcher -match 'CONFIG_OPENTHREAD_FTD=n') -and `
-                ($pitcher -match 'CONFIG_OPENTHREAD_MTD=y') -and `
-                ($pitcher -match 'CONFIG_OPENTHREAD_MTD_SED=y'))
-Assert-Check -Name 'pitcher uses the 4096 Thread stack' -Condition ($pitcher -match 'CONFIG_OPENTHREAD_THREAD_STACK_SIZE=4096')
+Assert-Check -Name 'pitcher is a Thread relay' `
+    -Condition (($pitcher -match 'CONFIG_OPENTHREAD_FTD=y') -and `
+                ($pitcher -match 'CONFIG_OPENTHREAD_MTD=n') -and `
+                ($pitcher -notmatch 'CONFIG_OPENTHREAD_MTD_SED') -and `
+                ($pitcher -notmatch 'CONFIG_OPENTHREAD_POLL_PERIOD'))
+Assert-Check -Name 'pitcher uses the 8192 Thread stack' -Condition ($pitcher -match 'CONFIG_OPENTHREAD_THREAD_STACK_SIZE=8192')
 Assert-Check -Name 'catcher enables the menu' -Condition ($catcher -match 'CONFIG_PITCHCOMM_CATCHER_MENU=y')
 Assert-Check -Name 'catcher enables the display driver' -Condition ($catcher -match 'CONFIG_SSD1306=y')
 Assert-Check -Name 'catcher leaves the recall button to the menu' -Condition ($catcher -match 'CONFIG_PITCHCOMM_FIELD_BUTTON=n')
@@ -107,7 +108,7 @@ $rejected = Invoke-DryRun 'first'
 Assert-Check -Name 'unenrolled unit is rejected' -Condition ($rejected.ExitCode -ne 0)
 Assert-Check -Name 'rejection names the key' -Condition ($rejected.Output -match "Unit 'first' is not enrolled")
 
-# --- relay check: a staged roster copy with center as a Thread relay ---------
+# --- sleepy check: a staged roster copy with center relay off -----------------
 # The staged roster lives in the system temp directory and is deleted before
 # the summary, so the check leaves no build plan or roster behind.
 $tempRoster = Join-Path ([System.IO.Path]::GetTempPath()) `
@@ -115,7 +116,7 @@ $tempRoster = Join-Path ([System.IO.Path]::GetTempPath()) `
 try {
     $staged = Get-Content -LiteralPath (Join-Path $root 'config\roster.json') -Raw | ConvertFrom-Json
     foreach ($stagedUnit in $staged.units) {
-        if ($stagedUnit.key -eq 'center') { $stagedUnit.relay = $true }
+        if ($stagedUnit.key -eq 'center') { $stagedUnit.relay = $false }
     }
     $staged | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $tempRoster -Encoding ascii
     $relay = Invoke-DryRun 'center' $tempRoster
@@ -124,13 +125,13 @@ try {
 }
 
 $relayCenter = Get-DryRunSection $relay.Output 'center'
-Assert-Check -Name 'relay roster plans center (exit 0)' -Condition ($relay.ExitCode -eq 0)
-Assert-Check -Name 'relay center is a Full Thread Device' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_FTD=y')
-Assert-Check -Name 'relay center is not an MTD' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_MTD=n')
-Assert-Check -Name 'relay center omits the sleepy poll period' -Condition ($relayCenter -notmatch 'CONFIG_OPENTHREAD_POLL_PERIOD')
-Assert-Check -Name 'relay center omits the sleepy MTD_SED' -Condition ($relayCenter -notmatch 'CONFIG_OPENTHREAD_MTD_SED')
-Assert-Check -Name 'relay center uses the 8192 Thread stack' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_THREAD_STACK_SIZE=8192')
-Assert-Check -Name 'relay temp roster is removed' -Condition (-not (Test-Path -LiteralPath $tempRoster))
+Assert-Check -Name 'sleepy roster plans center (exit 0)' -Condition ($relay.ExitCode -eq 0)
+Assert-Check -Name 'sleepy center is an MTD' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_MTD=y')
+Assert-Check -Name 'sleepy center is not a Full Thread Device' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_FTD=n')
+Assert-Check -Name 'sleepy center keeps the poll period' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_POLL_PERIOD=200')
+Assert-Check -Name 'sleepy center keeps MTD_SED' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_MTD_SED=y')
+Assert-Check -Name 'sleepy center uses the 4096 Thread stack' -Condition ($relayCenter -match 'CONFIG_OPENTHREAD_THREAD_STACK_SIZE=4096')
+Assert-Check -Name 'sleepy temp roster is removed' -Condition (-not (Test-Path -LiteralPath $tempRoster))
 
 if ($failures.Count -gt 0) {
     Write-Host ('build plan check failed: {0} check(s)' -f $failures.Count) -ForegroundColor Red

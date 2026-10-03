@@ -903,7 +903,8 @@ class GenerateCatalogTests(unittest.TestCase):
                           for unit in data['units']])
         self.assertEqual(len(catalog['units']), 4)
         self.assertTrue(all('relay' in unit for unit in catalog['units']))
-        self.assertEqual([unit['relay'] for unit in catalog['units']], [False, False, False, False])
+        self.assertTrue(all(unit['relay'] is True for unit in catalog['units']))
+        self.assertEqual([unit['relay'] for unit in catalog['units']], [True, True, True, True])
         self.assertEqual(catalog['pitches'],
                          [{'key': p['key'], 'label': p['label'], 'short': p['short'],
                            'speech': p['speech']} for p in data['pitches']])
@@ -1108,11 +1109,11 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
         self.assertNotIn('kUnitRelay', header_before)
         self.assertNotIn('relay', header_before)
         self.assertTrue(all('relay' in unit for unit in gui_before['units']))
-        self.assertTrue(all(unit['relay'] is False for unit in gui_before['units']))
+        self.assertTrue(all(unit['relay'] is True for unit in gui_before['units']))
 
         units = real_roster_units()
         center = next(unit for unit in units if unit['key'] == 'center')
-        center['relay'] = True
+        center['relay'] = False
         self.write(units)
 
         after_data, _ = generate_catalog.load(self.tmp)
@@ -1121,8 +1122,8 @@ class GenerateCatalogRosterTests(TempRepoTestCase):
         self.assertEqual(after_files['firmware/include/pc/catalog.h'], header_before)
         self.assertNotIn('kUnitRelay', after_files['firmware/include/pc/catalog.h'])
         gui_after = json.loads(after_files['gui/catalog.json'])
-        self.assertTrue(next(unit for unit in gui_after['units']
-                             if unit['key'] == 'center')['relay'])
+        center_after = next(unit for unit in gui_after['units'] if unit['key'] == 'center')
+        self.assertFalse(center_after['relay'])
         self.assertEqual({name for name, _ in generate_catalog.clips(after_data)}, before_clips)
 
 
@@ -1353,7 +1354,7 @@ class RosterCliTests(TempRepoTestCase):
         self.assertTrue(first['enrolled'])
         self.assertEqual({field: first[field] for field in roster.CAPABILITY_FIELDS},
                          {'audio': False, 'display': True, 'controls': False,
-                          'pitches': False, 'relay': False})
+                          'pitches': False, 'relay': True})
         data, version = generate_catalog.load(self.tmp)
         self.assertNotEqual(version, 0x299314f6)
         by_key = {play['key']: play['audience'] for play in data['plays']}
@@ -1439,38 +1440,46 @@ class RosterCliTests(TempRepoTestCase):
         self.assertEqual((self.tmp / 'firmware/include/pc/catalog.h').read_bytes(), first_header)
         self.assert_no_side_outputs()
 
-    def test_relay_flags_flip_and_default_profiles_are_false(self):
+    def test_relay_flags_flip_and_default_profiles_are_true(self):
         for key in ('pitcher', 'catcher', 'first', 'center', 'custom'):
             with self.subTest(key=key):
-                self.assertFalse(roster.default_profile(key)['relay'])
+                self.assertTrue(roster.default_profile(key)['relay'])
+        # --relay on the relay default is a no-op that keeps it true.
+        no_op_before = self.roster_path.read_bytes()
         code, out, err = self.run_roster('enable', 'center', '--relay')
         self.assertEqual(code, 0)
         self.assertEqual(err, '')
         self.assertTrue(self.unit_by_key('center')['relay'])
+        self.assertEqual(self.roster_path.read_bytes(), no_op_before)
+        # --no-relay builds a Sleepy End Device instead.
         code, out, err = self.run_roster('enable', 'center', '--no-relay')
         self.assertEqual(code, 0)
         self.assertEqual(err, '')
         self.assertFalse(self.unit_by_key('center')['relay'])
-        # A default profile enable resets every capability, including relay.
-        self.run_roster('enable', 'center', '--relay')
+        # --relay flips it back on.
+        code, out, err = self.run_roster('enable', 'center', '--relay')
+        self.assertEqual(code, 0)
+        self.assertEqual(err, '')
         self.assertTrue(self.unit_by_key('center')['relay'])
+        # A default profile enable resets every capability, including relay.
+        self.run_roster('enable', 'center', '--no-relay')
+        self.assertFalse(self.unit_by_key('center')['relay'])
         code, out, err = self.run_roster('enable', 'center')
         self.assertEqual(code, 0)
         self.assertEqual(err, '')
         center = self.unit_by_key('center')
-        self.assertFalse(center['relay'])
+        self.assertTrue(center['relay'])
         self.assertTrue(center['enrolled'])
         self.assertTrue(center['display'])
         self.assert_no_side_outputs()
 
     def test_list_shows_relay_in_the_capabilities_column(self):
-        self.run_roster('enable', 'center', '--relay')
         code, out, err = self.run_roster('list')
         self.assertEqual(code, 0)
         self.assertEqual(err, '')
         rows = {row.split()[1]: row for row in out.splitlines()[1:] if row.split()}
         self.assertIn('display, relay', rows['center'])
-        self.assertNotIn('relay', rows['pitcher'])
+        self.assertIn('audio, pitches, relay', rows['pitcher'])
         self.assertNotIn('relay', rows['coach'])
         self.assert_no_side_outputs()
 

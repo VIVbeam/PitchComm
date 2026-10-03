@@ -46,7 +46,7 @@ Rules:
 `tools/roster.py` edits `config/roster.json` and regenerates the catalog in one step:
 
 - `python tools/roster.py list` prints every unit, its index when enrolled, capabilities, and whether an EUI exists.
-- `python tools/roster.py enable first` enrolls with the standard profile (pitcher: audio and pitches; catcher: display, controls and pitches; any other key: display; relay is off everywhere). Capability flags such as `--audio`, `--no-pitches`, `--controls`, `--relay` override individual capabilities. `relay` does not enter the dictionary; it is a build choice.
+- `python tools/roster.py enable first` enrolls with the standard profile (pitcher: audio and pitches; catcher: display, controls and pitches; any other key: display; relay is on for every profile). Capability flags such as `--audio`, `--no-pitches`, `--controls`, `--no-relay` override individual capabilities. `relay` does not enter the dictionary; it is a build choice. A unit that must sleep for a season can be built sleepy with `--no-relay`.
 - `python tools/roster.py disable first` un-enrolls; it refuses to remove the last unit with `pitches`. Both commands stage the edited roster with the real calls and validate it before writing, so a change that would leave a play with no enrolled recipient (for example disabling the only outfield unit) is refused with the file untouched.
 
 Both commands print the provisioning and build steps to run next. Disabling warns that `config/team.local.json` and `team_config.h` still hold the unit until provisioning reruns; preflight reports that drift.

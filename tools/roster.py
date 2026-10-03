@@ -50,10 +50,10 @@ import generate_catalog
 
 CAPABILITY_FIELDS = ('audio', 'display', 'controls', 'pitches', 'relay')
 DEFAULT_PROFILES = {
-    'pitcher': {'audio': True, 'display': False, 'controls': False, 'pitches': True, 'relay': False},
-    'catcher': {'audio': False, 'display': True, 'controls': True, 'pitches': True, 'relay': False},
+    'pitcher': {'audio': True, 'display': False, 'controls': False, 'pitches': True, 'relay': True},
+    'catcher': {'audio': False, 'display': True, 'controls': True, 'pitches': True, 'relay': True},
 }
-FIELD_PROFILE = {'audio': False, 'display': True, 'controls': False, 'pitches': False, 'relay': False}
+FIELD_PROFILE = {'audio': False, 'display': True, 'controls': False, 'pitches': False, 'relay': True}
 HEADERS = ('UNIT', 'KEY', 'LABEL', 'SHORT', 'ENROLLED', 'CAPABILITIES', 'EUI')
 
 

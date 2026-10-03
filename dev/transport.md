@@ -41,14 +41,13 @@ Both sit on IEEE 802.15.4. The call link is logically a single-hop star: the coa
 
 **Pick Thread.** Our 56-byte packet fits a single 802.15.4 frame (max PSDU 127 B), so no 6LoWPAN fragmentation. Only UDPv6 is used; Thread's leader election and mesh routing are overhead we do not need at this size but come for free.
 
-No border router and no phone are needed. The coach is the leader (`CONFIG_OPENTHREAD_FTD`); each field unit is a Sleepy End Device by default (`CONFIG_OPENTHREAD_MTD` + `CONFIG_OPENTHREAD_MTD_SED`, 200 ms poll period). A unit with the roster `relay` capability is built as a Full Thread Device instead, stays receive-on, and forwards for the mesh. Sockets use the Zephyr BSD API (`zsock_socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)`).
+No border router and no phone are needed. The coach is the leader (`CONFIG_OPENTHREAD_FTD`); each field unit is built as a Full Thread Device relay by default, stays receive-on, and forwards for the mesh. A unit with `relay: false` is a Sleepy End Device instead (`CONFIG_OPENTHREAD_MTD` + `CONFIG_OPENTHREAD_MTD_SED`, 200 ms poll). Sockets use the Zephyr BSD API (`zsock_socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)`).
 
 ### Mesh relays
 
-- Without relays every Sleepy End Device parents to the coach, so one body or a dugout wall between the coach and center field is a single point of failure.
-- A relay is a Full Thread Device: `CONFIG_OPENTHREAD_FTD=y`, `CONFIG_OPENTHREAD_MTD=n`, an 8 KB OpenThread stack. Thread then routes through it and far units can attach to the closer router.
-- Enable it per unit in `config/roster.json` or with `python tools/roster.py enable <key> --relay`. The build planner emits the right fragment; the dictionary and the call protocol do not change.
-- Cost: a relay keeps its radio receive-on, roughly 5 mA against the polled sleep of a Sleepy End Device. On a 500 mAh cell that is days, not a season, so enable relays only where coverage needs them. The pitcher relay also shares its radio with LE Audio; that combination is the phase 3 coexistence risk to measure.
+- Every unit relays by default, so any unit can forward for another. A Sleepy End Device (`relay: false`) parents to a router instead.
+- Set `relay: false` in `config/roster.json` or run `python tools/roster.py enable <key> --no-relay` for a sleepy build. The build planner emits the right fragment; the dictionary and the call protocol do not change.
+- Cost: a relay keeps its radio receive-on, roughly 5 mA against the polled sleep of a Sleepy End Device. On a 500 mAh cell that is still about 30 games of three hours, comfortably more than one game, so the default is relay; use `--no-relay` where season-long sleep matters. The pitcher relay also shares its radio with LE Audio; that combination is the phase 3 coexistence risk to measure.
 - Placement: shortstop or center field covers both outfielders; the catcher and pitcher sit closest to the coach and benefit least.
 
 ### Provisioning: pre-shared dataset

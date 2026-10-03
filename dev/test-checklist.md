@@ -81,7 +81,7 @@ Observations:
 - [ ] Pull the catcher's radio (power off) mid-call: coach shows `MISS`, does not hang.
 - [ ] Request path: catcher keypad sends a pitch; the coach module accepts it (no human step); catcher shows `COACH ACCEPTED` and the call.
 - [ ] Range baseline: walk the catcher away until the link drops; record distance (open field, body-worn orientation).
-- [ ] Relay range: enable `relay` on one mid-field unit (`python tools/roster.py enable <key> --relay`), rebuild it, and compare range and link stability against the sleepy baseline; record that unit's battery drain over the same interval.
+- [ ] Sleepy range: disable relay on one mid-field unit (`python tools/roster.py enable <key> --no-relay`), rebuild it, and compare range, link stability and battery drain against the default relay build over the same interval.
 
 Pass: calls and ACKs reliable at arm's length and across a normal baseball field; no lockups.
 

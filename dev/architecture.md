@@ -22,7 +22,7 @@ There is one RF front-end. Two stacks use it, and they do not share application 
 | Call link | 802.15.4 (Thread) | 56-byte packets: call trigger, ACK, sync, heartbeat | Coach to/from field units | A few ms target |
 | Audio link | LE Audio (LC3) | LC3-encoded spoken call | Pitcher unit to earbud | Isochronous, bounded |
 
-The call link is the portable call engine, running on a closed Thread network. The coach is the leader; field units are Sleepy End Devices. The catcher can also originate a pitch request, which the coach module accepts and relays; no person approves a pitch. The 56-byte format carries kind, source, target, category, code, sequence, session, boot, clock, deadline, and TTL.
+The call link is the portable call engine, running on a closed Thread network. The coach is the leader; field units are Thread relays by default, and a unit with `relay: false` is a Sleepy End Device. The catcher can also originate a pitch request, which the coach module accepts and relays; no person approves a pitch. The 56-byte format carries kind, source, target, category, code, sequence, session, boot, clock, deadline, and TTL.
 
 The audio link reads the call clips, decodes them to PCM, encodes LC3, and streams over an isochronous channel to one earbud on the pitcher unit. The headset is the HomeSpot JY300 neckband (LC3 / LE Audio).
 

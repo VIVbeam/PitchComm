@@ -18,7 +18,7 @@ The design is decided. Do not re-derive it:
 - Each field unit is a single Seeed XIAO nRF54L15 (21 x 17.8 mm; Nordic
   nRF54L15: Bluetooth 6.0 LE with LE Audio, IEEE 802.15.4, no Wi-Fi).
 - Call trigger: 802.15.4 over Thread. The coach is the leader; field units are
-  Sleepy End Devices. See dev/transport.md.
+  Thread relays by default see dev/transport.md.
 - Audio: LE Audio (LC3) to ONE earbud, mono only (no TWS). Headphones: HomeSpot
   JY300 neckband (LC3 / LE Audio), one for the pitcher.
 - Firmware: Zephyr / nRF Connect SDK (C).
