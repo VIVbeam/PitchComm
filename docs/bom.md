@@ -69,7 +69,17 @@ The full parts list above is still the right order for a finished team.
 
 ## Cost summary
 
-- Electronics: about $96.
-- Loose parts and fielder straps: about $40 to $60.
+Goods at list prices:
+
+- Electronics: about $97.
+- Loose parts, screws and two NATO straps: about $40 to $55.
 - Headset: about $40 for one JY300.
-- Total: about $180 to $200.
+- Goods total: about $175 to $195.
+
+Delivered estimate for the United States, standard shipping and state sales tax, ordering from the suppliers above as separate orders:
+
+- Shipping: about $30 to $55 total (Seeed, Adafruit, Addicore or AliExpress, DigiKey).
+- Tax: about $5 to $25 depending on the state and where each order ships from.
+- Delivered full team: about $210 to $270. Consolidating the AliExpress items (generic OLEDs, cells, switches) or a Seeed sale can bring it to about $180 to $220.
+
+Bench minimum (three boards, one 128x32 panel, switches, one JY300, three USB-C cables; no cells, charger or cases): about $105 to $140 delivered. Add about $5 for the 128x64 watch panel if the fielder build is on the bench.
