@@ -8,7 +8,7 @@ Five nodes, each one Seeed XIAO nRF54L15 (21 x 17.8 mm; Nordic nRF54L15; Bluetoo
 |---|---|---|---|
 | Seeed XIAO nRF54L15 | 5 | $9.90 | https://www.seeedstudio.com/XIAO-nRF54L15-p-6493.html |
 | 0.91" 128x32 I2C OLED, SSD1306, addr 0x3C (catcher) | 1 | $5.55 | https://www.addicore.com/products/oled-display-128x32-0-91in-monochrome |
-| 0.96" 128x64 I2C OLED, SSD1306, addr 0x3C (fielder watch) | 2 | about $4.50 | https://www.aliexpress.com/w/wholesale-0.96-oled-128x64.html |
+| 0.96" 128x64 I2C OLED, SSD1306, addr 0x3C (fielder watch) | 2 | $6.50 US, about $4.50 AliExpress | https://www.addicore.com/products/oled-display-128x64-0-96in-monochrome (budget: https://www.aliexpress.com/w/wholesale-0.96-oled-128x64.html) |
 | Protected Li-ion cell, 100 mAh, JST-PH (Adafruit 1570) | 4 | $5.95 | https://www.adafruit.com/product/1570 |
 | 6 x 6 x 4.3 mm tactile switches, Omron B3F-1000 class | 8 | about $0.35 | https://www.digikey.com/en/products/detail/omron-electronics-inc-emc-div/B3F-1000/78996 |
 | Single-cell Li-ion charger, Micro-Lipo (Adafruit 1304) | 1 | $5.95 | https://www.adafruit.com/product/1304 |
@@ -50,7 +50,7 @@ Audio is a per-unit option: add one JY300 per position you want hearing calls. T
 - M2.5 x 8 mm self-tapping screws (about 10 for a full team).
 - Elastic straps for the pitcher belt and catcher guard.
 - 20 mm NATO watch straps for the fielder watches, about $10 each.
-- Solder and solder wick.
+- Temperature-controlled soldering iron with a fine tip (Pinecil V2 class, USB-C PD), 63/37 solder 0.6 to 0.8 mm, flux pen, brass wool, and a basic multimeter for continuity. Not needed for the first two bench phases, which run from USB, but required for the battery pigtail, the switches and the OLED wiring.
 - Optional: USB-C cable for the coach, USB charger for the Micro-Lipo.
 
 ## Bench-only order
