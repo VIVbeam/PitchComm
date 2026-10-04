@@ -108,7 +108,7 @@ Observations:
 - [ ] Catcher menu end to end: pitch -> row -> column -> send; Back and long-hold volume.
 - [ ] Pitcher recall tap and volume hold.
 - [ ] Fielder display labels and OLD marking after 15 s.
-- [ ] OLED disconnect (unplug) does not authorize a blind send.
+- [ ] Pre-soldered boards: bench phases done with the pins intact; header pins trimmed flush before the boards go into the cases, with no pin or fillet contact on the deck or cell.
 
 ## Phase 4b: wear check (with the first printed shells)
 

@@ -663,6 +663,47 @@ def dashboard_meshes(C: Case):
     return plateau, head
 
 
+def header_rects(C: Case):
+    """(x0, y0, x1, y1) rectangles of the pre-soldered header strips on the board top."""
+    bd = C.g['board']
+    hdr = bd.get('header') or {}
+    if not hdr:
+        return []
+    bx0, by0, bx1, by1 = C.board_rect()
+    pins = int(hdr['pins'])
+    pitch = float(hdr['pitch'])
+    hw = float(hdr['width'])
+    sl = (pins - 1) * pitch + pitch
+    if (bx1 - bx0) >= (by1 - by0):
+        sx0 = (bx0 + bx1 - sl) / 2.0
+        return [(sx0, by0, sx0 + sl, by0 + hw), (sx0, by1 - hw, sx0 + sl, by1)]
+    sy0 = (by0 + by1 - sl) / 2.0
+    return [(bx0, sy0, bx0 + hw, sy0 + sl), (bx1 - hw, sy0, bx1, sy0 + sl)]
+
+
+def board_keepouts(C: Case):
+    """(x0, y0, x1, y1) rectangles on the board top that the lid pads must clear."""
+    g = C.g
+    bd = g['board']
+    bx0, by0, bx1, by1 = C.board_rect()
+    rects = list(header_rects(C))
+    face = C.p['charge']['face']
+    cxm = (bx0 + bx1) / 2.0
+    cym = (by0 + by1) / 2.0
+    if face == 'y_max':
+        rects.append((cxm - 4.0, C.l - 6.0, cxm + 4.0, C.l - 2.5))
+    elif face == 'y_min':
+        rects.append((cxm - 4.0, 2.5, cxm + 4.0, 6.0))
+    elif face == 'x_max':
+        rects.append((C.w - 6.0, cym - 4.0, C.w - 2.5, cym + 4.0))
+    else:
+        rects.append((2.5, cym - 4.0, 6.0, cym + 4.0))
+    rects.append((bx0 + 6.8, by0 + 6.8,
+                  bx0 + 6.8 + max(bx1 - bx0 - 13.6, 4.0),
+                  by0 + 6.8 + max(by1 - by0 - 13.6, 4.0)))
+    return rects
+
+
 def build_lid(C: Case):
     g = C.g
     wall = C.wall
@@ -680,6 +721,11 @@ def build_lid(C: Case):
     ring = dif(prism_axis(lip_out, 'z', C.hb - lip['height'], C.hb + 0.4),
                prism_axis(lip_in, 'z', C.hb - lip['height'] - 0.5, C.hb + 0.5))
     lid = uni(lid, ring)
+
+    # relieve the lip ring where the pre-soldered header strips pass
+    for (x0, y0, x1, y1) in header_rects(C):
+        lid = dif(lid, box(x1 - x0 + 0.2, y1 - y0 + 0.2, lip['height'] + 0.1,
+                           (x0 - 0.1, y0 - 0.1, C.hb - lip['height'] - 0.1)))
 
     # control deck
     plateau, head = dashboard_meshes(C)
@@ -732,26 +778,67 @@ def build_lid(C: Case):
                          (-ci / 2.0, -ci / 2.0, -L - cdep - 0.5)))
         lid = uni(lid, xform(frame, F))
 
-    # board pads on the inner face
+    # relieve a collar wall where a taller side-entry switch reaches into it
+    if C.p.get('sidebar'):
+        sbp = C.p['sidebar']
+        sbc = C.comp(sbp['switch'])
+        ci = float(C.sw['collar_interior'])
+        cw = float(C.sw['collar_wall'])
+        swx0 = float(sbc['x'])
+        swx1 = swx0 + float(sbc['width'])
+        swy0 = float(sbc['y'])
+        swy1 = swy0 + float(sbc['length'])
+        top = float(sbp['z']) + float(sbc['width']) / 2.0
+        bot = C.hb - (float(C.sw['body'][2]) + float(C.sw['actuator'][1]) +
+                      float(C.pl['flange_height'])) - 0.2
+        for b in C.buttons():
+            cx, cy = C.button_center(b)
+            if sbp.get('face', 'y_max') == 'y_min':
+                w0, w1 = cy - ci / 2.0 - cw, cy - ci / 2.0
+            else:
+                w0, w1 = cy + ci / 2.0, cy + ci / 2.0 + cw
+            if w1 < swy0 or w0 > swy1:
+                continue
+            x0 = max(swx0, cx - ci / 2.0 - cw)
+            x1 = min(swx1, cx + ci / 2.0 + cw)
+            lid = dif(lid, box(x1 - x0 + 0.1, (w1 - w0) + 0.1, top - bot + 0.1,
+                               (x0 - 0.05, w0 - 0.05, bot)))
+
+    # board pads on the inner face: nearest clear spot to each nominal corner,
+    # keeping clear of the header strips, USB shell, component stack and bosses
     bx0, by0, bx1, by1 = C.board_rect()
     so = float(g['board']['standoff'])
+    pad_r = 1.7
+    keepouts = board_keepouts(C)
+
+    def pad_score(qx, qy):
+        if qx - pad_r < bx0 or qx + pad_r > bx1 or qy - pad_r < by0 or qy + pad_r > by1:
+            return None
+        pen = 0.0
+        for (x0, y0, x1, y1) in keepouts:
+            dx = max(x0 - qx, 0.0, qx - x1)
+            dy = max(y0 - qy, 0.0, qy - y1)
+            pen = max(pen, pad_r + 0.2 - math.hypot(dx, dy))
+        for (fx, fy) in C.p['fasteners']:
+            pen = max(pen, 6.5 - math.hypot(qx - fx, qy - fy))
+        return pen
+
     pads = []
-    for px in (bx0 + 2.2, bx1 - 2.2):
-        for py in (by0 + 2.2, by1 - 2.2):
-            qx, qy = px, py
-            for (sx, sy) in C.p['fasteners']:
-                d = math.hypot(qx - sx, qy - sy)
-                if d < 6.5:
-                    push = 6.5 - d + 0.5
-                    if abs(qx - sx) >= abs(qy - sy):
-                        qx += math.copysign(push, qx - sx)
-                    else:
-                        qy += math.copysign(push, qy - sy)
-            qx = min(max(qx, bx0 + 1.8), bx1 - 1.8)
-            qy = min(max(qy, by0 + 1.8), by1 - 1.8)
-            pads.append((qx, qy))
+    for (nx, ny) in ((bx0 + pad_r, by0 + pad_r), (bx1 - pad_r, by0 + pad_r),
+                     (bx0 + pad_r, by1 - pad_r), (bx1 - pad_r, by1 - pad_r)):
+        best = None
+        for i in range(-32, 33):
+            for j in range(-32, 33):
+                qx, qy = nx + i * 0.5, ny + j * 0.5
+                pen = pad_score(qx, qy)
+                if pen is None:
+                    continue
+                key = (round(max(pen, 0.0), 2), i * i + j * j)
+                if best is None or key < best[0]:
+                    best = (key, qx, qy)
+        pads.append((best[1], best[2]))
     for (qx, qy) in pads:
-        lid = uni(lid, cyl_at(4.4, C.board_z()[1], C.hb + 0.1, qx, qy))
+        lid = uni(lid, cyl_at(3.4, C.board_z()[1], C.hb + 0.1, qx, qy))
 
     # hood bar along the high edge of the head
     if C.p.get('oled') and C.dash and C.dash.get('head'):
@@ -1367,6 +1454,32 @@ def build_style(profiles, style, outdir, palette):
                           float(bd['component_stack']),
                           (bx0 + 6.8, by0 + 6.8, zt - 0.05)))
     check_shape('xiao_nrf54l15', board_shape)
+    hdr = bd.get('header') or {}
+    header_shape = fillet_shape = None
+    if hdr:
+        pins = int(hdr['pins'])
+        pitch = float(hdr['pitch'])
+        hw, hh = float(hdr['width']), float(hdr['height'])
+        fl = float(hdr['fillet'])
+        sl = (pins - 1) * pitch + pitch
+        strips, fillets = [], []
+        if (bx1 - bx0) >= (by1 - by0):
+            # 21 mm axis is x: strips run along x on the y_min/y_max edges
+            sx0 = (bx0 + bx1 - sl) / 2.0
+            for yy in (by0, by1 - hw):
+                strips.append(box(sl, hw, hh, (sx0, yy, zt)))
+                fillets.append(box(sl, hw, fl, (sx0, yy, zb - fl)))
+        else:
+            sy0 = (by0 + by1 - sl) / 2.0
+            for xx in (bx0, bx1 - hw):
+                strips.append(box(hw, sl, hh, (xx, sy0, zt)))
+                fillets.append(box(hw, sl, fl, (xx, sy0, zb - fl)))
+        header_shape = uni(*strips)
+        fillet_shape = uni(*fillets)
+        check_shape('xiao_headers', header_shape,
+                    note='pre-soldered 1x7 header strips on the 21 mm board edges, component side')
+        check_shape('xiao_solder_fillets', fillet_shape,
+                    note='solder fillet allowance below the PCB at the trimmed pins, pad side')
     shell = box(9.0, 3.5, float(bd['usb_shell_height']),
                 ((bx0 + bx1) / 2.0 - 4.5, 0.0, zt))
     # place shell at the USB end based on the wall
@@ -1382,6 +1495,9 @@ def build_style(profiles, style, outdir, palette):
         shell = box(3.5, 8.0, float(bd['usb_shell_height']), (2.5, (by0 + by1) / 2.0 - 4.0, shell_z))
     check_shape('xiao_usb_shell', shell, note='USB-C shell allowance near the port')
     reserved = {'xiao_nrf54l15': board_shape, 'xiao_usb_shell': shell}
+    if header_shape is not None:
+        reserved['xiao_headers'] = header_shape
+        reserved['xiao_solder_fillets'] = fillet_shape
 
     # antenna keepout: metal-free band from the deck top to the lid
     kz = C.comp('xiao_antenna_keepout')
@@ -1394,6 +1510,9 @@ def build_style(profiles, style, outdir, palette):
         "hardware_measured": False,
     }
     metal_hits = 0
+
+    if fillet_shape is not None:
+        metal_hits += probe_violation(fillet_shape, keepout)[0]
 
     cell = C.cell()
     cell_shape = rbox(float(cell['width']), float(cell['length']), C.cell_h(),

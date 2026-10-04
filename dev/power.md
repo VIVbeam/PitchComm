@@ -27,11 +27,11 @@ The XIAO's onboard charger runs at about 100 mA, which is 1C for the 100 mAh cel
 
 | Case | Original | Shipped now (`dev/cad/dimensions.json`) | Cell |
 |---|---|---|---|
-| Pitcher | 42.0 x 63.5 mm, flat 14.65 mm | 30.0 x 48.6 mm, flat 12.0 mm | 100 mAh, 11.5 x 31 x 3.8 mm |
-| Fielder watch | 46.0 x 56.0 mm, flat 14.3 mm, 19.9 mm max | 45.8 x 50.1 mm, flat 12.0 mm, 12.4 mm max, 55.1 mm lug to lug | 100 mAh |
-| Catcher | 48.0 x 80.0 mm, flat 16.8 mm, 23.9 mm max | 37.0 x 58.2 mm, flat 13.0 mm, 13.4 mm max, worn landscape | 100 mAh |
+| Pitcher | 42.0 x 63.5 mm, flat 14.65 mm | 30.0 x 48.6 mm, flat 13.0 mm, pre-soldered board | 100 mAh, 11.5 x 31 x 3.8 mm |
+| Fielder watch | 46.0 x 56.0 mm, flat 14.3 mm, 19.9 mm max | 45.8 x 50.1 mm, flat 13.0 mm, 13.4 mm max, 55.1 mm lug to lug | 100 mAh |
+| Catcher | 48.0 x 80.0 mm, flat 16.8 mm, 23.9 mm max | 37.0 x 58.2 mm, flat 14.0 mm, 14.4 mm max, worn landscape | 100 mAh |
 
-Against the original shells that is roughly 25 to 57 percent less envelope and 44 to 60 percent less printed plastic, with the 6 mm switch class and the 100 mAh cell doing most of the catcher's cut. The old 500 and 850 mAh cells no longer fit any shell. The floor is now the electronics: the 21 x 17.8 mm board, the two OLED modules, the switch bodies and the antenna keepout.
+Against the original shells that is roughly 25 to 57 percent less envelope and 40 to 60 percent less printed plastic, with the 6 mm switch class, the 100 mAh cell and the display rework doing the work. The old 500 and 850 mAh cells no longer fit any shell. The floor is now the electronics: the 21 x 17.8 mm board, the two OLED modules, the switch bodies and the antenna keepout.
 
 ## What to measure on hardware
 

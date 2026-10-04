@@ -6,16 +6,17 @@ Five nodes, each one Seeed XIAO nRF54L15 (21 x 17.8 mm; Nordic nRF54L15; Bluetoo
 
 | Part | Qty | Approx. unit price | Buy link |
 |---|---|---|---|
-| Seeed XIAO nRF54L15 | 5 | $9.90 | https://www.seeedstudio.com/XIAO-nRF54L15-p-6493.html |
+| Seeed XIAO nRF54L15, pre-soldered | 5 | $10.90 | https://www.seeedstudio.com/XIAO-nRF54L15-p-6493.html |
 | 0.91" 128x32 I2C OLED, SSD1306, addr 0x3C (catcher) | 1 | $5.55 | https://www.addicore.com/products/oled-display-128x32-0-91in-monochrome |
 | 0.96" 128x64 I2C OLED, SSD1306, addr 0x3C (fielder watch) | 2 | $6.50 US, about $4.50 AliExpress | https://www.addicore.com/products/oled-display-128x64-0-96in-monochrome (budget: https://www.aliexpress.com/w/wholesale-0.96-oled-128x64.html) |
 | Protected Li-ion cell, 100 mAh, JST-PH (Adafruit 1570) | 4 | $5.95 | https://www.adafruit.com/product/1570 |
-| 6 x 6 x 4.3 mm tactile switches, Omron B3F-1000 class | 8 | about $0.35 | https://www.digikey.com/en/products/detail/omron-electronics-inc-emc-div/B3F-1000/78996 |
-| Single-cell Li-ion charger, Micro-Lipo (Adafruit 1304) | 1 | $5.95 | https://www.adafruit.com/product/1304 |
+| 6 x 6 x 5 mm tactile switches, TE 1825910-6 class (Addicore AD140 or Adafruit 367) | 8 | $0.10 each, or $2.50 per 20-pack | https://www.addicore.com/products/small-tact-mini-push-button-switch-6x6x5mm |
+| JST-PH 2-pin cable, female, 100 mm (Adafruit 261) | 4 | $0.75 | https://www.adafruit.com/product/261 |
+| Single-cell Li-ion charger, Micro-Lipo (Adafruit 1304) | 1 | $5.95 | optional; the XIAO charges onboard |
 
-Electronics subtotal: about $96 before the headset and straps.
+Electronics subtotal: about $101, including the pre-soldered boards, three panels, four cells, eight switches and the battery pigtails.
 
-Board note: buy the bare XIAO for the cased units. The pre-soldered header plastic sits on the pad side, which faces the cell and deck, and does not fit the slim shells; pre-soldered boards are fine for the bench phases on USB with jumper wires, and the header strips have to come off (or the boards have to be swapped for bare ones) before a unit closes. The battery pads need solder either way.
+Board note: pre-soldered boards are the standard now. The cases clear the soldered header strips and the trimmed-pin solder fillets, about 1 mm more flat height than a bare board. Do the bench phases with the pins intact and jumper wires, then trim the pins flush with flush cutters before the cased build; trimmed boards cannot plug into breadboards again. A bare board needs about 1 mm of shim under it. The battery pads need solder either way.
 
 One game needs about 54 mAh on a catcher or fielder and about 45 mAh on the pitcher (`dev/power.md`), so a 100 mAh pouch covers every field unit with margin to spare for a single game. The cases are sized around this cell; the larger 150, 500 and 850 mAh cells do not fit the slim shells. A multi-game weekend build would need the older, larger case set from the repository history.
 
@@ -71,17 +72,17 @@ The full parts list above is still the right order for a finished team.
 
 ## Cost summary
 
-Goods at list prices:
+Full team parts at list prices:
 
-- Electronics: about $97.
-- Loose parts, screws and two NATO straps: about $40 to $55.
-- Headset: about $40 for one JY300.
-- Goods total: about $175 to $195.
+- Five pre-soldered XIAO boards: $54.50.
+- One 0.91 inch catcher panel and two 0.96 inch watch panels: $18.55.
+- Four 100 mAh cells: $23.80.
+- Eight 6 mm switches: $0.80.
+- Four JST-PH battery pigtails: $3.00.
+- M2.5 x 8 mm screws, 100-pack: $7.64.
+- One JY300: $37.99.
+- Full team parts: **about $146**.
 
-Delivered estimate for the United States, standard shipping and state sales tax, ordering from the suppliers above as separate orders:
+Delivered: the Addicore and Seeed orders ship free at these totals, Amazon was free with Prime, and Adafruit adds about $10 to $15 of shipping and tax for the cells and pigtails. Call it **about $160 delivered**. Two NATO straps and the filament are assumed owned; add about $35 if not.
 
-- Shipping: about $30 to $55 total (Seeed, Adafruit, Addicore or AliExpress, DigiKey).
-- Tax: about $5 to $25 depending on the state and where each order ships from.
-- Delivered full team: about $210 to $270. Consolidating the AliExpress items (generic OLEDs, cells, switches) or a Seeed sale can bring it to about $180 to $220.
-
-Bench minimum (three boards, one 128x32 panel, switches, one JY300, three USB-C cables; no cells, charger or cases): about $105 to $140 delivered. Add about $5 for the 128x64 watch panel if the fielder build is on the bench.
+Bench minimum: three boards, one 128x32 panel, eight switches, one JY300 and the jumper wires, about $77 plus shipping, no cells or cases. Tools are separate: the soldering setup runs about $85 and a multimeter, flush cutters, USB-C data cables, straps and filament are assumed owned.

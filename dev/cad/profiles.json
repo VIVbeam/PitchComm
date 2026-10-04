@@ -34,10 +34,18 @@
     "pcb_thickness": 1.6,
     "component_stack": 2.0,
     "usb_shell_height": 3.2,
-    "standoff": 0.25,
+    "standoff": 0.75,
     "antenna_keepout_mm": 10.0,
     "usb_center_above_pcb_top": 1.6,
-    "assumption": "USB-C on the short end opposite the antenna, component side facing the lid; PCB 1.6, component stack 2.0, USB shell 3.2 and its centre 1.6 above the PCB face. Caliper-check."
+    "header": {
+      "pins": 7,
+      "pitch": 2.54,
+      "width": 2.5,
+      "height": 2.5,
+      "fillet": 0.5,
+      "note": "Pre-soldered 1x7 male header strips on the two 21 mm board edges, component side, about 2.5 tall and 2.5 wide. The pins are trimmed flush to the pad side for the cased build, leaving a 0.5 solder fillet allowance below the PCB. The standoff covers the fillet plus the usual 0.25 clearance."
+    },
+    "assumption": "USB-C on the short end opposite the antenna, component side facing the lid; PCB 1.6, component stack 2.0, USB shell 3.2 and its centre 1.6 above the PCB face. Sizes cover a pre-soldered board with 1x7 header strips and the pins trimmed flush; run the bench phases before trimming. Caliper-check."
   },
   "oled": {
     "name": "0.91 inch 128x32 SSD1306 module",
@@ -79,15 +87,15 @@
     "body": [
       6.0,
       6.0,
-      3.5
+      3.6
     ],
     "actuator": [
       3.5,
-      0.8
+      1.4
     ],
     "collar_interior": 6.4,
     "collar_wall": 0.5,
-    "legs_note": "Trim through-hole legs flush. The collar tube captures the switch body with the lid plate as its roof so the actuator presses the plunger flange."
+    "legs_note": "Trim through-hole legs flush. TE 1825910-6 / Adafruit 367 class 6 x 6 x 5 mm: 3.6 body plus 1.4 button. The collar tube captures the switch body with the lid plate as its roof so the actuator presses the plunger flange. A 4.3 mm B3F-1000 class switch also fits but sits 0.7 mm clear of its pedestal."
   },
   "plunger": {
     "shaft": 3.2,
@@ -225,7 +233,7 @@
     "role": "pitcher",
     "width": 30.0,
     "length": 48.6,
-    "wall_height": 10.2,
+    "wall_height": 11.2,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
@@ -351,7 +359,7 @@
     "role": "fielder",
     "width": 45.8,
     "length": 50.1,
-    "wall_height": 10.2,
+    "wall_height": 11.2,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
@@ -478,7 +486,7 @@
     "role": "catcher",
     "width": 37.0,
     "length": 58.2,
-    "wall_height": 11.2,
+    "wall_height": 12.2,
     "floor": 1.4,
     "corner_radius": 6.0,
     "fasteners": [
@@ -679,8 +687,8 @@
         "x": 23.1,
         "y": 2.7,
         "width": 6.0,
-        "length": 4.3,
-        "source": "6 mm side-entry Back switch in the y_min wall, bare-hand reach"
+        "length": 5.0,
+        "source": "6 mm side-entry Back switch in the y_min wall, bare-hand reach; 5 mm class height axis along y"
       },
       {
         "name": "charge_opening",
