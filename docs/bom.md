@@ -15,6 +15,8 @@ Five nodes, each one Seeed XIAO nRF54L15 (21 x 17.8 mm; Nordic nRF54L15; Bluetoo
 
 Electronics subtotal: about $96 before the headset and straps.
 
+Board note: buy the bare XIAO for the cased units. The pre-soldered header plastic sits on the pad side, which faces the cell and deck, and does not fit the slim shells; pre-soldered boards are fine for the bench phases on USB with jumper wires, and the header strips have to come off (or the boards have to be swapped for bare ones) before a unit closes. The battery pads need solder either way.
+
 One game needs about 54 mAh on a catcher or fielder and about 45 mAh on the pitcher (`dev/power.md`), so a 100 mAh pouch covers every field unit with margin to spare for a single game. The cases are sized around this cell; the larger 150, 500 and 850 mAh cells do not fit the slim shells. A multi-game weekend build would need the older, larger case set from the repository history.
 
 Cheaper sources: XIAO nRF54L15 $7.90 at 10+ on Seeed; generic 0.91" 128x32 and 0.96" 128x64 SSD1306 OLEDs about $3 to $5 on AliExpress (https://www.aliexpress.com/w/wholesale-0.91-oled-ssd1306.html, https://www.aliexpress.com/w/wholesale-0.96-oled-128x64.html); generic protected 100 mAh cells about $2 on AliExpress. Adafruit STEMMA QT OLED (https://www.adafruit.com/product/4440, $12.50) if a Qwiic cable is preferred; the 4-pin module matches the wiring doc.
