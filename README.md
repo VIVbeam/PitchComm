@@ -4,12 +4,12 @@ Baseball pitch-call system. A coach console sends pitch and play calls to worn u
 
 ## Get started
 
-1. Download this repository.
-2. Buy the parts: [parts list](docs/bom.md).
-3. Print the cases: [print list](cad/unbranded/README.md). One pitcher set, one catcher set, two fielder sets; extra positions add fielder sets. `tools/build_print_pack.ps1` writes the same STLs, 3MFs, quantities, and settings to `PitchComm-cases-print-pack.zip`.
-4. Wire the units: [wiring reference](docs/wiring.md).
-5. Build, flash, and provision: [firmware guide](firmware/README.md).
-6. Open the coach desk: `powershell tools\start_coach_gui.ps1` and connect the coach board over USB.
+1. **Download** this repository.
+2. **Buy the parts**: [parts list](docs/bom.md).
+3. **Print the cases**: [print guide](cad/unbranded/README.md). One pitcher set, one catcher set, two fielder sets; extra positions add fielder sets. `tools/build_print_pack.ps1` writes the same STLs, 3MFs, quantities, and settings to `PitchComm-cases-print-pack.zip`.
+4. **Wire the units**: [wiring reference](docs/wiring.md).
+5. **Build, flash, and provision**: [firmware guide](firmware/README.md).
+6. **Open the coach desk**: `powershell tools\start_coach_gui.ps1` and connect the coach board over USB.
 
 ## Units
 
@@ -20,7 +20,19 @@ Baseball pitch-call system. A coach console sends pitch and play calls to worn u
 | Pitcher | XIAO nRF54L15, recall button, 100 mAh cell | JY300 earbud |
 | Shortstop / center field / other fielders | XIAO nRF54L15, 128x64 OLED watch, recall button, NATO strap, 100 mAh cell | OLED |
 
-Vocabulary: 81 pitch calls (9 pitch types x 3 rows x 3 columns) plus 21 play calls. Any number of positions can be enrolled and audio is optional per unit; see `dev/roster.md`.
+## Vocabulary
+
+Nine pitch types x three heights x three sides (81 pitch calls) plus 21 play calls (including nine defensive plays). The default dictionary is in `config/calls.json`; regenerate the firmware and coach files after editing it. Any number of positions can be enrolled and audio is optional per unit; see `dev/roster.md`.
+
+## Files
+
+| Location | Contents |
+|---|---|
+| `firmware/` | Zephyr / nRF Connect SDK application |
+| `gui/` | Offline coach console (browser + Web Serial) |
+| `config/calls.json` | Pitch and defensive-play dictionary |
+| `tools/` | Build, flash, provisioning, and audio tools |
+| `cad/unbranded/` | Printable case sources and STLs |
 
 ## License
 
