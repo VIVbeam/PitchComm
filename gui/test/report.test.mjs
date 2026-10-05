@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SessionReport } from '../report.js';
 
-const DICTIONARY = '299314f6';
+const DICTIONARY = '94b7a24a';
 
 function fakeClocks() {
   let wall = 0;

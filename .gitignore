@@ -3,6 +3,16 @@
 .pio/
 build/
 __pycache__/
+.venv/
+.pytest_cache/
+*.pyc
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
 
 # V1 (previous two-board build)
 v1/
@@ -15,3 +25,7 @@ firmware/include/app/team_config.h
 firmware/build/
 PitchComm-cases-*-pack.zip
 /PC/
+
+# Local crash reports and generated distribution snapshot (source stays in Git)
+/ErrorReports/
+/PitchComm-current-field-fit-bundle.zip

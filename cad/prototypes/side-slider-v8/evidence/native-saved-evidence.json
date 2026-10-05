@@ -1,0 +1,655 @@
+{
+  "passed": true,
+  "kernel_valid_solids": 46,
+  "printable_solids": 34,
+  "nonprinted_reference_solids": 12,
+  "audit_errors": 0,
+  "parts": [
+    {
+      "name": "receiver_body",
+      "printed": true,
+      "volume_delta_mm3": 0.0003024188135896111,
+      "bounds_delta_mm": 0.0,
+      "extra_boundary_mm3": 0.011041071199239619,
+      "missing_boundary_mm3": 0.007472826990124304,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_lid",
+      "printed": true,
+      "volume_delta_mm3": 0.00022929384704184486,
+      "bounds_delta_mm": 1.9073486257070726e-07,
+      "extra_boundary_mm3": 0.005207470116753636,
+      "missing_boundary_mm3": 0.00903312290605148,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_deck",
+      "printed": true,
+      "volume_delta_mm3": 0.00022391272341337753,
+      "bounds_delta_mm": 1.5258789076710855e-06,
+      "extra_boundary_mm3": 0.0012826413065075333,
+      "missing_boundary_mm3": 0.0007741649318025642,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_panel",
+      "printed": true,
+      "volume_delta_mm3": 0.00011809253503258788,
+      "bounds_delta_mm": 1.5258789076710855e-06,
+      "extra_boundary_mm3": 7.690111859119432e-05,
+      "missing_boundary_mm3": 1.0943401002804984e-06,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_plunger_recall",
+      "printed": true,
+      "volume_delta_mm3": 1.0958920206860512e-06,
+      "bounds_delta_mm": 4.7683716530855236e-08,
+      "extra_boundary_mm3": 0.00019403388070789637,
+      "missing_boundary_mm3": 0.00013771328102052394,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_plunger_recall_head",
+      "printed": true,
+      "volume_delta_mm3": 7.362428775081753e-06,
+      "bounds_delta_mm": 4.7683714754498396e-08,
+      "extra_boundary_mm3": 0.0002088151994001919,
+      "missing_boundary_mm3": 0.0009078621594653669,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_belt_carrier",
+      "printed": true,
+      "volume_delta_mm3": 0.00016851865984790493,
+      "bounds_delta_mm": 1.5258789076710855e-06,
+      "extra_boundary_mm3": 0.010221082186641675,
+      "missing_boundary_mm3": 0.00776225141150159,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.500001,
+        5.700001
+      ]
+    },
+    {
+      "name": "wrist_body",
+      "printed": true,
+      "volume_delta_mm3": 0.00020696471619885415,
+      "bounds_delta_mm": 1.5258789076710855e-06,
+      "extra_boundary_mm3": 0.012595375405605106,
+      "missing_boundary_mm3": 0.012415106111196414,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        2.500001,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_lid",
+      "printed": true,
+      "volume_delta_mm3": 5.205854040468694e-05,
+      "bounds_delta_mm": 1.5258789289873675e-06,
+      "extra_boundary_mm3": 0.005889659378529662,
+      "missing_boundary_mm3": 0.007748631839604059,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_deck",
+      "printed": true,
+      "volume_delta_mm3": 0.00031708939843611006,
+      "bounds_delta_mm": 1.5258789076710855e-06,
+      "extra_boundary_mm3": 0.0013610572994669685,
+      "missing_boundary_mm3": 0.0008410488928992285,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_panel",
+      "printed": true,
+      "volume_delta_mm3": 0.00027517509059293843,
+      "bounds_delta_mm": 1.5258789005656581e-06,
+      "extra_boundary_mm3": 9.04080854525341e-06,
+      "missing_boundary_mm3": 2.1743703837277806e-06,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_plunger_recall",
+      "printed": true,
+      "volume_delta_mm3": 1.0958920313441922e-06,
+      "bounds_delta_mm": 4.7683716530855236e-08,
+      "extra_boundary_mm3": 0.00019223492923477656,
+      "missing_boundary_mm3": 0.000135494616415599,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_plunger_recall_head",
+      "printed": true,
+      "volume_delta_mm3": 7.3624287466600435e-06,
+      "bounds_delta_mm": 4.7683714754498396e-08,
+      "extra_boundary_mm3": 0.00020631073656810864,
+      "missing_boundary_mm3": 0.0008917631832143039,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_display_bezel",
+      "printed": true,
+      "volume_delta_mm3": 2.4063877219759888e-05,
+      "bounds_delta_mm": 3.814697322468419e-07,
+      "extra_boundary_mm3": 0.0012162644083370349,
+      "missing_boundary_mm3": 0.002087289440927028,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_body",
+      "printed": true,
+      "volume_delta_mm3": 9.212336226482876e-05,
+      "bounds_delta_mm": 7.629394538355427e-07,
+      "extra_boundary_mm3": 0.015856826358988958,
+      "missing_boundary_mm3": 0.014118366734085916,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_lid",
+      "printed": true,
+      "volume_delta_mm3": 0.0008888058405318588,
+      "bounds_delta_mm": 7.629394538355427e-07,
+      "extra_boundary_mm3": 0.008715298692550277,
+      "missing_boundary_mm3": 0.015196444717730628,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_deck",
+      "printed": true,
+      "volume_delta_mm3": 0.0003312727661750614,
+      "bounds_delta_mm": 7.629394644936838e-07,
+      "extra_boundary_mm3": 0.0015522310401744714,
+      "missing_boundary_mm3": 0.0009241201332770288,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_panel",
+      "printed": true,
+      "volume_delta_mm3": 1.6106605897903137e-05,
+      "bounds_delta_mm": 7.629394502828291e-07,
+      "extra_boundary_mm3": 4.112725491722813e-06,
+      "missing_boundary_mm3": 1.0943415554715008e-06,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_1",
+      "printed": true,
+      "volume_delta_mm3": 1.0958920064751965e-06,
+      "bounds_delta_mm": 4.768372718899627e-08,
+      "extra_boundary_mm3": 0.00018061482577043839,
+      "missing_boundary_mm3": 0.00013092417623283836,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_1_head",
+      "printed": true,
+      "volume_delta_mm3": 1.7358186426008615e-06,
+      "bounds_delta_mm": 9.536745437799254e-08,
+      "extra_boundary_mm3": 0.0002207875478082618,
+      "missing_boundary_mm3": 0.0002525891565407316,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_label_call_1",
+      "printed": true,
+      "volume_delta_mm3": 3.254413138975565e-08,
+      "bounds_delta_mm": 4.7683716530855236e-08,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_2",
+      "printed": true,
+      "volume_delta_mm3": 1.0958920064751965e-06,
+      "bounds_delta_mm": 4.768372718899627e-08,
+      "extra_boundary_mm3": 0.0001846079028382519,
+      "missing_boundary_mm3": 0.00013192768665248877,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_2_head",
+      "printed": true,
+      "volume_delta_mm3": 1.6308026715705637e-06,
+      "bounds_delta_mm": 9.536745437799254e-08,
+      "extra_boundary_mm3": 0.0002228268462355724,
+      "missing_boundary_mm3": 0.0002527147802690403,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_label_call_2",
+      "printed": true,
+      "volume_delta_mm3": 1.3236701335017642e-07,
+      "bounds_delta_mm": 4.7683720083568915e-08,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_3",
+      "printed": true,
+      "volume_delta_mm3": 1.0958920064751965e-06,
+      "bounds_delta_mm": 4.768372718899627e-08,
+      "extra_boundary_mm3": 0.00018761164255920448,
+      "missing_boundary_mm3": 0.00013207423603489588,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_3_head",
+      "printed": true,
+      "volume_delta_mm3": 1.6308027070977005e-06,
+      "bounds_delta_mm": 9.536745437799254e-08,
+      "extra_boundary_mm3": 0.00022584750801494616,
+      "missing_boundary_mm3": 0.00025332232462460524,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_label_call_3",
+      "printed": true,
+      "volume_delta_mm3": 1.3236701601471168e-07,
+      "bounds_delta_mm": 4.7683720083568915e-08,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_4",
+      "printed": true,
+      "volume_delta_mm3": 1.0958920064751965e-06,
+      "bounds_delta_mm": 4.768372718899627e-08,
+      "extra_boundary_mm3": 0.00018761164255920448,
+      "missing_boundary_mm3": 0.00013207423603489588,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_call_4_head",
+      "printed": true,
+      "volume_delta_mm3": 1.7143237371897158e-06,
+      "bounds_delta_mm": 9.536745437799254e-08,
+      "extra_boundary_mm3": 0.00022194209873305226,
+      "missing_boundary_mm3": 0.00025332232462460524,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_label_call_4",
+      "printed": true,
+      "volume_delta_mm3": 2.494007418363253e-07,
+      "bounds_delta_mm": 4.7683720083568915e-08,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_back",
+      "printed": true,
+      "volume_delta_mm3": 1.0380474435578435e-06,
+      "bounds_delta_mm": 4.768372718899627e-08,
+      "extra_boundary_mm3": 0.00026921898302885206,
+      "missing_boundary_mm3": 0.00014730473200412023,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_plunger_back_head",
+      "printed": true,
+      "volume_delta_mm3": 4.407772221526329e-05,
+      "bounds_delta_mm": 3.552713678800501e-15,
+      "extra_boundary_mm3": 0.00012202801318987137,
+      "missing_boundary_mm3": 0.00035669000062778694,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_display_bezel",
+      "printed": true,
+      "volume_delta_mm3": 1.1095382603798498e-06,
+      "bounds_delta_mm": 1.9073486612342094e-07,
+      "extra_boundary_mm3": 0.0010416978623955704,
+      "missing_boundary_mm3": 0.0019228322404766611,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_guard_carrier",
+      "printed": true,
+      "volume_delta_mm3": 0.0003205677376172389,
+      "bounds_delta_mm": 7.629394502828291e-07,
+      "extra_boundary_mm3": 0.01327868446848394,
+      "missing_boundary_mm3": 0.011626895387356248,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        5.700001
+      ]
+    },
+    {
+      "name": "receiver_cell",
+      "printed": false,
+      "volume_delta_mm3": 2.2737367544323206e-13,
+      "bounds_delta_mm": 0.0,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_pull_sling",
+      "printed": false,
+      "volume_delta_mm3": 1.3661382993745974e-05,
+      "bounds_delta_mm": 7.629394538355427e-07,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_anchor",
+      "printed": false,
+      "volume_delta_mm3": 3.552713678800501e-15,
+      "bounds_delta_mm": 7.105427357601002e-15,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "receiver_connector_assumed",
+      "printed": false,
+      "volume_delta_mm3": 1.7053025658242404e-13,
+      "bounds_delta_mm": 7.105427357601002e-15,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_cell",
+      "printed": false,
+      "volume_delta_mm3": 4.547473508864641e-13,
+      "bounds_delta_mm": 7.105427357601002e-15,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_pull_sling",
+      "printed": false,
+      "volume_delta_mm3": 2.8810500388942728e-05,
+      "bounds_delta_mm": 7.629394502828291e-07,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_anchor",
+      "printed": false,
+      "volume_delta_mm3": 1.7763568394002505e-15,
+      "bounds_delta_mm": 2.220446049250313e-16,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "wrist_connector_assumed",
+      "printed": false,
+      "volume_delta_mm3": 2.842170943040401e-14,
+      "bounds_delta_mm": 2.220446049250313e-16,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_cell",
+      "printed": false,
+      "volume_delta_mm3": 1.1368683772161603e-12,
+      "bounds_delta_mm": 0.0,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_pull_sling",
+      "printed": false,
+      "volume_delta_mm3": 1.1758804262740341e-05,
+      "bounds_delta_mm": 3.814697322468419e-07,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_anchor",
+      "printed": false,
+      "volume_delta_mm3": 4.440892098500626e-15,
+      "bounds_delta_mm": 2.220446049250313e-16,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "keypad_connector_assumed",
+      "printed": false,
+      "volume_delta_mm3": 2.5579538487363607e-13,
+      "bounds_delta_mm": 7.105427357601002e-15,
+      "extra_boundary_mm3": 0.0,
+      "missing_boundary_mm3": 0.0,
+      "raw_export_closed": true,
+      "stl_positive_octant_relocation_mm": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "drawing_sha256": "7bb48217381d533d91bb142d5a5178d82337fc8baeb76b53b3d4102ceb0372b4",
+  "scope": "References are cell, soft film, adhesive and assumed connector; no actual fit or material strength measurement."
+}

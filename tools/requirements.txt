@@ -1,3 +1,0 @@
-# Python packages used by tools/ (everything else is the standard library).
-# build_audio_fs.py and verify_audio_fs.py use littlefs-python for the audio image.
-littlefs-python>=0.19

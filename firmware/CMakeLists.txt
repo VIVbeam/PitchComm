@@ -1,13 +1,8 @@
 # PitchComm field-unit firmware.
 # nRF Connect SDK (Zephyr) application for the Seeed XIAO nRF54L15.
 #
-# Build one role at a time; tools/build_firmware.ps1 wraps these calls:
-#   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware \
-#     -d firmware/build/coach -- \
-#     -DEXTRA_CONF_FILE=roles/coach.conf
-#   west build -b xiao_nrf54l15/nrf54l15/cpuapp firmware \
-#     -d firmware/build/pitcher -- \
-#     -DEXTRA_CONF_FILE="firmware/build/unit-confs/pitcher.conf;roles/field-common.conf;roles/audio-unit.conf"
+# Use tools/build_firmware.ps1 for roster-derived role configuration, unit
+# defines, display overlays and image-size checks. See firmware/README.md.
 
 cmake_minimum_required(VERSION 3.20.0)
 

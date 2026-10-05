@@ -72,7 +72,7 @@ static int checkCommands(const char* path) {
 
   constexpr uint32_t kClient = 0x1a2b3c4d;
   constexpr uint64_t kBoot = 0x0011223344556677ULL;
-  constexpr unsigned kPitchCodes = pc::kPitchCount * pc::kRows * pc::kCols;
+  constexpr unsigned kPitchCodes = pc::kMaxPitchCode;
   int handshake = 0, calls = 0;
   uint32_t previousId = 0;
   std::string line;

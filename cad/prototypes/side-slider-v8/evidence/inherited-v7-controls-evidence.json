@@ -1,0 +1,2736 @@
+{
+  "released": false,
+  "hardware_measured": false,
+  "styles": {
+    "receiver": {
+      "component_contacts": {
+        "pcb": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "components": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "header0": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "fillet0": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "header1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "fillet1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "usb": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "recall": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0
+        }
+      },
+      "control_motion": {
+        "recall": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0
+        }
+      },
+      "support_witnesses": {
+        "recall": {
+          "expected_mm3": 1.7999999999999947,
+          "missing_mm3": 0.0
+        }
+      },
+      "part_names": [
+        "receiver_body",
+        "receiver_lid",
+        "receiver_deck",
+        "receiver_panel",
+        "receiver_plunger_recall",
+        "receiver_plunger_recall_head",
+        "receiver_belt_carrier"
+      ],
+      "case_profile": {
+        "role": "pitcher",
+        "width": 29.0,
+        "length": 47.6,
+        "wall_height": 13.0,
+        "floor": 1.4,
+        "corner_radius": 6.0,
+        "fasteners": [
+          [
+            5,
+            5
+          ],
+          [
+            24,
+            5
+          ],
+          [
+            5,
+            41.9
+          ]
+        ],
+        "cell": "protected_100mah_cell",
+        "board": {
+          "x": 8.6,
+          "y": 22.400000000000002,
+          "antenna_end": "y_min",
+          "usb_end": "y_max",
+          "support_centers": [
+            [
+              14.209999999999999,
+              26.022500000000008
+            ],
+            [
+              14.41,
+              35.22250000000001
+            ],
+            [
+              21.81,
+              24.622500000000006
+            ],
+            [
+              20.41,
+              35.22250000000001
+            ]
+          ],
+          "standoff": 2.05
+        },
+        "deck": {
+          "y0": 12.5,
+          "y1": 45.9,
+          "pull_notch": [
+            12.0,
+            10.0
+          ],
+          "access_end": "front",
+          "lightening": {
+            "new_window_web_mm": 3.0,
+            "cell_xy_allowance_mm": 0.6,
+            "windows": [
+              {
+                "rect_mm": [
+                  5.2,
+                  22.8,
+                  2.4,
+                  2.2
+                ],
+                "radius_mm": 0.6,
+                "purpose": "wire-passage"
+              }
+            ],
+            "note": "Keep3mm existing deck boundary web,0.6mm cell-cover allowance and existing post/ledge/screw lands. Small2.4x2.2mm R0.6 functional wire passage; large lightening openings retain their existing radius policy. Physical strength unmeasured."
+          }
+        },
+        "dashboard": null,
+        "oled": null,
+        "bezel": false,
+        "buttons": [
+          {
+            "id": "recall",
+            "x": 12.0,
+            "y": 5.7,
+            "switch": "switch_recall",
+            "head": "plain",
+            "operating_hand": "either, sized for a glove"
+          }
+        ],
+        "sidebar": null,
+        "charge": {
+          "face": "y_max",
+          "y_center": 15.8
+        },
+        "mounts": [
+          {
+            "name": "belt",
+            "strap_width": 45.0,
+            "layout": "in_line_x",
+            "loop_length": 12.0,
+            "centers": [
+              [
+                8.0,
+                23.8
+              ],
+              [
+                21.0,
+                23.8
+              ]
+            ]
+          }
+        ],
+        "menu_keys": {
+          "recall": "throw / recall (D1)"
+        },
+        "components": [
+          {
+            "name": "xiao_nrf54l15",
+            "x": 8.6,
+            "y": 22.400000000000002,
+            "width": 17.8,
+            "length": 21.0,
+            "source": "PCB 1.6 + 2.0 components above, USB end at the y_max wall"
+          },
+          {
+            "name": "xiao_antenna_keepout",
+            "x": 8.6,
+            "y": 12.399999999999999,
+            "width": 17.8,
+            "length": 10.0,
+            "source": "metal-free band outward from the antenna end between the deck top and the lid"
+          },
+          {
+            "name": "protected_100mah_cell",
+            "x": 8.2,
+            "y": 12.0,
+            "width": 12.700000000000001,
+            "length": 32.4,
+            "source": "v20 maximum-pack reservation moved forward1mm with matching bay rails to permit conditional short-edge wire bends; delivered pack/lead pose and physical fit unverified."
+          },
+          {
+            "name": "deck_plate",
+            "x": 2.200000047683716,
+            "y": 12.5,
+            "width": 24.59999918937683,
+            "length": 32.900001525878906,
+            "source": "v19 battery-envelope deck; no physical fit claim."
+          },
+          {
+            "name": "switch_recall",
+            "x": 12.0,
+            "y": 5.7,
+            "width": 6.0,
+            "length": 6.0,
+            "source": "6 mm face switch under the flat lid, clear of the board"
+          },
+          {
+            "name": "charge_opening",
+            "x": 12.5,
+            "y": 45.6,
+            "width": 10.0,
+            "length": 2.0,
+            "source": "USB-C slot through the y_max wall and lid edge"
+          }
+        ]
+      }
+    },
+    "wrist": {
+      "component_contacts": {
+        "pcb": {
+          "body": 1.803845307857873e-06,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "components": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "header0": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "fillet0": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "header1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "fillet1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "usb": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "oled": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "recall": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        }
+      },
+      "control_motion": {
+        "recall": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        }
+      },
+      "support_witnesses": {
+        "recall": {
+          "expected_mm3": 1.799999999999993,
+          "missing_mm3": 0.0
+        }
+      },
+      "part_names": [
+        "wrist_body",
+        "wrist_lid",
+        "wrist_deck",
+        "wrist_panel",
+        "wrist_plunger_recall",
+        "wrist_plunger_recall_head",
+        "wrist_display_bezel"
+      ],
+      "case_profile": {
+        "role": "fielder",
+        "component_relief": {
+          "clearance": 0.15,
+          "corner_radius": 4.6,
+          "minimum_upper_corner_wall": 1.2,
+          "note": "Nominal PCB/header and OLED insertion reliefs; local exterior corner ramps retain a 1.2 mm upper wall witness without increasing bounding dimensions. Hardware fit remains unmeasured."
+        },
+        "width": 45.8,
+        "length": 50.1,
+        "wall_height": 13.0,
+        "floor": 1.4,
+        "corner_radius": 6.0,
+        "fasteners": [
+          [
+            40.8,
+            5
+          ],
+          [
+            5,
+            45.1
+          ]
+        ],
+        "cell": "protected_100mah_cell",
+        "board": {
+          "x": 4.2,
+          "y": 2.0,
+          "antenna_end": "x_max",
+          "usb_end": "x_min",
+          "support_centers": [
+            [
+              21.577499999999997,
+              7.609999999999999
+            ],
+            [
+              12.377499999999998,
+              7.81
+            ],
+            [
+              22.9775,
+              15.209999999999999
+            ],
+            [
+              12.377499999999998,
+              13.81
+            ]
+          ],
+          "standoff": 2.05
+        },
+        "deck": {
+          "y0": 1.5,
+          "y1": 41.599999999999994,
+          "pull_notch": [
+            12.0,
+            10.0
+          ],
+          "access_end": "rear",
+          "lightening": {
+            "new_window_web_mm": 3.0,
+            "cell_xy_allowance_mm": 0.6,
+            "windows": [
+              {
+                "rect_mm": [
+                  29.300000000000004,
+                  7.0,
+                  7.699999999999996,
+                  20.0
+                ],
+                "radius_mm": 1.5
+              }
+            ],
+            "note": "Preserve existing cell-cover material and post/ledge lands. New rounded openings reserve this margin from existing deck boundaries; physical strength unmeasured."
+          }
+        },
+        "dashboard": {
+          "tilt_deg": 0.0,
+          "plateau": null,
+          "head": {
+            "x": 15.8,
+            "y": 22.5,
+            "width": 28.5,
+            "length": 23.0
+          }
+        },
+        "oled": {
+          "x": 16.4,
+          "y": 20.3,
+          "module": "oled64"
+        },
+        "bezel": true,
+        "bars": true,
+        "buttons": [
+          {
+            "id": "recall",
+            "x": 5.7,
+            "y": 23.4,
+            "switch": "switch_recall",
+            "head": "plain",
+            "operating_hand": "bare hand or glove heel"
+          }
+        ],
+        "sidebar": null,
+        "charge": {
+          "face": "x_min",
+          "y_center": 10.9
+        },
+        "mounts": [],
+        "menu_keys": {
+          "recall": "recall / volume (D1)"
+        },
+        "components": [
+          {
+            "name": "xiao_nrf54l15",
+            "x": 4.2,
+            "y": 2.0,
+            "width": 21.0,
+            "length": 17.8,
+            "source": "PCB 1.6 + 2.0 components above, USB end at the x_min wall"
+          },
+          {
+            "name": "xiao_antenna_keepout",
+            "x": 25.2,
+            "y": 2.0,
+            "width": 10.0,
+            "length": 17.8,
+            "source": "metal-free band outward from the antenna end between the deck top and the lid"
+          },
+          {
+            "name": "protected_100mah_cell",
+            "x": 15.899999999999999,
+            "y": 8.7,
+            "width": 12.700000000000001,
+            "length": 32.4,
+            "source": "v19 design reservation: linked 2014 12.3x32x4.3mm maximum pack, plus explicit design clearance; delivered current cell relationship unverified."
+          },
+          {
+            "name": "deck_plate",
+            "x": 2.200000047683716,
+            "y": 2.200000047683716,
+            "width": 41.39999842643738,
+            "length": 32.89999842643738,
+            "source": "v19 battery-envelope deck; no physical fit claim."
+          },
+          {
+            "name": "oled_display",
+            "x": 16.4,
+            "y": 20.3,
+            "width": 27.3,
+            "length": 27.8,
+            "source": "nested 1.0 mm from the flat face, screen under the bezel window"
+          },
+          {
+            "name": "switch_recall",
+            "x": 5.7,
+            "y": 23.4,
+            "width": 6.0,
+            "length": 6.0,
+            "source": "6 mm face switch beside the display head"
+          },
+          {
+            "name": "charge_opening",
+            "x": 2.0,
+            "y": 5.9,
+            "width": 2.0,
+            "length": 10.0,
+            "source": "USB-C slot through the x_min wall and lid edge"
+          }
+        ],
+        "control_web": {
+          "minimum_mm": 0.8,
+          "note": "Recall well separated from OLED seat by a finite wall; matching switch and pedestal move with the button. Calculated geometry, printed strength unmeasured."
+        }
+      }
+    },
+    "keypad": {
+      "component_contacts": {
+        "pcb": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "components": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "header0": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "fillet0": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "header1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "fillet1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "usb": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "oled": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0
+        },
+        "call_1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        },
+        "call_2": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        },
+        "call_3": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        },
+        "call_4": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        },
+        "back": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        }
+      },
+      "control_motion": {
+        "call_1": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        },
+        "call_2": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0,
+          "plunger_call_1": 0.0,
+          "plunger_call_1_head": 0.0,
+          "label_call_1": 0.0
+        },
+        "call_3": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0,
+          "plunger_call_1": 0.0,
+          "plunger_call_1_head": 0.0,
+          "label_call_1": 0.0,
+          "plunger_call_2": 0.0,
+          "plunger_call_2_head": 0.0,
+          "label_call_2": 0.0
+        },
+        "call_4": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0,
+          "plunger_call_1": 0.0,
+          "plunger_call_1_head": 0.0,
+          "label_call_1": 0.0,
+          "plunger_call_2": 0.0,
+          "plunger_call_2_head": 0.0,
+          "label_call_2": 0.0,
+          "plunger_call_3": 0.0,
+          "plunger_call_3_head": 0.0,
+          "label_call_3": 0.0
+        },
+        "back": {
+          "body": 0.0,
+          "lid": 0.0,
+          "deck": 0.0,
+          "pcb": 0.0,
+          "components": 0.0,
+          "header0": 0.0,
+          "fillet0": 0.0,
+          "header1": 0.0,
+          "fillet1": 0.0,
+          "usb": 0.0,
+          "oled": 0.0
+        }
+      },
+      "support_witnesses": {
+        "call_1": {
+          "expected_mm3": 1.7999999999999925,
+          "missing_mm3": 0.0
+        },
+        "call_2": {
+          "expected_mm3": 1.7999999999999925,
+          "missing_mm3": 0.0
+        },
+        "call_3": {
+          "expected_mm3": 1.7999999999999925,
+          "missing_mm3": 0.0
+        },
+        "call_4": {
+          "expected_mm3": 1.7999999999999925,
+          "missing_mm3": 0.0
+        }
+      },
+      "part_names": [
+        "keypad_body",
+        "keypad_lid",
+        "keypad_deck",
+        "keypad_panel",
+        "keypad_plunger_call_1",
+        "keypad_plunger_call_1_head",
+        "keypad_label_call_1",
+        "keypad_plunger_call_2",
+        "keypad_plunger_call_2_head",
+        "keypad_label_call_2",
+        "keypad_plunger_call_3",
+        "keypad_plunger_call_3_head",
+        "keypad_label_call_3",
+        "keypad_plunger_call_4",
+        "keypad_plunger_call_4_head",
+        "keypad_label_call_4",
+        "keypad_plunger_back",
+        "keypad_plunger_back_head",
+        "keypad_display_bezel",
+        "keypad_guard_carrier"
+      ],
+      "case_profile": {
+        "role": "catcher",
+        "component_relief": {
+          "clearance": 0.15,
+          "corner_radius": 5.2,
+          "minimum_upper_corner_wall": 1.2,
+          "note": "Nominal PCB/header insertion reliefs; local exterior corner ramp retains a 1.2 mm upper wall witness without increasing bounding dimensions. Hardware fit remains unmeasured."
+        },
+        "width": 37.0,
+        "length": 58.2,
+        "wall_height": 18.2,
+        "floor": 1.4,
+        "corner_radius": 6.0,
+        "fasteners": [
+          [
+            5.0,
+            23.0
+          ],
+          [
+            5.0,
+            38.1
+          ],
+          [
+            5.0,
+            53.2
+          ]
+        ],
+        "cell": "protected_100mah_cell",
+        "board": {
+          "x": 11.9,
+          "y": 2.0,
+          "antenna_end": "x_min",
+          "usb_end": "x_max",
+          "standoff": 2.4,
+          "support_centers": [
+            [
+              15.522499999999999,
+              14.389999999999999
+            ],
+            [
+              29.9225,
+              15.19
+            ],
+            [
+              14.122499999999999,
+              6.59
+            ],
+            [
+              19.7225,
+              7.989999999999998
+            ]
+          ]
+        },
+        "deck": {
+          "y0": 1.5,
+          "y1": 45.2,
+          "pull_notch": [
+            12.0,
+            10.0
+          ],
+          "access_end": "rear",
+          "lightening": {
+            "new_window_web_mm": 3.0,
+            "cell_xy_allowance_mm": 0.6,
+            "windows": [
+              {
+                "rect_mm": [
+                  5.899999999999998,
+                  6.0,
+                  3.2,
+                  12.0
+                ],
+                "radius_mm": 1.5
+              }
+            ],
+            "note": "Preserve existing cell-cover material and post/ledge lands. New rounded openings reserve this margin from existing deck boundaries; physical strength unmeasured."
+          }
+        },
+        "dashboard": {
+          "tilt_deg": 0.0,
+          "plateau": null,
+          "head": {
+            "x": 11.0,
+            "y": 15.0,
+            "width": 16.0,
+            "length": 38.0
+          }
+        },
+        "oled": {
+          "x": 12.05,
+          "y": 16.0,
+          "seat_depth": 0.5,
+          "window": [
+            7.6,
+            26.0
+          ]
+        },
+        "bezel": true,
+        "buttons": [
+          {
+            "id": "call_1",
+            "x": 25.8,
+            "y": 20.2,
+            "switch": "switch_call_1",
+            "head": "numbered",
+            "digit": "1",
+            "operating_hand": "bare hand"
+          },
+          {
+            "id": "call_2",
+            "x": 25.8,
+            "y": 29.7,
+            "switch": "switch_call_2",
+            "head": "numbered",
+            "digit": "2",
+            "operating_hand": "bare hand"
+          },
+          {
+            "id": "call_3",
+            "x": 25.8,
+            "y": 39.2,
+            "switch": "switch_call_3",
+            "head": "numbered",
+            "digit": "3",
+            "operating_hand": "bare hand"
+          },
+          {
+            "id": "call_4",
+            "x": 25.8,
+            "y": 48.7,
+            "switch": "switch_call_4",
+            "head": "numbered",
+            "digit": "4",
+            "operating_hand": "bare hand"
+          }
+        ],
+        "sidebar": {
+          "id": "back",
+          "x": 26.1,
+          "z": 6.2,
+          "face": "x_max",
+          "head": "back",
+          "switch": "switch_back",
+          "stop_depth": 1.2,
+          "y": 29.1,
+          "face_recess": -0.25
+        },
+        "charge": {
+          "face": "x_max",
+          "y_center": 10.9
+        },
+        "mounts": [
+          {
+            "name": "guard",
+            "strap_width": 25.0,
+            "layout": "in_line_y",
+            "loop_length": 27.0,
+            "centers": [
+              [
+                18.5,
+                14.3
+              ],
+              [
+                18.5,
+                43.9
+              ]
+            ]
+          }
+        ],
+        "menu_keys": {
+          "call_1": "call 1 (D0)",
+          "call_2": "call 2 (D1)",
+          "call_3": "call 3 (D2)",
+          "call_4": "call 4 (D3)",
+          "back": "back (D13)"
+        },
+        "components": [
+          {
+            "name": "xiao_nrf54l15",
+            "x": 11.9,
+            "y": 2.0,
+            "width": 21.0,
+            "length": 17.8,
+            "source": "PCB 1.6 + 2.0 components above; the 21 mm axis runs along x: USB end at the x_max charge wall, antenna end at x_min facing the side wall"
+          },
+          {
+            "name": "xiao_antenna_keepout",
+            "x": 1.9000000000000004,
+            "y": 2.0,
+            "width": 10.0,
+            "length": 17.8,
+            "source": "metal-free band outward from the antenna end; the antenna faces the x_min wall, so the band runs through the wall with no metal inside the case"
+          },
+          {
+            "name": "protected_100mah_cell",
+            "x": 9.799999999999997,
+            "y": 12.3,
+            "width": 12.700000000000001,
+            "length": 32.4,
+            "source": "v19 design reservation: linked 2014 12.3x32x4.3mm maximum pack, plus explicit design clearance; delivered current cell relationship unverified."
+          },
+          {
+            "name": "deck_plate",
+            "x": 2.200000047683716,
+            "y": 2.200000047683716,
+            "width": 32.59999918937683,
+            "length": 43.00000071525574,
+            "source": "v19 battery-envelope deck; no physical fit claim."
+          },
+          {
+            "name": "oled_display",
+            "x": 12.05,
+            "y": 16.0,
+            "width": 12.5,
+            "length": 36.0,
+            "source": "0.91 inch module at x 11.2, y 20, rotated 90 degrees; seat depth 0.5 mm below the flat face, header at y_min. Nominal dimensions and header shape remain unmeasured."
+          },
+          {
+            "name": "switch_call_1",
+            "x": 25.8,
+            "y": 20.2,
+            "width": 6.0,
+            "length": 6.0
+          },
+          {
+            "name": "switch_call_2",
+            "x": 25.8,
+            "y": 29.7,
+            "width": 6.0,
+            "length": 6.0
+          },
+          {
+            "name": "switch_call_3",
+            "x": 25.8,
+            "y": 39.2,
+            "width": 6.0,
+            "length": 6.0
+          },
+          {
+            "name": "switch_call_4",
+            "x": 25.8,
+            "y": 48.7,
+            "width": 6.0,
+            "length": 6.0
+          },
+          {
+            "name": "switch_back",
+            "x": 29.3,
+            "y": 26.1,
+            "width": 5.0,
+            "length": 6.0,
+            "source": "6 mm side-entry Back switch in the y_min wall, bare-hand reach; 5 mm class height axis along y"
+          },
+          {
+            "name": "charge_opening",
+            "x": 35.0,
+            "y": 5.9,
+            "width": 2.0,
+            "length": 10.0,
+            "source": "USB-C slot through the x_max wall and lid edge"
+          }
+        ],
+        "note": "Compact horizontal four-key row; 9.5mm pitch, 7.8mm heads, 0.9mm well webs. First key shifted off PCB/header reservation so its floor pedestal can be retained. Nominal geometry only.",
+        "well": {
+          "diameter": 8.6,
+          "depth": 1.4
+        },
+        "user_frame": {
+          "rotation_deg": -90.0,
+          "translation_mm": [
+            0.0,
+            37.0,
+            0.0
+          ],
+          "size_mm": [
+            58.2,
+            37.0
+          ],
+          "screen": "upper",
+          "call_keys": "lower row1..4 left-to-right",
+          "back": "centered lower edge"
+        },
+        "plunger": {
+          "head_numbered": [
+            7.8,
+            0.85
+          ]
+        }
+      }
+    }
+  },
+  "parts": [
+    {
+      "name": "receiver_body",
+      "style": "receiver",
+      "color": "#74D7EE",
+      "source_volume_mm3": 5422.287314668813,
+      "assembly_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          29.0,
+          52.75,
+          13.0
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "1c1a00f4794a58fd3be64ff4f578a98c37e4c534293cc9576936d56702709191",
+      "stl_extra_mm3": 0.005803388263529996,
+      "stl_missing_mm3": 0.009023749122813266,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "receiver_lid",
+      "style": "receiver",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 2772.477356453847,
+      "assembly_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          7.0
+        ],
+        [
+          29.0,
+          52.75,
+          14.800000190734863
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          52.75
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          14.80000019073487
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "1bc783742d13bfa11e7782e9768c1f69c9970dd2251659857d8fc3536d39ad64",
+      "stl_extra_mm3": 0.008788719752374163,
+      "stl_missing_mm3": 0.005084715401001934,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "receiver_deck",
+      "style": "receiver",
+      "color": "#74D7EE",
+      "source_volume_mm3": 546.9193332427234,
+      "assembly_bounds_mm": [
+        [
+          2.200000047683716,
+          12.5,
+          6.099999904632568
+        ],
+        [
+          26.799999237060547,
+          45.400001525878906,
+          8.850000381469727
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.200000047683716
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          12.5
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          6.099999904632568
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "6e9256f7f8ebad8041d90ce8c2ca35bcd985f726d83d374c9cf2a18f111a740c",
+      "stl_extra_mm3": 0.0007734925821599367,
+      "stl_missing_mm3": 0.0012736285812214494,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "receiver_panel",
+      "style": "receiver",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 72.90461809253503,
+      "assembly_bounds_mm": [
+        [
+          6.849999904632568,
+          50.349998474121094,
+          1.149999976158142
+        ],
+        [
+          22.25,
+          52.5,
+          6.349999904632568
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.849999904632568
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          1.0,
+          50.349998474121094
+        ],
+        [
+          -0.0,
+          -1.0,
+          6.123233995736766e-17,
+          6.349999904632568
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "59a71ad5472a2a029508a01d03ea9a151445f7f313dcb4ea433e3f95accb32c9",
+      "stl_extra_mm3": 1.0943401002804984e-06,
+      "stl_missing_mm3": 7.999817554415686e-05,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "receiver_plunger_recall",
+      "style": "receiver",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 20.57510582589202,
+      "assembly_bounds_mm": [
+        [
+          12.200000047683716,
+          5.900000047683715,
+          12.3
+        ],
+        [
+          17.799999952316284,
+          11.499999952316283,
+          13.750000047683717
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          12.200000047683716
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          5.900000047683715
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          12.3
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "8fd2f22d986a83d0ce34013917cc734b3f45ae7da1b9ccd149bde8cb1bb05c8a",
+      "stl_extra_mm3": 0.0001373856443602032,
+      "stl_missing_mm3": 0.00019346009263661776,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "receiver_plunger_recall_head",
+      "style": "receiver",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 98.56149511757123,
+      "assembly_bounds_mm": [
+        [
+          9.0,
+          2.6999999999999993,
+          13.099999952316285
+        ],
+        [
+          21.0,
+          14.7,
+          14.599999997019768
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          9.0
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          14.7
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          14.59999999701977
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "c557a0138537e833f578c340a747163726f34d3a299582016d1214921deff539",
+      "stl_extra_mm3": 0.0009061090515653328,
+      "stl_missing_mm3": 0.0002070697962229436,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "receiver_belt_carrier",
+      "style": "receiver",
+      "color": "#74D7EE",
+      "source_volume_mm3": 3380.9482029813403,
+      "assembly_bounds_mm": [
+        [
+          0.0,
+          -0.5,
+          -5.699999809265137
+        ],
+        [
+          29.0,
+          48.099998474121094,
+          0.0
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          -1.0,
+          -0.0,
+          -1.2246467991473532e-16,
+          29.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.5
+        ],
+        [
+          1.2246467991473532e-16,
+          -0.0,
+          -1.0,
+          -9.797165049865238e-17
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "e37702723eb67f5b2f782e6aa48acf49f27496c831cf5b39bebaa7e3242db7b2",
+      "stl_extra_mm3": 0.0076133214949247,
+      "stl_missing_mm3": 0.01012869858823251,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 0
+    },
+    {
+      "name": "wrist_body",
+      "style": "wrist",
+      "color": "#74D7EE",
+      "source_volume_mm3": 7725.336479746501,
+      "assembly_bounds_mm": [
+        [
+          -1.038715711382091e-22,
+          -2.4999984741210923,
+          0.0
+        ],
+        [
+          49.29999923706055,
+          52.59999856948853,
+          13.0
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.038715711382091e-22
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -2.4999984741210923
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "24011eea0ca1e8552d38b215cc2d6684c42261ce9b093bdb5de798c0c12f077f",
+      "stl_extra_mm3": 0.011068149965315873,
+      "stl_missing_mm3": 0.011249649805904482,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "wrist_lid",
+      "style": "wrist",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 3312.2666473485406,
+      "assembly_bounds_mm": [
+        [
+          -1.038715711382091e-22,
+          1.5258789076710855e-06,
+          7.0
+        ],
+        [
+          49.29999923706055,
+          50.09999847412107,
+          15.25
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.038715711382091e-22
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          50.09999847412107
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          15.25
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "f7fd2813c19b9c669431fb62b34c9361bffced8587c8a4a8ba1545d5fa33c1f5",
+      "stl_extra_mm3": 0.0077331539547837265,
+      "stl_missing_mm3": 0.005814281612401828,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "wrist_deck",
+      "style": "wrist",
+      "color": "#74D7EE",
+      "source_volume_mm3": 978.6711184893984,
+      "assembly_bounds_mm": [
+        [
+          2.2000000476837154,
+          2.200000047683716,
+          6.099999904632568
+        ],
+        [
+          43.599998474121094,
+          41.599998474121094,
+          8.850000381469727
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.2000000476837154
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.200000047683716
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          6.099999904632568
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "6aad9c1c198bafe4d55af59a50494efca33dc6bf66527670605c503933ce1a23",
+      "stl_extra_mm3": 0.0009244110386437873,
+      "stl_missing_mm3": 0.0014253945262225898,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "wrist_panel",
+      "style": "wrist",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 152.88622482490942,
+      "assembly_bounds_mm": [
+        [
+          46.900001525878906,
+          7.350000000000001,
+          1.149999976158142
+        ],
+        [
+          49.04999923706055,
+          42.44999990463257,
+          6.349999904632568
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          6.123233995736766e-17,
+          -0.0,
+          -1.0,
+          49.04999923706055
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          7.350000000000001
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          1.1499999761581419
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "549cfe3ea595944588e887891b05ed3091a163714c00de7bb0e65b2e084db3b3",
+      "stl_extra_mm3": 1.587865106102727e-06,
+      "stl_missing_mm3": 1.0521386370785507e-05,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "wrist_plunger_recall",
+      "style": "wrist",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 20.57510582589203,
+      "assembly_bounds_mm": [
+        [
+          5.900000047683715,
+          23.600000047683714,
+          12.3
+        ],
+        [
+          11.499999952316283,
+          29.199999952316283,
+          13.750000047683717
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          5.900000047683715
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          23.600000047683714
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          12.3
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "8fd2f22d986a83d0ce34013917cc734b3f45ae7da1b9ccd149bde8cb1bb05c8a",
+      "stl_extra_mm3": 0.00013709181723697839,
+      "stl_missing_mm3": 0.00019386158316099986,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "wrist_plunger_recall_head",
+      "style": "wrist",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 98.56149511757125,
+      "assembly_bounds_mm": [
+        [
+          2.6999999999999993,
+          20.4,
+          13.099999952316285
+        ],
+        [
+          14.7,
+          32.4,
+          14.599999997019768
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.6999999999999993
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          32.4
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          14.59999999701977
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "c557a0138537e833f578c340a747163726f34d3a299582016d1214921deff539",
+      "stl_extra_mm3": 0.0008993913282277314,
+      "stl_missing_mm3": 0.00020701928319096416,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "wrist_display_bezel",
+      "style": "wrist",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 216.22916219387722,
+      "assembly_bounds_mm": [
+        [
+          16.150000381469727,
+          25.700000000000003,
+          14.8
+        ],
+        [
+          43.94999961853027,
+          42.7,
+          16.40000002384186
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          16.150000381469727
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          25.700000000000003
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          14.8
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "bb00982b8f0a38c6642a399ec0545daf381efc03ee1573f12a39f037b607b3ad",
+      "stl_extra_mm3": 0.002077559321719491,
+      "stl_missing_mm3": 0.0011959744695862657,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 72
+    },
+    {
+      "name": "keypad_body",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 10306.519105803362,
+      "assembly_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          37.0,
+          61.70000076293945,
+          18.200000762939453
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "d72fe7f0aaf5f4e6c839d7bfc8652eb306e0fc58b0dd7acfbb3b8b36051f111f",
+      "stl_extra_mm3": 0.012565542770820079,
+      "stl_missing_mm3": 0.015342039903771365,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_lid",
+      "style": "keypad",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 4027.3489179941594,
+      "assembly_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          7.0
+        ],
+        [
+          37.0,
+          61.70000076293945,
+          20.450000762939453
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          61.70000076293945
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          20.450000762939453
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "a7ff0a9bbc9581569d1481dec684c07d182e3bf257d5e9e1e77581dda35d635c",
+      "stl_extra_mm3": 0.015305898975081314,
+      "stl_missing_mm3": 0.009316077582601187,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_deck",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 803.6418542627662,
+      "assembly_bounds_mm": [
+        [
+          2.200000047683716,
+          2.200000047683716,
+          6.099999904632568
+        ],
+        [
+          34.79999923706055,
+          45.20000076293945,
+          9.199999809265137
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.200000047683716
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.200000047683716
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          6.099999904632568
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "5777952acbeb6345ca404c7abe21b37c804c5784fd6f3b7e9e9a13d50838cc18",
+      "stl_extra_mm3": 0.000914727645806579,
+      "stl_missing_mm3": 0.0015583815808402808,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_panel",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 72.9045161066059,
+      "assembly_bounds_mm": [
+        [
+          8.449999809265137,
+          59.29999923706055,
+          1.149999976158142
+        ],
+        [
+          23.850000381469727,
+          61.45000076293945,
+          6.349999904632568
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          8.449999809265137
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          1.0,
+          59.29999923706055
+        ],
+        [
+          -0.0,
+          -1.0,
+          6.123233995736766e-17,
+          6.349999904632568
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "59a71ad5472a2a029508a01d03ea9a151445f7f313dcb4ea433e3f95accb32c9",
+      "stl_extra_mm3": 2.2935858415470043e-06,
+      "stl_missing_mm3": 4.112723104298353e-06,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_1",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 20.575105825892006,
+      "assembly_bounds_mm": [
+        [
+          26.000000047683717,
+          20.400000047683715,
+          17.5
+        ],
+        [
+          31.599999952316285,
+          25.999999952316283,
+          18.950000047683716
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.000000047683717
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          20.400000047683715
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          17.5
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "8fd2f22d986a83d0ce34013917cc734b3f45ae7da1b9ccd149bde8cb1bb05c8a",
+      "stl_extra_mm3": 0.00013797997881681567,
+      "stl_missing_mm3": 0.0001943670165379293,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_1_head",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 38.90325420418136,
+      "assembly_bounds_mm": [
+        [
+          24.89999990463257,
+          19.299999904632568,
+          18.299999952316284
+        ],
+        [
+          32.70000009536743,
+          27.10000009536743,
+          19.799999997019768
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          24.89999990463257
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          27.10000009536743
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          19.799999997019768
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "09adce100ddcaa2f72c9309a1549df8e1c52285ea638dcd8205a41be1a4f6d04",
+      "stl_extra_mm3": 0.00026688334405851794,
+      "stl_missing_mm3": 0.00026132405705917944,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_label_call_1",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 3.5280000325441314,
+      "assembly_bounds_mm": [
+        [
+          26.175,
+          21.624999952316283,
+          19.4
+        ],
+        [
+          31.425,
+          24.775000047683715,
+          19.800000005960463
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.175
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          21.624999952316283
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          19.4
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "e91b4c2664dc39669ab6a3ce247e2c6a5dc0df513dec610cef5e0e605152ebe5",
+      "stl_extra_mm3": 0.0,
+      "stl_missing_mm3": 0.0,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_2",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 20.575105825892006,
+      "assembly_bounds_mm": [
+        [
+          26.000000047683717,
+          29.90000004768372,
+          17.5
+        ],
+        [
+          31.599999952316285,
+          35.49999995231629,
+          18.950000047683716
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.000000047683717
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          29.90000004768372
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          17.5
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "8fd2f22d986a83d0ce34013917cc734b3f45ae7da1b9ccd149bde8cb1bb05c8a",
+      "stl_extra_mm3": 0.00013888993014650927,
+      "stl_missing_mm3": 0.00019182014382105686,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_2_head",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 37.32825430919733,
+      "assembly_bounds_mm": [
+        [
+          24.89999990463257,
+          28.79999990463257,
+          18.299999952316284
+        ],
+        [
+          32.70000009536743,
+          36.600000095367434,
+          19.799999997019768
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          24.89999990463257
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          36.600000095367434
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          19.799999997019768
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "e47590ecd1328f47febe5324b0984e3c282b43d19db722792b2dcf4cd4498567",
+      "stl_extra_mm3": 0.00026689925782837537,
+      "stl_missing_mm3": 0.00026391159343575055,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_label_call_2",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 4.851000132367013,
+      "assembly_bounds_mm": [
+        [
+          26.175,
+          31.124999952316287,
+          19.4
+        ],
+        [
+          31.425,
+          34.27500004768372,
+          19.800000005960463
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.175
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          31.124999952316287
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          19.4
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "d0c89ace27ec309375106c633f74bbfea9cdbbf74d335cff1911798ee71d71d2",
+      "stl_extra_mm3": 0.0,
+      "stl_missing_mm3": 0.0,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_3",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 20.575105825892006,
+      "assembly_bounds_mm": [
+        [
+          26.000000047683717,
+          39.40000004768372,
+          17.5
+        ],
+        [
+          31.599999952316285,
+          44.99999995231629,
+          18.950000047683716
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.000000047683717
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          39.40000004768372
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          17.5
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "8fd2f22d986a83d0ce34013917cc734b3f45ae7da1b9ccd149bde8cb1bb05c8a",
+      "stl_extra_mm3": 0.00013820862313214852,
+      "stl_missing_mm3": 0.00019300327674424503,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_3_head",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 37.32825430919729,
+      "assembly_bounds_mm": [
+        [
+          24.89999990463257,
+          38.29999990463257,
+          18.299999952316284
+        ],
+        [
+          32.70000009536743,
+          46.100000095367434,
+          19.799999997019768
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          24.89999990463257
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          46.100000095367434
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          19.79999999701977
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "15e08a3f58312d46dc7ca15c755efcd596476c644ed1975e958dd354af1b4888",
+      "stl_extra_mm3": 0.00026507531627828484,
+      "stl_missing_mm3": 0.000265337400160585,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_label_call_3",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 4.851000132367016,
+      "assembly_bounds_mm": [
+        [
+          26.175,
+          40.62499995231629,
+          19.4
+        ],
+        [
+          31.425,
+          43.77500004768372,
+          19.800000005960463
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.175
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          40.62499995231629
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          19.4
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "ab8b331fa755e1a943faeb318befd98c2c18a77529ab2d2b5c1378b377b570f9",
+      "stl_extra_mm3": 0.0,
+      "stl_missing_mm3": 0.0,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_4",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 20.575105825892006,
+      "assembly_bounds_mm": [
+        [
+          26.000000047683717,
+          48.90000004768372,
+          17.5
+        ],
+        [
+          31.599999952316285,
+          54.49999995231629,
+          18.950000047683716
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.000000047683717
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          48.90000004768372
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          17.5
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "8fd2f22d986a83d0ce34013917cc734b3f45ae7da1b9ccd149bde8cb1bb05c8a",
+      "stl_extra_mm3": 0.00013820862313214852,
+      "stl_missing_mm3": 0.00019275331168463103,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_call_4_head",
+      "style": "keypad",
+      "color": "#FFFFFF",
+      "source_volume_mm3": 38.378254225676265,
+      "assembly_bounds_mm": [
+        [
+          24.89999990463257,
+          47.79999990463257,
+          18.299999952316284
+        ],
+        [
+          32.70000009536743,
+          55.600000095367434,
+          19.799999997019768
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          24.89999990463257
+        ],
+        [
+          -0.0,
+          -1.0,
+          1.2246467991473532e-16,
+          55.600000095367434
+        ],
+        [
+          -0.0,
+          -1.2246467991473532e-16,
+          -1.0,
+          19.799999997019768
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "4ee19412ea948aa2ac9e78e7f9180f540ce1375148f4f749640a25e5a64a0a25",
+      "stl_extra_mm3": 0.0002648834335540566,
+      "stl_missing_mm3": 0.00026203848653002143,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_label_call_4",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 3.9690002494007417,
+      "assembly_bounds_mm": [
+        [
+          26.175,
+          50.12499995231629,
+          19.4
+        ],
+        [
+          31.425,
+          53.27500004768372,
+          19.800000005960463
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          26.175
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          50.12499995231629
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          19.4
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "339b09bae254e0cdba9fc8568fd71a90a650328fa6a6ded4d27e464508d20a01",
+      "stl_extra_mm3": 0.0,
+      "stl_missing_mm3": 0.0,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_back",
+      "style": "keypad",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 23.507246148047443,
+      "assembly_bounds_mm": [
+        [
+          34.299999952316284,
+          26.30000004768372,
+          3.400000047683718
+        ],
+        [
+          36.39999997615814,
+          31.89999995231629,
+          8.999999952316287
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          6.123233995736766e-17,
+          6.123233995736766e-17,
+          1.0,
+          34.299999952316284
+        ],
+        [
+          -1.0,
+          3.749399456654644e-33,
+          6.123233995736766e-17,
+          31.89999995231629
+        ],
+        [
+          -0.0,
+          -1.0,
+          6.123233995736766e-17,
+          8.999999952316287
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "2d3b7d5e64693e62df343c8115c9993d95a7e7c33f61ec666cf68fe22876f85e",
+      "stl_extra_mm3": 0.00015705923851045146,
+      "stl_missing_mm3": 0.00028124516387481244,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_plunger_back_head",
+      "style": "keypad",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 35.321518272277785,
+      "assembly_bounds_mm": [
+        [
+          35.75,
+          25.600000000000005,
+          2.7000000000000024
+        ],
+        [
+          37.25,
+          32.6,
+          9.700000000000003
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          6.123233995736766e-17,
+          6.123233995736766e-17,
+          -1.0,
+          37.25
+        ],
+        [
+          -1.0,
+          3.749399456654644e-33,
+          -6.123233995736766e-17,
+          32.6
+        ],
+        [
+          0.0,
+          1.0,
+          6.123233995736766e-17,
+          2.7000000000000024
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "628de1ba6e1db85e9d3e9f00fa114f1882432ff6c638693ceacf5b18162fcf80",
+      "stl_extra_mm3": 0.00037725359325174274,
+      "stl_missing_mm3": 0.00012586311484421957,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_display_bezel",
+      "style": "keypad",
+      "color": "#FFAFC8",
+      "source_volume_mm3": 200.36166686953825,
+      "assembly_bounds_mm": [
+        [
+          12.450000095367432,
+          18.949999809265137,
+          20.0
+        ],
+        [
+          24.14999990463257,
+          49.05000019073486,
+          21.600000023841858
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          12.450000095367432
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          18.949999809265137
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          20.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "fe8baa7965a85f4ea688c304411d4abd9d2b2772aada2a5e649ee20a29bfdace",
+      "stl_extra_mm3": 0.001881210672687909,
+      "stl_missing_mm3": 0.0010630744812184882,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    },
+    {
+      "name": "keypad_guard_carrier",
+      "style": "keypad",
+      "color": "#74D7EE",
+      "source_volume_mm3": 5465.031581442262,
+      "assembly_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -5.699999809265137
+        ],
+        [
+          37.0,
+          58.20000076293945,
+          0.0
+        ]
+      ],
+      "print_to_assembly": [
+        [
+          -1.0,
+          -0.0,
+          -1.2246467991473532e-16,
+          37.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.2246467991473532e-16,
+          -0.0,
+          -1.0,
+          -9.797165049865238e-17
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "source_sha256": "733bbe98cd501b7737db2e2a097fe5d8424e0abe66efcd568bf26f1ccfb8237d",
+      "stl_extra_mm3": 0.011419931769220662,
+      "stl_missing_mm3": 0.01398851530666434,
+      "watertight": true,
+      "single_shell": true,
+      "native_offset_x_mm": 144
+    }
+  ],
+  "failures": [],
+  "passed": true
+}

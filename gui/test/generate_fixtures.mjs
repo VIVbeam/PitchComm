@@ -10,7 +10,8 @@ const catalog = JSON.parse(readFileSync(new URL('../catalog.json', import.meta.u
 export const COUNTS = Object.freeze({
   rows: catalog.rows.length,
   cols: catalog.cols.length,
-  maxPitch: catalog.pitches.length * catalog.rows.length * catalog.cols.length,
+  maxPitch: catalog.pitchFlow.maxCode,
+  pitchFlow: catalog.pitchFlow,
   maxPlay: catalog.plays.length,
   unitCount: catalog.units.length + 1,
 });
@@ -38,10 +39,12 @@ const COMMAND_HEADER = `# PitchComm coach USB command fixtures, USB protocol v4.
 #   gui <client>
 #   call <client> <id> p <type> <row> <col> <boot> <dictionary> <deadline>
 #   call <client> <id> d <play> <boot> <dictionary> <deadline>
+#   call <client> <id> t <type> <boot> <dictionary> <deadline>
+#   call <client> <id> l <type> <row> <col> <boot> <dictionary> <deadline>
 # Fields:
 #   client: 8 lowercase hex digits, nonzero
 #   id: canonical decimal uint32, nonzero
-#   category: p = pitch, d = play
+#   category: p = complete pitch, d = play, t = pitch announcement, l = placement
 #   type: decimal 1..${catalog.pitches.length}; row: decimal 1..${COUNTS.rows}; col: decimal 1..${COUNTS.cols}; play: decimal 1..${COUNTS.maxPlay}
 #   boot: 16 lowercase hex digits, nonzero
 #   dictionary: 8 lowercase hex digits
@@ -157,6 +160,15 @@ export function commandRecords() {
     clock: SESSION_CLOCKS.wrapSmall,
     line: command(id, 1, last.type, last.row, last.col, session(SESSION_CLOCKS.wrapSmall), COUNTS),
   });
+  id += 1;
+  for (const sample of pitchSamples()) {
+    for (const stage of ['type', 'placement']) {
+      const clock=stage==='type' ? SESSION_CLOCKS.wrapToZero : SESSION_CLOCKS.wrapSmall;
+      records.push({kind:stage,id,clock,...sample,
+        line:command(id,1,sample.type,sample.row,sample.col,session(clock),COUNTS,stage)});
+      ++id;
+    }
+  }
   return records;
 }
 
@@ -166,6 +178,22 @@ export function buildGuiCommandsText() {
 
 export function stateSamples() {
   return [
+    {
+      // Highest pitch announcement, with both pitch recipients accepting output.
+      type:'state',v:4,client:FIXED_SESSION.client,clock:0x900,role:0,
+      dictionary:FIXED_SESSION.dictionary,boot:FIXED_SESSION.boot,configured:1,radio:1,busy:0,
+      seq:9,category:1,code:catalog.pitchFlow.placementBase,links:[1,1,1,1,1],delivery:[0,2,2,0,0],
+      records:[{category:1,seq:9,code:catalog.pitchFlow.placementBase,delivery:[0,2,2,0,0]},
+               {category:2,seq:0,code:0,delivery:[0,0,0,0,0]}],
+    },
+    {
+      // Highest placement code preserves pitch identity while speaking location only.
+      type:'state',v:4,client:FIXED_SESSION.client,clock:0xa00,role:0,
+      dictionary:FIXED_SESSION.dictionary,boot:FIXED_SESSION.boot,configured:1,radio:1,busy:0,
+      seq:10,category:1,code:COUNTS.maxPitch,links:[1,1,1,1,1],delivery:[0,2,2,0,0],
+      records:[{category:1,seq:10,code:COUNTS.maxPitch,delivery:[0,2,2,0,0]},
+               {category:2,seq:0,code:0,delivery:[0,0,0,0,0]}],
+    },
     {
       // Ready and idle: nothing called yet, every unit link up.
       type: 'state', v: 4, client: FIXED_SESSION.client, clock: 0x1000, role: 0,

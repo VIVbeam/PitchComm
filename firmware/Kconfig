@@ -24,18 +24,15 @@ config PITCHCOMM_ROLE_SHORTSTOP
 config PITCHCOMM_ROLE_CENTERFIELD
 	bool "Center field"
 
-config PITCHCOMM_ROLE_AUDIO_PROOF
-	bool "LE Audio bench proof (no call link)"
-
 endchoice
 
 # Field builds set PITCHCOMM_AUDIO, PITCHCOMM_DISPLAY, PITCHCOMM_CATCHER_MENU,
 # PITCHCOMM_FIELD_BUTTON and PITCHCOMM_BATTERY explicitly from the generated
 # unit conf (firmware/build/unit-confs/<key>.conf). The role choice above
-# remains for the coach and the audio proof builds.
+# remains for the coach build.
 config PITCHCOMM_AUDIO
 	bool "LE Audio earbud output"
-	default y if PITCHCOMM_ROLE_PITCHER || PITCHCOMM_ROLE_AUDIO_PROOF
+	default y if PITCHCOMM_ROLE_PITCHER
 
 config PITCHCOMM_DISPLAY
 	bool "128x32 OLED output"

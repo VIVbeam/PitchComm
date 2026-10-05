@@ -17,8 +17,7 @@ enrolled) is rejected. A unit with display64 true (the fielder watch) also
 appends -DEXTRA_DTC_OVERLAY_FILE=boards/display64.overlay for the 128x64 panel;
 the catcher's 128x32 panel keeps the base overlay. -Roles is kept as an alias
 for -Units and maps centerfield to center. -RosterPath selects a different
-roster file (default config/roster.json) for staged or test rosters. proof is
-not a roster key and keeps its fixed proof fragments.
+roster file (default config/roster.json).
 
 The NCS version pin in firmware/ncs_version.txt is authoritative. Without
 -NcsVersion, west is used directly and the pinned version is printed for
@@ -29,7 +28,8 @@ manager toolchain and the value must match the pin; a deliberate override needs
 After each successful build, the text+data size of
 firmware/build/<key>/zephyr/zephyr.elf is reported against the 712 KB
 (729088 byte) MCUboot application slot. An overflow warns by default and fails
-with -StrictSize. -MinSize appends roles/min-size.conf to every fragment list.
+with -StrictSize. Strict mode also fails when size evidence is missing or the
+size tool fails. -MinSize appends roles/min-size.conf to every fragment list.
 
 -NoBootloader removes MCUboot and uses the 776 KB (794624 byte) fallback layout:
 it appends boards/no_bootloader.conf to EXTRA_CONF_FILE, passes
@@ -113,7 +113,7 @@ $requested = @($requested | ForEach-Object { $_ -split ',' } |
     ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ })
 $requested = @($requested | ForEach-Object { if ($_ -eq 'centerfield') { 'center' } else { $_ } } |
     Select-Object -Unique)
-if (-not $requested.Count) { throw 'No units requested. Pass -Units with roster keys plus proof.' }
+if (-not $requested.Count) { throw 'No units requested. Pass -Units with roster keys or coach.' }
 
 # --- roster and generated catalog -------------------------------------------
 # -RosterPath defaults to config/roster.json and may be relative to the repo
@@ -127,7 +127,7 @@ if (-not (Test-Path -LiteralPath $rosterPath)) {
 }
 $catalogPath = Join-Path $root 'firmware/include/pc/catalog.h'
 if (-not (Test-Path -LiteralPath $catalogPath)) {
-    throw 'firmware/include/pc/catalog.h is missing; run python tools\generate_catalog.py first.'
+    throw 'firmware/include/pc/catalog.h is missing; restore the complete product package.'
 }
 $roster = Get-Content -LiteralPath $rosterPath -Raw | ConvertFrom-Json
 $rosterUnits = @{}
@@ -141,15 +141,15 @@ foreach ($match in [regex]::Matches($catalogText, '#define\s+PC_UNIT_([A-Za-z_][
 }
 
 foreach ($unit in $requested) {
-    if ($unit -eq 'coach' -or $unit -eq 'proof') { continue }
+    if ($unit -eq 'coach') { continue }
     if (-not $rosterUnits.ContainsKey($unit)) {
-        throw "Unknown unit '$unit'. Roster keys: $((@($rosterUnits.Keys) | Sort-Object) -join ', '); plus coach and proof."
+        throw "Unknown unit '$unit'. Roster keys: $((@($rosterUnits.Keys) | Sort-Object) -join ', '); plus coach."
     }
     if (-not $pcUnit.ContainsKey($unit)) {
-        throw "firmware/include/pc/catalog.h has no PC_UNIT_$unit macro; run python tools\generate_catalog.py."
+        throw "The package catalog has no unit '$unit'; restore matching package files."
     }
     if ($pcUnit[$unit] -eq 0 -or -not $rosterUnits[$unit].enrolled) {
-        throw "Unit '$unit' is not enrolled in config/roster.json (PC_UNIT_$unit is $($pcUnit[$unit])); enroll it and regenerate the catalog."
+        throw "Unit '$unit' is not included in this package (PC_UNIT_$unit is $($pcUnit[$unit]))."
     }
 }
 
@@ -157,9 +157,6 @@ foreach ($unit in $requested) {
 # enrollment needs no new checked-in conf. audio also pulls the LE Audio stack.
 # -DryRun prints the fragment and conf it would write without creating them.
 $generatedDir = Join-Path $root 'firmware/build/unit-confs'
-if (-not $DryRun) {
-    New-Item -ItemType Directory -Path $generatedDir -Force | Out-Null
-}
 
 function Get-CapabilityConf {
     param([string]$Key, [object]$Info)
@@ -209,9 +206,7 @@ function Get-BuildPlan {
     $capabilityLines = $null
     $capabilityPath = $null
     $display64 = $false
-    if ($Key -eq 'proof') {
-        $fragmentList = 'roles/audio-proof.conf;roles/audio-unit.conf'
-    } elseif ($Key -eq 'coach') {
+    if ($Key -eq 'coach') {
         $fragmentList = 'roles/coach.conf'
     } else {
         $info = $rosterUnits[$Key]
@@ -272,6 +267,10 @@ if ($NcsVersion -and $NcsVersion -ne $pinnedVersion) {
     Write-Warning "-NcsVersion $NcsVersion overrides the firmware/ncs_version.txt pin ($pinnedVersion)."
 }
 
+$pythonPath = (Get-Command python -ErrorAction Stop).Source
+& $pythonPath (Join-Path $PSScriptRoot 'check_setup.py')
+if ($LASTEXITCODE -ne 0) { throw 'Package setup check failed.' }
+
 # -DryRun stops here: units, enrollment, the NCS pin and the fragment rules
 # above are validated exactly like a real run, but west and nrfutil are not
 # looked up and no build directory is written.
@@ -315,6 +314,7 @@ if ($NcsVersion) {
     Write-Host "Pinned NCS version: $pinnedVersion (west on PATH; not comparing)"
 }
 
+New-Item -ItemType Directory -Path $generatedDir -Force | Out-Null
 Push-Location $root
 $builtNames = New-Object 'System.Collections.Generic.List[string]'
 try {
@@ -348,22 +348,38 @@ try {
 
         $elf = Join-Path $root "firmware/build/$buildName/zephyr/zephyr.elf"
         if (-not (Test-Path -LiteralPath $elf)) {
+            if ($StrictSize) { throw "IMAGE ${buildName}: zephyr.elf not found; cannot enforce -StrictSize." }
             Write-Warning "IMAGE ${buildName}: zephyr.elf not found at firmware/build/$buildName/zephyr/zephyr.elf"
             continue
         }
         $sizeTool = Find-SizeTool
         if (-not $sizeTool) {
+            if ($StrictSize) { throw "IMAGE ${buildName}: size tool not found; install the NCS size tool to enforce -StrictSize." }
             Write-Host "IMAGE ${buildName}: size tool not found (install the NCS toolchain or use west's rom_report)"
             continue
         }
         $bytes = $null
-        foreach ($line in @(& $sizeTool $elf 2>$null)) {
+        $previousEap = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = 'Continue'
+            $sizeOutput = @(& $sizeTool $elf 2>$null)
+            $sizeExit = $LASTEXITCODE
+        } finally {
+            $ErrorActionPreference = $previousEap
+        }
+        if ($sizeExit -ne 0) {
+            if ($StrictSize) { throw "IMAGE ${buildName}: size tool failed (exit $sizeExit); cannot enforce -StrictSize." }
+            Write-Warning "IMAGE ${buildName}: size tool failed (exit $sizeExit); use west's rom_report"
+            continue
+        }
+        foreach ($line in $sizeOutput) {
             if ($line -match '^\s*(\d+)\s+(\d+)(\s|$)') {
                 $bytes = [int64]$Matches[1] + [int64]$Matches[2]
                 break
             }
         }
         if ($null -eq $bytes) {
+            if ($StrictSize) { throw "IMAGE ${buildName}: could not parse size output; cannot enforce -StrictSize." }
             Write-Warning "IMAGE ${buildName}: could not parse size output from $sizeTool; use west's rom_report"
             continue
         }

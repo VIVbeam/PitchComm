@@ -9,7 +9,7 @@
  * The source is consumed in bounded chunks through a caller-supplied read
  * callback, so nothing here allocates and the whole state fits in one
  * fixed-size struct.  There is no floating point and no RTOS dependency:
- * this header is portable C and is covered by firmware/tests/test_audio.cpp.
+ * this header is portable C.
  *
  * Callers start every clip with pc_resampler_init(), which resets the
  * window, position, and EOF latch along with the rates, so each stream

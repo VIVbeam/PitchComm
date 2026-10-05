@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.hex -text
+*.png -text
+*.stl -text
+*.3mf -text
+*.dwg -text
+*.zip -text

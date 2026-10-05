@@ -6,7 +6,7 @@ Writes the LittleFS audio image to the pitcher unit.
 This is a data image, not a firmware ELF, so west flash does not apply. It is
 programmed with nRF Util at the raw slot address recorded in the Intel HEX:
 
-  nrfutil device program --firmware firmware/build/audio/littlefs.hex `
+  nrfutil device program --firmware data/audio/littlefs.hex `
     --options chip_erase_mode=ERASE_RANGES,verify=VERIFY_READ
 
 Run this once on the pitcher unit after flashing its firmware with
@@ -28,10 +28,16 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-if (-not $Image) { $Image = Join-Path $root 'firmware/build/audio/littlefs.hex' }
+if (-not $Image) { $Image = Join-Path $root 'data/audio/littlefs.hex' }
 if (-not (Test-Path -LiteralPath $Image)) {
-    throw "Audio image not found: $Image. Run tools\build_audio_fs.py first."
+    throw "Audio image not found: $Image. Restore the complete audio package."
 }
+$metadata = Join-Path (Split-Path -Parent $Image) 'package.json'
+if (-not (Test-Path -LiteralPath $metadata -PathType Leaf)) { throw 'Audio package metadata is missing.' }
+$Image = (Resolve-Path -LiteralPath $Image).Path
+$pythonPath = (Get-Command python -ErrorAction Stop).Source
+& $pythonPath (Join-Path $PSScriptRoot 'check_setup.py') --root $root --audio-image $Image
+if ($LASTEXITCODE -ne 0) { throw 'Audio package verification failed; no programming was attempted.' }
 $nrfutil = (Get-Command nrfutil -ErrorAction SilentlyContinue).Source
 if (-not $nrfutil) {
     throw 'nrfutil was not found on PATH. Install nRF Util (and `nrfutil install device`) before flashing the audio image.'

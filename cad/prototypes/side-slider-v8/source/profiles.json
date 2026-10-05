@@ -1,0 +1,957 @@
+{
+  "revision": "side-slider-v7-compact-supported-controls-candidate",
+  "units": "mm",
+  "hardware_measured": false,
+  "note": "Parametric source for generate_cases.py. Case frame: x across the strap direction, y along the wear axis, z up from the flat back (z=0). The body is a thin flat V1-style tapered tray; the lid is a flat plate with an inset lip and a raised control deck (a sloped display head plus, where used, a flat button plateau). Only the control deck is tilted. Component rectangles are reserved spaces, not measured parts. Caliper-check every value before a full print set.",
+  "wall": 2.0,
+  "floor_default": 1.4,
+  "lid": 1.8,
+  "corner_radius": 6.0,
+  "skirt": {
+    "height": 2.0,
+    "inset": 2.0
+  },
+  "lip": {
+    "thickness": 1.2,
+    "height": 1.5,
+    "clearance": 0.3
+  },
+  "screw": {
+    "pilot": 2.2,
+    "clearance": 2.8,
+    "head_diameter": 5.6,
+    "head_depth": 1.0,
+    "boss_diameter": 5.4,
+    "inset": 5.0,
+    "boss_gap": 0.2,
+    "pilot_depth": 4.0,
+    "note": "M2.5 x 8 self-tapping. Screws enter from the case back: a 5.6 mm head counterbore 1.0 deep plus a 2.8 mm through hole in the body floor, then a blind 2.2 mm pilot in a 5.4 mm boss hanging from the lid inner face. The boss stops at the deck top plus boss_gap and clears the cavity walls by 0.3 mm.",
+    "seat_reinforcement": {
+      "height": 0.6,
+      "base_diameter": 8.4,
+      "top_diameter": 7.2,
+      "cell_clearance": 0.3
+    }
+  },
+  "board": {
+    "name": "Seeed XIAO nRF54L15",
+    "width": 21.0,
+    "length": 17.8,
+    "pcb_thickness": 1.6,
+    "component_stack": 2.0,
+    "usb_shell_height": 3.25,
+    "standoff": 0.75,
+    "antenna_keepout_mm": 10.0,
+    "usb_center_above_pcb_top": 1.725,
+    "header": {
+      "pins": 7,
+      "pitch": 2.54,
+      "width": 2.5,
+      "height": 2.5,
+      "fillet": 0.5,
+      "note": "Pre-soldered 1x7 male strips on PCB front; trim pins flush on underside. Reserve assumed 0.5 mm solder fillets. Use per-unit deck posts: 2.05 mm PCB gap receiver/watch, 2.4 mm catcher. Finished joint/insulation sizes and physical fit remain unverified."
+    },
+    "assumption": "Board-relative USB1 courtyard from the hashed manufacturer KiCad PCB; 3.25 mm height follows its description, while a 0.1 mm PCB-top mounting offset remains assumed. PCB and connector heights, cable insertion and all printed fits require physical checks.",
+    "use_manufacturer_usb": true,
+    "mounting": "deck-posts",
+    "front_side_coordinates": true,
+    "supports": {
+      "diameter": 2.0
+    }
+  },
+  "oled": {
+    "name": "0.91 inch 128x32 SSD1306 module",
+    "width": 36.0,
+    "length": 12.5,
+    "height": 6.0,
+    "active": [
+      22.38,
+      5.58
+    ],
+    "window": [
+      26.0,
+      7.6
+    ],
+    "seat_depth": 2.5,
+    "note": "Window is perpendicular through the sloped display head; the module nests 2.5 mm from the sloped surface and hangs below the lid inner face."
+  },
+  "cells": {
+    "protected_850mah": {
+      "width": 34.5,
+      "length": 45.0,
+      "height": 6.2,
+      "source": "SparkFun PRT-13854 class"
+    },
+    "protected_500mah": {
+      "width": 29.0,
+      "length": 36.0,
+      "height": 4.75,
+      "source": "Adafruit 1578 class"
+    },
+    "protected_100mah": {
+      "width": 12.700000000000001,
+      "length": 32.4,
+      "height": 4.3,
+      "source": "Adafruit 1570 class"
+    }
+  },
+  "switch": {
+    "nominal_travel": 0.25,
+    "body": [
+      6.0,
+      6.0,
+      3.6
+    ],
+    "actuator": [
+      3.5,
+      1.4
+    ],
+    "collar_interior": 6.4,
+    "collar_corner": 0.2,
+    "collar_wall": 0.5,
+    "legs_note": "Trim through-hole legs flush. TE 1825910-6 / Adafruit 367 class 6 x 6 x 5 mm: 3.6 body plus 1.4 button. The collar tube captures the switch body with the lid plate as its roof so the actuator presses the plunger flange. A 4.3 mm B3F-1000 class switch also fits but sits 0.7 mm clear of its pedestal."
+  },
+  "plunger": {
+    "face_recess": 0.2,
+    "travel_clearance": 0.1,
+    "joint": {
+      "post_diameter": 2.4,
+      "socket_diameter": 2.5,
+      "sleeve_diameter": 3.4,
+      "engagement": 0.65,
+      "note": "Separate stem enters from inside; head enters from outside. Bond the 0.05 mm radial-clearance joint with filament-compatible adhesive, keeping the guide free. No retention force has been measured."
+    },
+    "shaft": 3.2,
+    "flange": 5.6,
+    "flange_height": 0.7,
+    "lid_hole": 3.8,
+    "head_numbered": [
+      10.5,
+      0.85
+    ],
+    "head_plain": [
+      12.0,
+      0.85
+    ],
+    "head_back": [
+      7.0,
+      0.85
+    ],
+    "digit": {
+      "inlay": true,
+      "pocket_clearance": 0.1,
+      "bottom_clearance": 0.0,
+      "cols": 3,
+      "rows": 5,
+      "cell": 1.05,
+      "slot_depth": 0.4
+    },
+    "note": "Flange is wider than the 3.8 mm guide hole so the cap stays captive. Shaft ends flush with the flange bearing face, contacting the uncompressed actuator. The 0.85 mm heads sit 0.2 mm below the control surface with 0.35 mm of axial clearance, covering nominal 0.25 mm switch travel plus 0.1 mm reserve. Numbered heads take connected flush 0.4 mm numeral inlays seated on 0.4 mm pocket floors, with 0.1 mm edge clearance for adhesive. Pocket floors leave 0.45 mm of material over the stem socket. Printed movement, fit and strength require checks."
+  },
+  "well": {
+    "diameter": 13.0,
+    "depth": 1.4,
+    "note": "Finger recess around each cap; per-style override where the cap is smaller."
+  },
+  "deck": {
+    "edge_clearance": 0.2,
+    "thickness": 0.7,
+    "foam": 0.2,
+    "ledge_width": 0.6,
+    "rail": [
+      0.8,
+      1.0
+    ],
+    "pull_notch": [
+      12.0,
+      10.0
+    ],
+    "note": "Separate thin plate over the cell, clipped to the rounded tray cavity with 0.2 mm edge clearance. A 0.1 mm edge bevel leaves flat ledge-bearing lands; ledges end at the deck underside. Boss/collar notches, pull-tab pocket and charge-plug clearance remain."
+  },
+  "charge": {
+    "opening": [
+      10.0,
+      4.4
+    ],
+    "cap_plate": [
+      12.0,
+      5.0,
+      1.2
+    ],
+    "plug_depth": 1.0,
+    "plug_wall": 1.1,
+    "seat_depth": 0.6,
+    "note": "Half-recessed flange stands 0.6 mm proud for removal. Both halves share the same port and flange-seat cuts. One-millimetre hollow plug has a rounded lead-in and nominal 0.3 mm radial rim interference; actual printed fit must be checked.",
+    "plug_interference": 0.3
+  },
+  "bezel": {
+    "frame": 1.75,
+    "height": 1.6,
+    "hood": 2.0,
+    "hood_height": 0.4,
+    "note": "Pink bezel around the OLED window on the sloped head, no window insert: the opening hugs the lid window with a 0.3 mm reveal. A small hood bar crosses the high edge of the head."
+  },
+  "carrier": {
+    "plate": 2.0,
+    "junction_rise": 1.0,
+    "loop_height": 3.8,
+    "loop_wall": 1.5,
+    "tunnel": 2.6,
+    "inset": 0.3,
+    "note": "Screw-retained back plate. Rail junction landings rise 1.0 mm into the plate to cover its lower bevel while keeping the strap entrances open. Three M2.5 x 10 mm screws clamp carrier, body and lid; existing 8 mm screws remain for body-only use. Tunnels reserve the stated strap width plus 0.3 mm per side.",
+    "lightening": {
+      "edge": 3.0,
+      "rib": 3.0,
+      "max_width": 8.0,
+      "max_length": 18.0,
+      "head_margin": 1.0
+    },
+    "retention": {
+      "access_diameter": 6.2,
+      "screw_length": 10.0,
+      "bare_screw_length": 8.0
+    },
+    "loop_x_inset": 0.0
+  },
+  "fit_coupon": {
+    "size": [
+      64.0,
+      72.0,
+      3.0
+    ],
+    "holes": [
+      2.2,
+      2.6,
+      2.8,
+      3.3
+    ],
+    "hole_centers": [
+      [
+        12,
+        8
+      ],
+      [
+        26,
+        8
+      ],
+      [
+        40,
+        8
+      ],
+      [
+        54,
+        8
+      ]
+    ],
+    "strap_gauges": [
+      {
+        "role": "watch",
+        "width": 20.0,
+        "height": 2.2,
+        "nominal_strap_width": 20.0,
+        "center": [
+          32.0,
+          30.0
+        ]
+      },
+      {
+        "role": "catcher",
+        "width": 25.6,
+        "height": 2.5,
+        "nominal_strap_width": 25.0,
+        "center": [
+          32.0,
+          40.0
+        ]
+      },
+      {
+        "role": "pitcher",
+        "width": 45.6,
+        "height": 2.5,
+        "nominal_strap_width": 45.0,
+        "center": [
+          32.0,
+          50.0
+        ]
+      }
+    ],
+    "head_gauge": {
+      "center": [
+        12.0,
+        18.0
+      ],
+      "floor": 2.0,
+      "pocket_width": 10.0
+    },
+    "driver_gauge": {
+      "center": [
+        26.0,
+        18.0
+      ]
+    },
+    "charge_gauge": {
+      "center_x": 45.0,
+      "outer_y": 64.0
+    }
+  },
+  "palette": {
+    "cyan": "#74D7EE",
+    "pink": "#FFAFC8",
+    "white": "#FFFFFF"
+  },
+  "antenna_keepout": {
+    "measured": false,
+    "reserved_geometry": true,
+    "note": "Metal-free band 10 mm deep outward from the board antenna end, spanning the board width between the deck and the lid. Chip position, ground clearance and RF range need bench verification outdoors."
+  },
+  "receiver": {
+    "role": "pitcher",
+    "width": 29.0,
+    "length": 47.6,
+    "wall_height": 13.0,
+    "floor": 1.4,
+    "corner_radius": 6.0,
+    "fasteners": [
+      [
+        5,
+        5
+      ],
+      [
+        24,
+        5
+      ],
+      [
+        5,
+        41.9
+      ]
+    ],
+    "cell": "protected_100mah_cell",
+    "board": {
+      "x": 8.6,
+      "y": 22.400000000000002,
+      "antenna_end": "y_min",
+      "usb_end": "y_max",
+      "support_centers": [
+        [
+          14.209999999999999,
+          26.022500000000008
+        ],
+        [
+          14.41,
+          35.22250000000001
+        ],
+        [
+          21.81,
+          24.622500000000006
+        ],
+        [
+          20.41,
+          35.22250000000001
+        ]
+      ],
+      "standoff": 2.05
+    },
+    "deck": {
+      "y0": 12.5,
+      "y1": 45.9,
+      "pull_notch": [
+        12.0,
+        10.0
+      ],
+      "access_end": "front",
+      "lightening": {
+        "new_window_web_mm": 3.0,
+        "cell_xy_allowance_mm": 0.6,
+        "windows": [
+          {
+            "rect_mm": [
+              5.2,
+              22.8,
+              2.4,
+              2.2
+            ],
+            "radius_mm": 0.6,
+            "purpose": "wire-passage"
+          }
+        ],
+        "note": "Keep3mm existing deck boundary web,0.6mm cell-cover allowance and existing post/ledge/screw lands. Small2.4x2.2mm R0.6 functional wire passage; large lightening openings retain their existing radius policy. Physical strength unmeasured."
+      }
+    },
+    "dashboard": null,
+    "oled": null,
+    "bezel": false,
+    "buttons": [
+      {
+        "id": "recall",
+        "x": 12.0,
+        "y": 5.7,
+        "switch": "switch_recall",
+        "head": "plain",
+        "operating_hand": "either, sized for a glove"
+      }
+    ],
+    "sidebar": null,
+    "charge": {
+      "face": "y_max",
+      "y_center": 15.8
+    },
+    "mounts": [
+      {
+        "name": "belt",
+        "strap_width": 45.0,
+        "layout": "in_line_x",
+        "loop_length": 12.0,
+        "centers": [
+          [
+            8.0,
+            23.8
+          ],
+          [
+            21.0,
+            23.8
+          ]
+        ]
+      }
+    ],
+    "menu_keys": {
+      "recall": "throw / recall (D1)"
+    },
+    "components": [
+      {
+        "name": "xiao_nrf54l15",
+        "x": 8.6,
+        "y": 22.400000000000002,
+        "width": 17.8,
+        "length": 21.0,
+        "source": "PCB 1.6 + 2.0 components above, USB end at the y_max wall"
+      },
+      {
+        "name": "xiao_antenna_keepout",
+        "x": 8.6,
+        "y": 12.399999999999999,
+        "width": 17.8,
+        "length": 10.0,
+        "source": "metal-free band outward from the antenna end between the deck top and the lid"
+      },
+      {
+        "name": "protected_100mah_cell",
+        "x": 8.2,
+        "y": 12.0,
+        "width": 12.700000000000001,
+        "length": 32.4,
+        "source": "v20 maximum-pack reservation moved forward1mm with matching bay rails to permit conditional short-edge wire bends; delivered pack/lead pose and physical fit unverified."
+      },
+      {
+        "name": "deck_plate",
+        "x": 2.200000047683716,
+        "y": 12.5,
+        "width": 24.59999918937683,
+        "length": 32.900001525878906,
+        "source": "v19 battery-envelope deck; no physical fit claim."
+      },
+      {
+        "name": "switch_recall",
+        "x": 12.0,
+        "y": 5.7,
+        "width": 6.0,
+        "length": 6.0,
+        "source": "6 mm face switch under the flat lid, clear of the board"
+      },
+      {
+        "name": "charge_opening",
+        "x": 12.5,
+        "y": 45.6,
+        "width": 10.0,
+        "length": 2.0,
+        "source": "USB-C slot through the y_max wall and lid edge"
+      }
+    ]
+  },
+  "wrist": {
+    "role": "fielder",
+    "component_relief": {
+      "clearance": 0.15,
+      "corner_radius": 4.6,
+      "minimum_upper_corner_wall": 1.2,
+      "note": "Nominal PCB/header and OLED insertion reliefs; local exterior corner ramps retain a 1.2 mm upper wall witness without increasing bounding dimensions. Hardware fit remains unmeasured."
+    },
+    "width": 45.8,
+    "length": 50.1,
+    "wall_height": 13.0,
+    "floor": 1.4,
+    "corner_radius": 6.0,
+    "fasteners": [
+      [
+        40.8,
+        5
+      ],
+      [
+        5,
+        45.1
+      ]
+    ],
+    "cell": "protected_100mah_cell",
+    "board": {
+      "x": 4.2,
+      "y": 2.0,
+      "antenna_end": "x_max",
+      "usb_end": "x_min",
+      "support_centers": [
+        [
+          21.577499999999997,
+          7.609999999999999
+        ],
+        [
+          12.377499999999998,
+          7.81
+        ],
+        [
+          22.9775,
+          15.209999999999999
+        ],
+        [
+          12.377499999999998,
+          13.81
+        ]
+      ],
+      "standoff": 2.05
+    },
+    "deck": {
+      "y0": 1.5,
+      "y1": 35.099999999999994,
+      "pull_notch": [
+        12.0,
+        10.0
+      ],
+      "access_end": "rear",
+      "lightening": {
+        "new_window_web_mm": 3.0,
+        "cell_xy_allowance_mm": 0.6,
+        "windows": [
+          {
+            "rect_mm": [
+              29.300000000000004,
+              7.0,
+              7.699999999999996,
+              20.0
+            ],
+            "radius_mm": 1.5
+          }
+        ],
+        "note": "Preserve existing cell-cover material and post/ledge lands. New rounded openings reserve this margin from existing deck boundaries; physical strength unmeasured."
+      }
+    },
+    "dashboard": {
+      "tilt_deg": 0.0,
+      "plateau": null,
+      "head": {
+        "x": 15.8,
+        "y": 22.5,
+        "width": 28.5,
+        "length": 23.0
+      }
+    },
+    "oled": {
+      "x": 16.4,
+      "y": 20.3,
+      "module": "oled64"
+    },
+    "bezel": true,
+    "bars": true,
+    "buttons": [
+      {
+        "id": "recall",
+        "x": 5.7,
+        "y": 23.4,
+        "switch": "switch_recall",
+        "head": "plain",
+        "operating_hand": "bare hand or glove heel"
+      }
+    ],
+    "sidebar": null,
+    "charge": {
+      "face": "x_min",
+      "y_center": 10.9
+    },
+    "mounts": [],
+    "menu_keys": {
+      "recall": "recall / volume (D1)"
+    },
+    "components": [
+      {
+        "name": "xiao_nrf54l15",
+        "x": 4.2,
+        "y": 2.0,
+        "width": 21.0,
+        "length": 17.8,
+        "source": "PCB 1.6 + 2.0 components above, USB end at the x_min wall"
+      },
+      {
+        "name": "xiao_antenna_keepout",
+        "x": 25.2,
+        "y": 2.0,
+        "width": 10.0,
+        "length": 17.8,
+        "source": "metal-free band outward from the antenna end between the deck top and the lid"
+      },
+      {
+        "name": "protected_100mah_cell",
+        "x": 15.899999999999999,
+        "y": 2.1999999999999993,
+        "width": 12.700000000000001,
+        "length": 32.4,
+        "source": "v19 design reservation: linked 2014 12.3x32x4.3mm maximum pack, plus explicit design clearance; delivered current cell relationship unverified."
+      },
+      {
+        "name": "deck_plate",
+        "x": 2.200000047683716,
+        "y": 2.200000047683716,
+        "width": 41.39999842643738,
+        "length": 32.89999842643738,
+        "source": "v19 battery-envelope deck; no physical fit claim."
+      },
+      {
+        "name": "oled_display",
+        "x": 16.4,
+        "y": 20.3,
+        "width": 27.3,
+        "length": 27.8,
+        "source": "nested 1.0 mm from the flat face, screen under the bezel window"
+      },
+      {
+        "name": "switch_recall",
+        "x": 5.7,
+        "y": 23.4,
+        "width": 6.0,
+        "length": 6.0,
+        "source": "6 mm face switch beside the display head"
+      },
+      {
+        "name": "charge_opening",
+        "x": 2.0,
+        "y": 5.9,
+        "width": 2.0,
+        "length": 10.0,
+        "source": "USB-C slot through the x_min wall and lid edge"
+      }
+    ],
+    "control_web": {
+      "minimum_mm": 0.8,
+      "note": "Recall well separated from OLED seat by a finite wall; matching switch and pedestal move with the button. Calculated geometry, printed strength unmeasured."
+    }
+  },
+  "keypad": {
+    "role": "catcher",
+    "component_relief": {
+      "clearance": 0.15,
+      "corner_radius": 5.2,
+      "minimum_upper_corner_wall": 1.2,
+      "note": "Nominal PCB/header insertion reliefs; local exterior corner ramp retains a 1.2 mm upper wall witness without increasing bounding dimensions. Hardware fit remains unmeasured."
+    },
+    "width": 37.0,
+    "length": 58.2,
+    "wall_height": 18.2,
+    "floor": 1.4,
+    "corner_radius": 6.0,
+    "fasteners": [
+      [
+        5.0,
+        23.0
+      ],
+      [
+        5.0,
+        38.1
+      ],
+      [
+        5.0,
+        53.2
+      ]
+    ],
+    "cell": "protected_100mah_cell",
+    "board": {
+      "x": 11.9,
+      "y": 2.0,
+      "antenna_end": "x_min",
+      "usb_end": "x_max",
+      "standoff": 2.4,
+      "support_centers": [
+        [
+          15.522499999999999,
+          14.389999999999999
+        ],
+        [
+          29.9225,
+          15.19
+        ],
+        [
+          14.122499999999999,
+          6.59
+        ],
+        [
+          19.7225,
+          7.989999999999998
+        ]
+      ]
+    },
+    "deck": {
+      "y0": 1.5,
+      "y1": 45.2,
+      "pull_notch": [
+        12.0,
+        10.0
+      ],
+      "access_end": "rear",
+      "lightening": {
+        "new_window_web_mm": 3.0,
+        "cell_xy_allowance_mm": 0.6,
+        "windows": [
+          {
+            "rect_mm": [
+              5.899999999999998,
+              6.0,
+              3.2,
+              12.0
+            ],
+            "radius_mm": 1.5
+          }
+        ],
+        "note": "Preserve existing cell-cover material and post/ledge lands. New rounded openings reserve this margin from existing deck boundaries; physical strength unmeasured."
+      }
+    },
+    "dashboard": {
+      "tilt_deg": 0.0,
+      "plateau": null,
+      "head": {
+        "x": 11.0,
+        "y": 15.0,
+        "width": 16.0,
+        "length": 38.0
+      }
+    },
+    "oled": {
+      "x": 12.05,
+      "y": 16.0,
+      "seat_depth": 0.5,
+      "window": [
+        7.6,
+        26.0
+      ]
+    },
+    "bezel": true,
+    "buttons": [
+      {
+        "id": "call_1",
+        "x": 25.8,
+        "y": 20.2,
+        "switch": "switch_call_1",
+        "head": "numbered",
+        "digit": "1",
+        "operating_hand": "bare hand"
+      },
+      {
+        "id": "call_2",
+        "x": 25.8,
+        "y": 29.7,
+        "switch": "switch_call_2",
+        "head": "numbered",
+        "digit": "2",
+        "operating_hand": "bare hand"
+      },
+      {
+        "id": "call_3",
+        "x": 25.8,
+        "y": 39.2,
+        "switch": "switch_call_3",
+        "head": "numbered",
+        "digit": "3",
+        "operating_hand": "bare hand"
+      },
+      {
+        "id": "call_4",
+        "x": 25.8,
+        "y": 48.7,
+        "switch": "switch_call_4",
+        "head": "numbered",
+        "digit": "4",
+        "operating_hand": "bare hand"
+      }
+    ],
+    "sidebar": {
+      "id": "back",
+      "x": 26.1,
+      "z": 6.2,
+      "face": "x_max",
+      "head": "back",
+      "switch": "switch_back",
+      "stop_depth": 1.2,
+      "y": 29.1,
+      "face_recess": -0.25
+    },
+    "charge": {
+      "face": "x_max",
+      "y_center": 10.9
+    },
+    "mounts": [
+      {
+        "name": "guard",
+        "strap_width": 25.0,
+        "layout": "in_line_y",
+        "loop_length": 27.0,
+        "centers": [
+          [
+            18.5,
+            14.3
+          ],
+          [
+            18.5,
+            43.9
+          ]
+        ]
+      }
+    ],
+    "menu_keys": {
+      "call_1": "call 1 (D0)",
+      "call_2": "call 2 (D1)",
+      "call_3": "call 3 (D2)",
+      "call_4": "call 4 (D3)",
+      "back": "back (D13)"
+    },
+    "components": [
+      {
+        "name": "xiao_nrf54l15",
+        "x": 11.9,
+        "y": 2.0,
+        "width": 21.0,
+        "length": 17.8,
+        "source": "PCB 1.6 + 2.0 components above; the 21 mm axis runs along x: USB end at the x_max charge wall, antenna end at x_min facing the side wall"
+      },
+      {
+        "name": "xiao_antenna_keepout",
+        "x": 1.9000000000000004,
+        "y": 2.0,
+        "width": 10.0,
+        "length": 17.8,
+        "source": "metal-free band outward from the antenna end; the antenna faces the x_min wall, so the band runs through the wall with no metal inside the case"
+      },
+      {
+        "name": "protected_100mah_cell",
+        "x": 9.799999999999997,
+        "y": 12.3,
+        "width": 12.700000000000001,
+        "length": 32.4,
+        "source": "v19 design reservation: linked 2014 12.3x32x4.3mm maximum pack, plus explicit design clearance; delivered current cell relationship unverified."
+      },
+      {
+        "name": "deck_plate",
+        "x": 2.200000047683716,
+        "y": 2.200000047683716,
+        "width": 32.59999918937683,
+        "length": 43.00000071525574,
+        "source": "v19 battery-envelope deck; no physical fit claim."
+      },
+      {
+        "name": "oled_display",
+        "x": 12.05,
+        "y": 16.0,
+        "width": 12.5,
+        "length": 36.0,
+        "source": "0.91 inch module at x 11.2, y 20, rotated 90 degrees; seat depth 0.5 mm below the flat face, header at y_min. Nominal dimensions and header shape remain unmeasured."
+      },
+      {
+        "name": "switch_call_1",
+        "x": 25.8,
+        "y": 20.2,
+        "width": 6.0,
+        "length": 6.0
+      },
+      {
+        "name": "switch_call_2",
+        "x": 25.8,
+        "y": 29.7,
+        "width": 6.0,
+        "length": 6.0
+      },
+      {
+        "name": "switch_call_3",
+        "x": 25.8,
+        "y": 39.2,
+        "width": 6.0,
+        "length": 6.0
+      },
+      {
+        "name": "switch_call_4",
+        "x": 25.8,
+        "y": 48.7,
+        "width": 6.0,
+        "length": 6.0
+      },
+      {
+        "name": "switch_back",
+        "x": 29.3,
+        "y": 26.1,
+        "width": 5.0,
+        "length": 6.0,
+        "source": "6 mm side-entry Back switch in the y_min wall, bare-hand reach; 5 mm class height axis along y"
+      },
+      {
+        "name": "charge_opening",
+        "x": 35.0,
+        "y": 5.9,
+        "width": 2.0,
+        "length": 10.0,
+        "source": "USB-C slot through the x_max wall and lid edge"
+      }
+    ],
+    "note": "Compact horizontal four-key row; 9.5mm pitch, 7.8mm heads, 0.9mm well webs. First key shifted off PCB/header reservation so its floor pedestal can be retained. Nominal geometry only.",
+    "well": {
+      "diameter": 8.6,
+      "depth": 1.4
+    },
+    "user_frame": {
+      "rotation_deg": -90.0,
+      "translation_mm": [
+        0.0,
+        37.0,
+        0.0
+      ],
+      "size_mm": [
+        58.2,
+        37.0
+      ],
+      "screen": "upper",
+      "call_keys": "lower row1..4 left-to-right",
+      "back": "centered lower edge"
+    },
+    "plunger": {
+      "head_numbered": [
+        7.8,
+        0.85
+      ]
+    }
+  },
+  "oled64": {
+    "name": "0.96 inch 128x64 SSD1306 module",
+    "width": 27.3,
+    "length": 27.8,
+    "height": 4.5,
+    "active": [
+      21.74,
+      10.86
+    ],
+    "window": [
+      23.7,
+      12.9
+    ],
+    "seat_depth": 1.0,
+    "note": "Generic 0.96 inch 128x64 I2C OLED: PCB 27.3 x 27.8, about 4.5 thick with its 4-pin header, glass 26.7 x 19.26, active 21.74 x 10.86 centred horizontally. The window is a through-cut centred on the module; the module nests 1.0 mm from the flat face."
+  },
+  "watch_bars": {
+    "bar": 4.0,
+    "standoff": 2.2,
+    "clear_width": 20.0,
+    "arm_width": 4.0,
+    "bite": 1.5,
+    "note": "Two printed fixed bars for a 20 mm NATO: 4 mm bars standing 2.2 mm off the case back plane, a 20 mm clear channel between the 4 mm lug arms, bar ends buried 1.5 mm into the case ends. No metal in the strap path. Outer lug roots have 1.5 mm tapered gussets following the shell bevel, clear of the strap corridor.",
+    "root_gusset": 1.5
+  }
+}

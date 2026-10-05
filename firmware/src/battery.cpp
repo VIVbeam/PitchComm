@@ -11,9 +11,9 @@
  *   millivolts = raw * vref / (1/4) * 2 / 4096
  *              = raw * vref * 8 / 4096
  *
- * With the expected vref = 900 mV that is exactly the V1 scale rule
+ * With the expected vref = 900 mV that gives
  * raw * 3600 / 4096 * 2, clamped to 6000. Eight samples are summed and
- * averaged in one integer division, as the proven V1 code did.
+ * averaged in one integer division.
  * VERIFY: adc_ref_internal() must report 900 on the nRF54L15 SAADC; the
  * fallback keeps the previous behaviour if a driver reports 0.
  */
@@ -138,10 +138,10 @@ void Battery::tick(uint32_t now) {
 
 uint32_t Battery::millivolts() const { return millivolts_; }
 
-/* V1 windows: a cell in this window is low but still powers the rail. */
+/* A cell in this window is low but still powers the rail. */
 bool Battery::low() const { return millivolts_ >= 2800 && millivolts_ < 3500; }
 
-/* V1 window in which the LE Audio rail is trusted to stay up. */
+/* Battery window in which the LE Audio rail is trusted to stay up. */
 bool Battery::audioPower() const {
   return millivolts_ >= 3100 && millivolts_ <= 4400;
 }

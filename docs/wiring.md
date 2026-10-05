@@ -6,7 +6,7 @@ Five units in the base set, one Seeed XIAO nRF54L15 each (21 x 17.8 mm; Nordic n
 
 | Silk | Port | Alt / notes |
 |------|------|-------------|
-| 5V   | VBUS | USB 5 V in/out; dead on battery |
+| 5V   | VBUS | System supply rail, USB-derived or battery-derived; see power notes |
 | GND  | GND  | Common ground |
 | 3V3  | 3V3_OUT | Regulated 3.3 V out |
 | D0   | P1.04 | GPIO, ADC |
@@ -58,7 +58,7 @@ OLED on D4/D5. Five buttons, all direct GPIO. Each button is wired pin to GND; t
 | Back   | D13  | P2.10 | D13 -> GND    |
 | Battery| BAT+ / BAT- | - | 100 mAh cell |
 
-The catcher uses 7 GPIOs (2 I2C + 5 buttons).
+The catcher uses 7 GPIOs (2 I2C + 5 buttons). D13 (Back) is the underside pad identified as TP15 in the manufacturer PCB file; it is not on the two standard 1x7 headers. Solder an insulated lead to that pad before securing the board, including for USB bench testing of all five buttons.
 
 ## Pitcher
 
@@ -96,12 +96,34 @@ Safe for this design: D0, D1, D2, D3, D4, D5, D13 (plus D8-D12, D14, D15 if need
 
 ## Power and battery
 
+- Operating routine: swap batteries every inning and charge removed cells separately through their two-pin JST connectors. Use charged spares rather than charging a cell connected to a worn unit. After reconnecting a spare, confirm the unit rejoins the network and the pitcher's audio is ready before sending calls. Swap time, reconnection time and charging turnaround remain unmeasured.
 - Cell: single protected 3.7 V Li-ion or LiPo, 1S only. Watch polarity at the BAT pads.
-- The XIAO has an onboard charger and charge LED. Charge over USB-C only, and only off-body: remove the unit from the player before charging.
+- The specified [Adafruit 1570 cell](https://www.adafruit.com/product/1570) permits at most 100 mA charging. The [XIAO power schematic](https://files.seeedstudio.com/wiki/XIAO_nRF54L15/Getting_Start/nRF54L15_Schematic.pdf), sheet 4, uses U1 SGM40567 and R4=120 kOhm for 200 mA charging. Its IREF net connects only U1 and R4 in the reviewed PCB; firmware cannot reduce this setting.
+- **Disconnect the cell before any USB connection to its board**, including flashing, diagnostics and USB bench operation. USB supplies the onboard charger even when the application is not running.
+- Charge off-body: unplug the cell from the board pigtail, then connect it alone to the [Micro-Lipo 1304](https://www.adafruit.com/product/1304) at its 100 mA setting. Do not select 500 mA for these cells. Remove the cell from the charger before reconnecting it to a board with USB unplugged. The [sliding-panel fit prototype](../cad/prototypes/side-slider-v8/PRINT_AND_ASSEMBLY.txt) opens at the battery side while leaving the lid, deck and mount fitted. For the preserved v20 screw-fastened cases, support the deck and attached wires during opening.
 - Do not charge and operate a hot cell. Charge in a fire-safe area on a non-flammable surface.
 - Battery sense is internal: P1.14 (AIN7) reads the cell through the load switch enabled by P1.15. Do not add an external divider. The firmware enables the switch, reads ADC channel 7, and scales by 2.
-- On battery the 5V pin has no voltage. Power the OLED from 3V3 only.
-- Deep sleep: the Global RTC can wake the part; the RF switch stays powered to keep the ceramic antenna selected (about 60 uA). The field units poll the Thread parent every 200 ms while awake; sleep between pitches to extend runtime.
+- The header labeled **5V** is the system supply rail `VBUS`, not the raw USB rail `TYPE-C_5V`. In the reviewed manufacturer circuit, Q1 connects the battery to `VBUS` when USB is absent; D4 supplies `VBUS` from USB when connected. Expect battery-derived voltage at the 5V header on battery, not regulated 5 V. It is **not a USB-presence signal**. This follows the schematic/PCB source; actual voltage has not been measured. Power the OLED from **3V3 only**.
+- The current roster marks every field unit as a relay. Their builds use Full Thread Device mode and keep the receiver available for forwarding; they do not use the 200 ms sleepy-device poll setting. The build tool applies that setting only to units explicitly configured with `relay: false`. Do not assume deep sleep between pitches or use chip sleep-current figures to estimate this system's runtime.
+- The pitcher keeps its LE Audio stream running between calls, transmitting encoded silence. Linked display units blank the OLED after 30 seconds without interaction; new calls and button activity wake it. Whole-unit battery current and runtime remain unmeasured; see the [battery planning assumptions](bom.md#parts).
+
+## Wiring inside the current cases
+
+Use the [v8 sliding-panel guide](../cad/prototypes/side-slider-v8/PRINT_AND_ASSEMBLY.txt) for the current horizontal catcher and battery-access prototype. Keep its complete matched parts together. Its connector envelope and battery extraction path are calculated; full wiring, soldered fit and actual housings remain unverified. Field USB openings are closed; service access requires opening the main lid, with the cell disconnected.
+
+The dimensions and routing studies below describe the preserved v20 cases. They are not a wiring-clearance certification for the v8 prototype.
+
+The manufacturer PCB identifies battery positive as TP9 (VBAT), battery negative as TP10 (GND), and the catcher Back input as TP15 (D13/P2.10), all on the underside. These are file reference names, not assumed silkscreen labels. Use the board markings and manufacturer pinout to identify the physical pads. Attach these leads while the underside is accessible, before retaining the PCB on its deck posts.
+
+| Unit | PCB underside to deck top | Existing solder reservation |
+|---|---|---|
+| Pitcher | 2.05 mm | 0.5 mm high, 0.2 mm XY allowance |
+| Fielder watch | 2.05 mm | 0.5 mm high, 0.2 mm XY allowance |
+| Catcher | 2.4 mm | 0.5 mm high, 0.2 mm XY allowance |
+
+These are calculated CAD spaces and assumed solder reservations. AWG describes the conductor, not the finished insulation diameter. The v19 cases have continuously checked spatial corridors for assumed 0.6, 1.0 and 1.4 mm insulated wire envelopes with 0.05 mm per-side allowance, stopping just outside the PCB. Other pad reservations, retained posts and the antenna band stay clear. These geometric paths do not establish a finished solder joint, bend radius, full wiring route or connector fit. Check the actual wire and joint against one printed set; do not use a PCB shim to gain space, since it changes charging-port alignment.
+
+Keep the PCB resting directly on all four posts, with removable retention adhesive beside the bearing tops. Keep adhesive away from pads and test points. Use the Adafruit 3814 male mating pigtail on the board, retaining the cell's existing connector; Adafruit 261 is the same connector half as the cell. Check physical polarity before connecting. The full mated housing, strain relief and protected-cell dimensions are not verified in the current assembly. Keep all wiring and metal out of the reserved antenna band; deck-lightening windows do not make that band a wiring route. The [v20 print guide](../cad/unbranded/README.md) gives the earlier release's matching parts and assembly order.
 
 ## Radio
 

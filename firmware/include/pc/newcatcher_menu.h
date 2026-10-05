@@ -1,106 +1,109 @@
 #pragma once
 #include <stdio.h>
-#include "catalog.h"
+#include "segmented_pitch.h"
 
 namespace pc {
-// Inputs are release events, except the side button's single long-hold event.
-// The model only asks its caller to send; selection never transmits by itself.
+// A pitch selection announces immediately; a human confirms the observed nod.
 class CatcherMenu {
  public:
-  enum class Screen { Pitches, Height, Location };
+  enum class Screen { Pitches, AwaitPitch, AwaitNod, Height, Location, AwaitPlacement };
   enum class Action { None, Send, Recall, Volume, Cancel };
-  // Three numbered slots per page; the fourth front key pages forward.
-  static constexpr unsigned kPitchPages = (kPitchCount + 2) / 3;
+  static constexpr unsigned kPitchPages=(kPitchCount+2)/3;
   Screen screen() const { return screen_; }
   unsigned page() const { return page_; }
   unsigned pitch() const { return pitch_; }
   unsigned height() const { return height_; }
   unsigned location() const { return location_; }
   bool draft() const { return engaged_; }
-  uint16_t code() const { return pitchCode(pitch_,height_,location_); }
-  void cancel() { screen_=Screen::Pitches; pitch_=height_=location_=0; engaged_=false; }
-  // Call only after queue acceptance; a rejected Send retains the editable draft.
-  void accepted() { cancel(); }
-  // Re-arm a complete selection after the coach rejects the request (busy) or
-  // it expires, so a resend is one press from the Location screen.
+  uint16_t code() const {
+    return screen_==Screen::Pitches ? pitchTypeCode(pitch_) :
+           screen_==Screen::Location ? placementCode(pitch_,height_,location_) : 0;
+  }
+  void cancel() { screen_=Screen::Pitches;pitch_=height_=location_=pending_=0;engaged_=false; }
+  void accepted() {
+    pending_=code();
+    screen_=screen_==Screen::Pitches ? Screen::AwaitPitch : Screen::AwaitPlacement;
+  }
+  // Only the current request may advance or restore the draft. Back/cancel
+  // invalidates it, so a late response cannot resurrect an abandoned call.
+  void confirmed(uint16_t code) {
+    if (!pending_ || pending_!=code) return;
+    pending_=0;
+    if (screen_==Screen::AwaitPitch) screen_=Screen::AwaitNod;
+    else if (screen_==Screen::AwaitPlacement) cancel();
+  }
   void restore(uint16_t code) {
-    constexpr unsigned kCodesPerPitch = kRows * kCols;
-    if (!code || code > kPitchCount * kCodesPerPitch) return;
-    pitch_=(code-1)/kCodesPerPitch+1;
-    height_=((code-1)%kCodesPerPitch)/kCols+1;
-    location_=(code-1)%kCols+1;
-    page_=(pitch_-1)/3; screen_=Screen::Location; engaged_=true;
+    if (!pending_ || pending_!=code) return;
+    pending_=0;
+    if (isPitchType(code)) { screen_=Screen::Pitches;height_=location_=0; }
+    else if (isPlacement(code)) screen_=Screen::Location;
+  }
+  void rejected(uint16_t code) {
+    if (pending_ && pending_==code) cancel();
   }
   template<class Submit>
   bool commit(bool displayReady,bool controlsReady,bool audioReady,Submit submit) {
-    if (screen_!=Screen::Location || !code() || !displayReady || !controlsReady || !audioReady)
-      return false;
+    if (!code() || !displayReady || !controlsReady || !audioReady) return false;
     if (!submit(code())) return false;
-    accepted(); return true;
+    accepted();return true;
   }
   Action front(unsigned key) {
     if (key<1 || key>4) return Action::None;
     if (screen_==Screen::Pitches) {
-      if (key==4) { page_=(page_+1)%kPitchPages; engaged_=true; return Action::None; }
-      const unsigned selected=page_*3+key;
-      if (selected>kPitchCount) return Action::None;  // short final page
-      if (selected!=pitch_) height_=location_=0;
-      engaged_=true; pitch_=selected; screen_=Screen::Height;
+      if (key==4) { page_=(page_+1)%kPitchPages;pitch_=0;engaged_=true;return Action::None; }
+      unsigned selected=page_*3+key;
+      if (selected>kPitchCount) return Action::None;
+      pitch_=selected;height_=location_=0;engaged_=true;return Action::Send;
+    }
+    if (screen_==Screen::AwaitNod) {
+      if (key==4) screen_=Screen::Height;
     } else if (screen_==Screen::Height) {
-      if (key<4 && key<=kRows) { if (height_!=key) location_=0; height_=key; }
-      else if (key==4 && height_) screen_=Screen::Location;
-    } else if (key<4 && key<=kCols) location_=key;
-    else if (key==4 && code()) return Action::Send;
+      if (key<4 && key<=kRows) { if(height_!=key) location_=0;height_=key; }
+      else if(key==4 && height_) screen_=Screen::Location;
+    } else if(screen_==Screen::Location) {
+      if(key<4 && key<=kCols) location_=key;
+      else if(key==4 && code()) return Action::Send;
+    }
     return Action::None;
   }
   Action back(bool longHold) {
-    if (longHold) {
-      if (!draft()) return Action::Volume;
-      cancel(); return Action::Cancel;
-    }
-    if (screen_==Screen::Location) screen_=Screen::Height;
-    else if (screen_==Screen::Height) { screen_=Screen::Pitches; page_=(pitch_-1)/3; }
-    else if (!draft()) return Action::Recall;
+    if(longHold) { if(!draft()) return Action::Volume;cancel();return Action::Cancel; }
+    if(screen_==Screen::Location) screen_=Screen::Height;
+    else if(screen_==Screen::Height) screen_=Screen::AwaitNod;
+    else if(screen_!=Screen::Pitches) { page_=(pitch_-1)/3;cancel(); }
+    else if(!draft()) return Action::Recall;
     return Action::None;
   }
-  // The generated short forms are the only labels the menu displays.
-  struct Frame { char header[24]{}, rows[2][24]{}, footer[24]{}; };
+  struct Frame { char header[24]{},footer[24]{},keys[4][6]{};unsigned selected=0; };
   Frame frame() const {
-    Frame f;
-    const char* labels[3]={"","",""}; unsigned selected=0;
-    const char* fourth="--";
-    if (screen_==Screen::Pitches) {
+    Frame f;const char* labels[4]={"--","--","--","--"};
+    if(screen_==Screen::Pitches) {
       snprintf(f.header,sizeof(f.header),"PITCHES %u/%u",page_+1,kPitchPages);
-      for (unsigned i=0;i<3;++i) {
-        const unsigned index=page_*3+i;
-        if (index<kPitchCount) labels[i]=kPitchShort[index];
-      }
-      if (pitch_ && (pitch_-1)/3==page_) selected=(pitch_-1)%3+1;
-      fourth="Next";
-      snprintf(f.footer,sizeof(f.footer),"%s",draft() ? "Hold Back: cancel" : "Back recall; hold vol");
+      for(unsigned i=0;i<3;++i) if(page_*3+i<kPitchCount) labels[i]=kPitchShort[page_*3+i];
+      labels[3]="NEXT";f.selected=pitch_ ? (pitch_-1)%3+1 : 0;
+      snprintf(f.footer,sizeof(f.footer),"%s",draft()?"Select; hold cancels":"Back recall; hold vol");
     } else {
-      const bool heightScreen=screen_==Screen::Height;
-      selected=heightScreen ? height_ : location_;
-      for (unsigned i=0;i<3;++i) {
-        if (heightScreen) { if (i<kRows) labels[i]=kRowShort[i]; }
-        else if (i<kCols) labels[i]=kColShort[i];
+      snprintf(f.header,sizeof(f.header),"%s %s",kPitchShort[pitch_-1],
+        screen_==Screen::Height?"HEIGHT":screen_==Screen::Location?"PLACEMENT":"PITCH");
+      if(screen_==Screen::AwaitNod) {
+        labels[3]="NOD";snprintf(f.footer,sizeof(f.footer),"Saw nod? 4; Back edit");
+      } else if(screen_==Screen::AwaitPitch || screen_==Screen::AwaitPlacement) {
+        snprintf(f.footer,sizeof(f.footer),"Sending; Back exits");
+      } else {
+        bool h=screen_==Screen::Height;f.selected=h?height_:location_;
+        for(unsigned i=0;i<3;++i) labels[i]=h?(i<kRows?kRowShort[i]:"--"):(i<kCols?kColShort[i]:"--");
+        labels[3]=f.selected?(h?"OK":"SEND"):"--";
+        snprintf(f.footer,sizeof(f.footer),"%s",h?"Choose height; Back":"Choose side; Back");
       }
-      if (heightScreen) snprintf(f.header,sizeof(f.header),"%s HEIGHT",kPitchShort[pitch_-1]);
-      else snprintf(f.header,sizeof(f.header),"%s %s %s",kPitchShort[pitch_-1],
-                         kRowShort[height_-1],location_ ? kColShort[location_-1] : "--");
-      if (selected) fourth=heightScreen ? "Confirm" : "Send";
-      snprintf(f.footer,sizeof(f.footer),"%s",selected ? "Back; hold: cancel" :
-                    (heightScreen ? "Choose height; Back" : "Choose side; Back"));
     }
-    snprintf(f.rows[0],sizeof(f.rows[0]),"1%c%-4s 2%c%s",selected==1 ? '>' : ' ',labels[0],
-                  selected==2 ? '>' : ' ',labels[1]);
-    snprintf(f.rows[1],sizeof(f.rows[1]),"3%c%-4s 4 %s",selected==3 ? '>' : ' ',labels[2],fourth);
+    for(unsigned i=0;i<4;++i) snprintf(f.keys[i],sizeof(f.keys[i]),"%s",labels[i]);
     return f;
   }
  private:
   bool engaged_=false;
   Screen screen_=Screen::Pitches;
   unsigned page_=0,pitch_=0,height_=0,location_=0;
+  uint16_t pending_=0;
 };
 
 // Combined five-button filter. Faults, even transient chords and startup-held

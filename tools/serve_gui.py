@@ -4,7 +4,7 @@ import functools
 import http.server
 import webbrowser
 from pathlib import Path
-from preflight import check
+from check_setup import check
 
 ROOT = Path(__file__).resolve().parents[1]
 

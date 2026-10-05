@@ -12,14 +12,14 @@ Creates a repository-root zip:
   PART_COUNTS.txt per-style part counts and totals
 
 The default full pack holds all three styles and lands at
-PitchComm-cases-print-pack.zip (29 STLs, 6 3MFs). -Bench selects the pitcher
-(receiver) and catcher (keypad) sets only: 21 parts plus the coupon, which is
+PitchComm-cases-print-pack.zip (34 STLs, 6 3MFs). -Bench selects the pitcher
+(receiver) and catcher (keypad) sets only: 27 parts plus the coupon, which is
 the bench (coach + catcher + pitcher) print list, and lands at
-PitchComm-cases-bench-pack.zip (21 STLs, 4 3MFs).
+PitchComm-cases-bench-pack.zip (27 STLs, 4 3MFs).
 
 The archive is written with System.IO.Compression and then reopened and
-checked entry by entry (exact names, counts, sizes, no colour STLs, portable
-paths). -Verify skips the build and checks the existing zip in the selected
+checked entry by entry (exact names, counts, sizes, SHA-256 content, quantities,
+no colour STLs, portable paths). -Verify checks the existing zip in the selected
 mode. The exit code is 1 on any mismatch.
 
 .EXAMPLE
@@ -28,7 +28,7 @@ Rebuilds the full print pack at the repository root.
 
 .EXAMPLE
 tools\build_print_pack.ps1 -Bench
-Rebuilds the bench print pack (pitcher and catcher, 21 parts plus coupon).
+Rebuilds the bench print pack (pitcher and catcher, 27 parts plus coupon).
 
 .EXAMPLE
 tools\build_print_pack.ps1 -Bench -Verify
@@ -64,10 +64,9 @@ $allThreeMf = @(Get-ChildItem -LiteralPath $exports -File -Filter '*.3mf' | Sort
 if (-not $allStl.Count) { throw "No printable STLs found in $exports" }
 if (-not $allThreeMf.Count) { throw "No 3MF files found in $exports" }
 
-# Styles are the three case families. The fielder can wear either carrier;
-# wrist_belt_carrier.stl is shipped as the optional alternative, so it is not
-# part of the 7-part fielder set in cad/unbranded/README.md. The bench pack
-# selects the pitcher and catcher styles only.
+# Styles are the three case families. Keep the legacy optional carrier separate
+# if it is included in an export set. The current watch uses integrated bars.
+# The bench pack selects the pitcher and catcher styles only.
 $styles = [ordered]@{
     'Pitcher (receiver)' = @{ Prefix = 'receiver_'; Optional = '' }
     'Catcher (keypad)'   = @{ Prefix = 'keypad_';   Optional = '' }
@@ -130,7 +129,7 @@ $teamTotal = $pitcherCount + $catcherCount + 2 * $fielderCount
 $teamBothCarriers = $teamTotal + 2 * $optionalParts.Count
 $benchTotal = $pitcherCount + $catcherCount
 
-# --- expected entries and the sources for the size check ---------------------
+# --- expected entries and their source files --------------------------------
 $expectedEntries = New-Object 'System.Collections.Generic.List[string]'
 $sourceMap = @{}
 $expectedEntries.Add('README.md')
@@ -148,19 +147,25 @@ foreach ($file in $threeMf) {
 }
 
 function Test-PackArchive {
-    param([string]$Path, $Expected, $Sources)
+    param([string]$Path, $Expected, $Sources, [string]$Counts)
     $problems = New-Object 'System.Collections.Generic.List[string]'
-    $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
+    $hasher = [System.Security.Cryptography.SHA256]::Create()
+    $countsDigest = [BitConverter]::ToString($hasher.ComputeHash([System.Text.Encoding]::ASCII.GetBytes($Counts)))
+    $zip = $null
     try {
+        $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
         $actual = @($zip.Entries | ForEach-Object { $_.FullName })
         if ($actual.Count -ne $Expected.Count) {
             $problems.Add(('entry count is {0}; expected {1}' -f $actual.Count, $Expected.Count))
         }
         foreach ($name in $Expected) {
-            if ($actual -notcontains $name) { $problems.Add('missing entry: ' + $name) }
+            if ($actual -cnotcontains $name) { $problems.Add('missing entry: ' + $name) }
         }
+        $seen = @{}
         foreach ($name in $actual) {
-            if ($Expected -notcontains $name) { $problems.Add('unexpected entry: ' + $name) }
+            if ($Expected -cnotcontains $name) { $problems.Add('unexpected entry: ' + $name) }
+            if ($seen.ContainsKey($name)) { $problems.Add('duplicate entry: ' + $name) }
+            $seen[$name] = $true
             if ($name.StartsWith('/') -or $name.Contains('\')) {
                 $problems.Add('non-portable entry name: ' + $name)
             }
@@ -173,37 +178,29 @@ function Test-PackArchive {
                 $size = (Get-Item -LiteralPath $Sources[$entry.FullName]).Length
                 if ($entry.Length -ne $size) {
                     $problems.Add(('size mismatch for {0}: {1} in the zip, {2} on disk' -f $entry.FullName, $entry.Length, $size))
+                } else {
+                    $input = $entry.Open()
+                    try { $digest = [BitConverter]::ToString($hasher.ComputeHash($input)) }
+                    finally { $input.Dispose() }
+                    $input = [System.IO.File]::OpenRead($Sources[$entry.FullName])
+                    try { $sourceDigest = [BitConverter]::ToString($hasher.ComputeHash($input)) }
+                    finally { $input.Dispose() }
+                    if ($digest -ne $sourceDigest) {
+                        $problems.Add('content mismatch for ' + $entry.FullName)
+                    }
                 }
+            } elseif ($entry.FullName -ceq 'PART_COUNTS.txt') {
+                $input = $entry.Open()
+                try { $digest = [BitConverter]::ToString($hasher.ComputeHash($input)) }
+                finally { $input.Dispose() }
+                if ($digest -ne $countsDigest) { $problems.Add('content mismatch for PART_COUNTS.txt') }
             }
         }
     } finally {
-        $zip.Dispose()
+        if ($zip) { $zip.Dispose() }
+        $hasher.Dispose()
     }
     return ,$problems
-}
-
-# --- verify-only mode -------------------------------------------------------
-if ($Verify) {
-    if (-not (Test-Path -LiteralPath $Output -PathType Leaf)) {
-        throw ("No pack to verify at {0}. Build it first with tools\build_print_pack.ps1{1}." -f
-            $Output, $(if ($Bench) { ' -Bench' } else { '' }))
-    }
-    $problems = Test-PackArchive $Output $expectedEntries $sourceMap
-    if ($problems.Count) {
-        throw ("Print pack verification failed ({0} mode, {1}):`n  {2}" -f $mode, $Output, ($problems -join "`n  "))
-    }
-    Write-Host ("Print pack verified ({0} mode): {1}" -f $mode, $Output)
-    Write-Host ("  entries: {0} ({1} stl, {2} 3mf, no *_color.stl, fit coupon at the root)" -f
-        $expectedEntries.Count, $stl.Count, $threeMf.Count)
-    if ($Bench) {
-        Write-Host ("  bench: {0} parts plus the coupon (catcher {1}, pitcher {2})" -f
-            $benchTotal, $catcherCount, $pitcherCount)
-    } else {
-        Write-Host ("  full team: {0} parts (pitcher 1 x {1}, catcher 1 x {2}, fielder 2 x {3})" -f
-            $teamTotal, $pitcherCount, $catcherCount, $fielderCount)
-    }
-    Write-Host 'Print pack verified with System.IO.Compression.'
-    exit 0
 }
 
 # --- PART_COUNTS.txt --------------------------------------------------------
@@ -264,6 +261,30 @@ $textLines.Add('')
 $textLines.Add('The fit coupon is calibration hardware, not a unit part; it is not counted above.')
 $partCountsText = ($textLines -join "`n") + "`n"
 
+# --- verify-only mode -------------------------------------------------------
+if ($Verify) {
+    if (-not (Test-Path -LiteralPath $Output -PathType Leaf)) {
+        throw ("No pack to verify at {0}. Build it first with tools\build_print_pack.ps1{1}." -f
+            $Output, $(if ($Bench) { ' -Bench' } else { '' }))
+    }
+    $problems = Test-PackArchive $Output $expectedEntries $sourceMap $partCountsText
+    if ($problems.Count) {
+        throw ("Print pack verification failed ({0} mode, {1}):`n  {2}" -f $mode, $Output, ($problems -join "`n  "))
+    }
+    Write-Host ("Print pack verified ({0} mode): {1}" -f $mode, $Output)
+    Write-Host ("  entries: {0} ({1} stl, {2} 3mf, no *_color.stl, fit coupon at the root)" -f
+        $expectedEntries.Count, $stl.Count, $threeMf.Count)
+    if ($Bench) {
+        Write-Host ("  bench: {0} parts plus the coupon (catcher {1}, pitcher {2})" -f
+            $benchTotal, $catcherCount, $pitcherCount)
+    } else {
+        Write-Host ("  full team: {0} parts (pitcher 1 x {1}, catcher 1 x {2}, fielder 2 x {3})" -f
+            $teamTotal, $pitcherCount, $catcherCount, $fielderCount)
+    }
+    Write-Host 'Print pack verified with System.IO.Compression.'
+    exit 0
+}
+
 # --- write the archive ------------------------------------------------------
 $outDir = Split-Path -Parent $Output
 if ($outDir -and -not (Test-Path -LiteralPath $outDir -PathType Container)) {
@@ -302,7 +323,7 @@ try {
     $archive.Dispose()
 }
 
-$problems = Test-PackArchive $temp $expectedEntries $sourceMap
+$problems = Test-PackArchive $temp $expectedEntries $sourceMap $partCountsText
 if ($problems.Count) {
     Remove-Item -LiteralPath $temp -Force -ErrorAction SilentlyContinue
     throw ("Print pack verification failed:`n  " + ($problems -join "`n  "))

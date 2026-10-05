@@ -18,14 +18,14 @@
 #   configured, radio, busy: 0|1  provisioning flag, radio flag, call busy flag
 #   seq: uint32                   last call sequence, 0 when idle
 #   category: 0|1|2               0 none, 1 pitch, 2 play
-#   code: uint32                  0 when seq is 0, else 1..81 pitch or 1..21 play
+#   code: uint32                  0 when seq is 0, else 1..171 pitch or 1..21 play
 #   links: 5 x 0|1                  per unit index, in unit order
 #   delivery: 5 x 0..4               per unit: 0 none, 1 waiting, 2 accepted, 3 unconfirmed, 4 error
 #                                 index 0 is the coach and always 0
 #   records: 2 records            index 0 pitch category, index 1 play category
 #     category: 1|2               fixed by index
 #     seq: uint32                 retained call sequence, 0 when none
-#     code: uint32                0 when seq is 0, else 1..81 or 1..21
+#     code: uint32                0 when seq is 0, else 1..171 or 1..21
 #     delivery: 5 x 0..4             per unit index, in unit order; index 0 is always 0
 #   Coach frames (role 0) keep records consistent with the current call: a record
 #   seq is never newer than seq, and the record matching category repeats seq,
@@ -39,13 +39,15 @@
 #   id: uint32 >= 1               request id from the call command
 #   result: 0..5                  0 accepted, 1 busy, 2 offline, 3 rejected, 4 expired, 5 session changed
 #   seq: uint32                   assigned call sequence, nonzero only when result is 0
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":4096,"role":0,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":0,"category":0,"code":0,"links":[1,1,1,1,1],"delivery":[0,0,0,0,0],"records":[{"category":1,"seq":0,"code":0,"delivery":[0,0,0,0,0]},{"category":2,"seq":0,"code":0,"delivery":[0,0,0,0,0]}]}
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":5120,"role":0,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":12,"category":1,"code":22,"links":[1,1,1,1,0],"delivery":[0,2,2,0,0],"records":[{"category":1,"seq":12,"code":22,"delivery":[0,2,2,0,0]},{"category":2,"seq":11,"code":5,"delivery":[0,1,0,0,0]}]}
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":6144,"role":0,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":20,"category":2,"code":7,"links":[1,1,1,1,1],"delivery":[0,2,2,1,0],"records":[{"category":1,"seq":19,"code":45,"delivery":[0,2,4,0,0]},{"category":2,"seq":20,"code":7,"delivery":[0,2,2,1,0]}]}
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":7168,"role":2,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":31,"category":1,"code":81,"links":[1,1,1,1,1],"delivery":[0,0,0,0,0],"records":[{"category":1,"seq":31,"code":81,"delivery":[0,2,0,0,0]},{"category":2,"seq":29,"code":21,"delivery":[0,0,0,0,0]}]}
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":8192,"role":0,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":5,"category":1,"code":1,"links":[1,1,0,1,1],"delivery":[0,1,0,0,0],"records":[{"category":1,"seq":5,"code":1,"delivery":[0,1,0,0,0]},{"category":2,"seq":4294967294,"code":21,"delivery":[0,0,0,0,0]}]}
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":9216,"role":0,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":44,"category":2,"code":21,"links":[1,1,1,1,1],"delivery":[0,2,3,0,0],"records":[{"category":1,"seq":43,"code":42,"delivery":[0,4,1,0,0]},{"category":2,"seq":44,"code":21,"delivery":[0,2,3,0,0]}]}
-@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":10240,"role":0,"dictionary":"299314f6","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":50,"category":1,"code":81,"links":[1,1,1,1,1],"delivery":[0,4,2,0,0],"records":[{"category":1,"seq":50,"code":81,"delivery":[0,4,2,0,0]},{"category":2,"seq":48,"code":1,"delivery":[0,2,2,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":2304,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":9,"category":1,"code":90,"links":[1,1,1,1,1],"delivery":[0,2,2,0,0],"records":[{"category":1,"seq":9,"code":90,"delivery":[0,2,2,0,0]},{"category":2,"seq":0,"code":0,"delivery":[0,0,0,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":2560,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":10,"category":1,"code":171,"links":[1,1,1,1,1],"delivery":[0,2,2,0,0],"records":[{"category":1,"seq":10,"code":171,"delivery":[0,2,2,0,0]},{"category":2,"seq":0,"code":0,"delivery":[0,0,0,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":4096,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":0,"category":0,"code":0,"links":[1,1,1,1,1],"delivery":[0,0,0,0,0],"records":[{"category":1,"seq":0,"code":0,"delivery":[0,0,0,0,0]},{"category":2,"seq":0,"code":0,"delivery":[0,0,0,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":5120,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":12,"category":1,"code":22,"links":[1,1,1,1,0],"delivery":[0,2,2,0,0],"records":[{"category":1,"seq":12,"code":22,"delivery":[0,2,2,0,0]},{"category":2,"seq":11,"code":5,"delivery":[0,1,0,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":6144,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":20,"category":2,"code":7,"links":[1,1,1,1,1],"delivery":[0,2,2,1,0],"records":[{"category":1,"seq":19,"code":45,"delivery":[0,2,4,0,0]},{"category":2,"seq":20,"code":7,"delivery":[0,2,2,1,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":7168,"role":2,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":31,"category":1,"code":81,"links":[1,1,1,1,1],"delivery":[0,0,0,0,0],"records":[{"category":1,"seq":31,"code":81,"delivery":[0,2,0,0,0]},{"category":2,"seq":29,"code":21,"delivery":[0,0,0,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":8192,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":5,"category":1,"code":1,"links":[1,1,0,1,1],"delivery":[0,1,0,0,0],"records":[{"category":1,"seq":5,"code":1,"delivery":[0,1,0,0,0]},{"category":2,"seq":4294967294,"code":21,"delivery":[0,0,0,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":9216,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":44,"category":2,"code":21,"links":[1,1,1,1,1],"delivery":[0,2,3,0,0],"records":[{"category":1,"seq":43,"code":42,"delivery":[0,4,1,0,0]},{"category":2,"seq":44,"code":21,"delivery":[0,2,3,0,0]}]}
+@PC {"type":"state","v":4,"client":"1a2b3c4d","clock":10240,"role":0,"dictionary":"94b7a24a","boot":"0011223344556677","configured":1,"radio":1,"busy":0,"seq":50,"category":1,"code":81,"links":[1,1,1,1,1],"delivery":[0,4,2,0,0],"records":[{"category":1,"seq":50,"code":81,"delivery":[0,4,2,0,0]},{"category":2,"seq":48,"code":1,"delivery":[0,2,2,0,0]}]}
 @PC {"type":"result","v":4,"client":"1a2b3c4d","boot":"0011223344556677","id":1,"result":0,"seq":12}
 @PC {"type":"result","v":4,"client":"1a2b3c4d","boot":"0011223344556677","id":2,"result":1,"seq":0}
 @PC {"type":"result","v":4,"client":"1a2b3c4d","boot":"0011223344556677","id":3,"result":2,"seq":0}

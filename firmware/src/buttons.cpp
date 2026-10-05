@@ -2,15 +2,14 @@
  * PitchComm buttons for the XIAO nRF54L15 (Zephyr / NCS).
  *
  * Field button: one active-low recall button on D1 = P1.05 with an internal
- * pull-up. 30 ms debounce, 700 ms long press, exactly the V1 board.h state
- * machine. Released reads raw 1; pressed (pin to GND) reads raw 0.
+ * pull-up. 30 ms debounce, 700 ms long press. Released reads raw 1;
+ * pressed (pin to GND) reads raw 0.
  *
  * Catcher keypad: four numbered calls on D0..D3 = P1.04..P1.07 plus Back on
  * D13 = P2.10, all pin-to-GND with internal pull-ups. Events are filtered by
  * the shared pc::CatcherButtons model (35 ms startup/release block, chord
  * rejection, event numbers 1..4 on a numbered release, 5 on a Back short
- * release and 6 on a Back long hold) so the semantics match the proven V1
- * keypad path.
+ * release and 6 on a Back long hold).
  */
 
 #include "board/buttons.h"
@@ -135,7 +134,7 @@ unsigned CatcherControls::tick(uint32_t now) {
     return 0;
   }
   if (elapsed(now, gScanAt) < 10) {
-    return 0; /* the V1 keypad path scanned every 10 ms */
+    return 0;
   }
   gScanAt = now;
 

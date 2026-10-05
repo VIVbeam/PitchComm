@@ -1,0 +1,106 @@
+PITCHCOMM SIDE-SLIDER v8 BATTERY ACCESS — COMPLETE MATCHING FIT PROTOTYPE
+CAD geometry verified; hardware, wired fit and printed durability remain untested.
+
+WHAT CHANGED
+A captive battery-side panel opens without removing lid, electronics, strap or carrier.
+Press its flexible tab inward, lift about5.2mm, unplug by the connector housings, then exchange the cell.
+Reinsert/reconnect, lower the panel until it latches, then confirm network/audio readiness.
+Disconnecting the battery powers the unit off. Swap/rejoin times are unmeasured.
+Initial panel installation is from above with the main lid open. Lid ears stop it escaping thereafter.
+Catcher remains landscape: screen above 1–4 left-to-right, Back centered on lower edge.
+Four7.8mm button heads at9.5mm pitch fit the shell. Wells8.6mm leave0.9mm nominal webs.
+The first switch now has a floor-connected pedestal and clears the modeled PCB/header.
+Internal USB recesses preserve connector space behind closed exterior walls.
+Board USB remains inside: setup/service can require releasing the retained board/deck to insert a cable.
+Disconnect the cell before any field-board USB use. Separate removed-cell charging remains the plan.
+
+
+OPTIONAL CASE-ANCHORED PULL SLING — FIRST FIT STUDY
+This is a geometric removal aid; adhesion, bending and actual pull force have not been tested.
+Use smooth, electrically insulating flexible film, modeled6mm wide and0.1mm thick maximum.
+No metallic tape or stiff printed strap. No qualified film/adhesive product is specified.
+The folded strip goes beneath the cell, around its far end, and above the cell toward the hatch.
+Fix ONLY the lower strip to the designated CASE FLOOR anchor. Do not glue it to the battery pouch.
+Modeled adhesive thickness0.1mm maximum. Sling and adhesive replace the prior0.2mm floor allowance.
+Do not add them on top of an existing foam stack. Account for actual film, adhesive, pouch and folds.
+Pitcher/catcher anchor6x8mm (48mm2); watch6x3mm (18mm2). Small anchor strength is unmeasured.
+Watch adds17.17mm3 net case material within the existing bounds.
+The free end stays0.15mm behind the nominal inward release-tab envelope while closed.
+Open panel, disconnect by the connector housings, and park leads clear before pulling the strip.
+Housing extraction and film deployment clear the modeled parts; actual leads have not been modeled.
+The rectilinear U model lets the cell protrude6mm beyond the outer guides for hand removal.
+Do not continue pulling after that handoff; grasp the cell without pinching or levering its pouch.
+Feed the loop back into place when inserting the replacement cell; keep strip and leads out of guides.
+This ideal model reserves no bend radius or printed tolerance. Prototype with an inert dummy first.
+Reject the sling if it jams, loads leads, abrades the pouch, detaches, or obstructs panel release.
+Do not treat the modeled path as proof of safe force, swelling allowance or repeated-use durability.
+Reference connector box8.4x5.4x4.4mm is still assumed, not measured.
+Pitcher/catcher box moves0.1mm downward versus v7 to clear the top strip; watch pose is unchanged.
+Rectilinear lengths below are modeled budgets, not qualified cutting dimensions:
+Pitcher: film path74.25mm; cell travel14.35mm; free-end travel28.70mm.
+Watch: film path65.30mm; cell travel26.70mm; free-end travel53.40mm.
+Catcher: film path82.90mm; cell travel23.00mm; free-end travel46.00mm.
+Include practical bend/handling requirements only after measuring the real assembly.
+
+MATCHED FILE SET
+stl/:34 distinct closed, consistently wound, single-shell pieces in printing orientations.
+plates/:three arranged, non-overlapping 3MF print plates within200x200mm; all parts rest on z=0.
+assemblies/:three colored assembled 3MFs for inspection; these are not printing poses.
+PitchComm-v8-battery-access-fit.dwg:46 editable native solids:34 printed parts plus12 nonprinted references.
+PART_ layers are printed parts; REF_ layers are soft film, adhesive, cell and assumed connector.
+references/:three assembled battery-access 3MFs with nonprinted references. NEVER slice these as print plates.
+Previews show actual meshes. Grey cells and red connector blocks are dimensional assumptions; leads are not rendered.
+Orange is a thin nonconductive film sling; yellow is its case-floor adhesive, both NONPRINTED.
+Use only this complete matched set for this prototype; do not mix compact catcher controls with v20.
+
+FIELD-SET QUANTITIES
+Pitcher: 1 set(s), 7 pieces per set.
+Fielder watch: 2 set(s), 7 pieces per set.
+Catcher: 1 set(s), 20 pieces per set.
+Total41 printed pieces for four field units. Coach case is not included.
+
+PRINT AND INITIAL ASSEMBLY
+Print one unpowered fit set first. Do not assume the nominal clearances fit your printer.
+Bodies stay floor-down. Lids are inner-face-up; panels lie broad-face-down; split heads are face-down.
+Inspect slicing around0.45mm tab slots,0.8mm tab thickness,0.9mm catcher webs and small numeral inlays.
+Use local supports/bridging as needed for bars and guides; remove all residue from moving surfaces.
+No filament, layer settings or fatigue/cycle strength have been qualified for these closures.
+Install switch bodies and wiring while the lid is open. Keep switches seated on their pedestal lands.
+Fit split control stems from inside and heads from outside. Bond with compatible adhesive, keeping guides free.
+Glue the connected numeral inlays into their0.4mm pockets without protrusion or squeeze-out.
+Fit the panel from above, retain the board on its deck posts, then fasten lid/body and carrier.
+M2.5 fastening and original hole datums are retained. Verify screw seating/engagement on the fit print.
+Do not tape the rotating battery permanently into its bay. Do not pull by leads or pry its pouch.
+
+SIZE
+Base shells retain29x47.6mm pitcher,45.8x50.1mm watch and58.2x37mm landscape catcher footprints.
+Local side-guide projections are5.15mm pitcher and3.5mm watch/catcher beyond their base faces.
+Catcher flat top is20mm; raised details reach20.45mm before the carrier is counted.
+Watch battery shifts6.5mm along the bay and deck extends; both NATO bars are retained.
+
+VERIFIED SCOPE
+All34STLs and1143MF mesh objects read back;33 printable shapes are byte-identical to v7.
+The watch body alone changes: an anchor land plus local clearance pocket, with no outside-size growth.
+No positive assembled part overlaps above0.001mm3. Switches/electronics clear the fixed case parts.
+Front and Back plunger strokes include0.25mm nominal switch travel plus0.1mm reserve.
+All front-switch central support witnesses are present; local catcher well-web stock witnesses are present.
+Exact released-panel and cell extraction sweeps clear the modeled fixed parts and screw shafts.
+Saved native drawing:46 valid ShapeManager solids,AUDIT0; all mass/bounds and exported boundaries match.
+The changed watch body also clears the exact continuously released-panel sweep.
+
+REMAINING FIT / WIRING WORK
+Battery reservation12.7x32.4x4.3mm; extraction checks add0.1mm per side.
+Mated connector service box8.4x5.4x4.4mm is an ASSUMPTION, not a measured Adafruit3814 housing.
+Full factory lead length/slack, solder joints, strain relief, actual connector grip access and sling material/adhesion remain unqualified.
+Printed latch force/retention, repeated cycles, cell fit, mounted hand access and free strap tails remain untested.
+Release model is a clearance envelope, not an elastic stress model. This case is not sealed/water rated.
+No hardware flashing, LE Audio/range/latency or battery life has been demonstrated.
+
+STATUS / PROVENANCE
+This supersedes the v7 fit package for the optional pull-sling study. It remains a development fit package.
+Established v20 release files and public native drawing are unchanged. Schedule remains PAUSED.
+Current workspace firmware/console/audio uses two-segment dictionary 94b7a24a.
+Host and simulated browser checks pass; real Nordic SDK build and hardware operation remain unverified.
+Source snapshots and evidence are included. Reproduction uses the existing project CAD helpers and references.
+Final native numeral pockets include a corrected construction-tree offset; canonical print geometry was unchanged.
+See .tools/WORK_STATUS.txt for the complete continuation record.

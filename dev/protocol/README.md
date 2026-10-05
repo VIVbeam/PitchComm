@@ -1,7 +1,7 @@
 # Protocol fixtures
 
 Shared, deterministic fixtures for the PitchComm coach USB line protocol
-(protocol v4). The coach GUI tests and any future firmware host test consume
+(protocol v4). The coach GUI tests and firmware host tests consume
 the same files, so a change on one side that is not mirrored on the other fails
 a test instead of reaching the field.
 
@@ -11,6 +11,7 @@ a test instead of reaching the field.
 | --- | --- | --- |
 | `gui_commands.txt` | host to coach | `gui CLIENT` handshake and `call ...` commands produced by `gui/core.js` `command()` |
 | `state_frames.txt` | coach to host | `@PC {...}` JSON state and result frames accepted by `gui/core.js` `validState()` and `validResult()` |
+| `calls.fixture.json` | tests only | Vocabulary source targets for variable-roster group-resolution tests; runtime uses the matched generated catalog |
 
 ## Format
 

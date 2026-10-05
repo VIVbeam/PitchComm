@@ -56,7 +56,7 @@ function audienceMask(keys) {
 }
 
 const entries = parseCallEntries(header);
-const pitchEntries = entries.filter(entry => entry.category === 'Pitch');
+const pitchEntries = entries.filter(entry => entry.category === 'Pitch' && entry.code<=catalog.pitches.length*catalog.rows.length*catalog.cols.length);
 const playEntries = entries.filter(entry => entry.category === 'Play');
 const rowCount = catalog.rows.length;
 const colCount = catalog.cols.length;
@@ -74,7 +74,7 @@ const fullAudience = audienceMask(unitKeys);
 
 test('GUI catalog has the schema 3 shape and the pinned dictionary', () => {
   assert.equal(catalog.schema, 3);
-  assert.equal(catalog.dictionary, '299314f6');
+  assert.equal(catalog.dictionary, '94b7a24a');
   assert.match(catalog.dictionary, /^[a-f0-9]{8}$/);
   assert.deepEqual(
     [catalog.pitches.length, rowCount, colCount, locationCount, catalog.plays.length],

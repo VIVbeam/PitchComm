@@ -10,7 +10,7 @@ build directory:
   west flash -d <BuildDir> [--erase]                  (-BuildDir)
 
 -Unit accepts the enrolled keys from config/roster.json plus coach (the
-implicit unit 0) and proof, resolved at runtime. -Role is a compatibility
+implicit unit 0), resolved at runtime. -Role is a compatibility
 alias for -Unit that maps the legacy key centerfield to the center roster key.
 -BuildDir designates any directory, which is how the no-bootloader builds are
 flashed (for example tools\build_firmware.ps1 -NoBootloader -BuildSuffix nb
@@ -72,14 +72,13 @@ if ($requested) {
     }
     $enrolled = @($roster.units | Where-Object { $_.enrolled } | ForEach-Object { $_.key })
     $known = @($roster.units | ForEach-Object { $_.key })
-    # coach is the implicit unit 0 and proof has fixed fragments; both build
-    # without a roster key in tools/build_firmware.ps1.
-    if ($requested -ne 'coach' -and $requested -ne 'proof') {
+    # The coach is the implicit unit 0.
+    if ($requested -ne 'coach') {
         if ($enrolled -notcontains $requested) {
             if ($known -contains $requested) {
-                throw "Unit '$requested' is not enrolled in config/roster.json. Enrolled keys: $($enrolled -join ', '); plus coach and proof."
+                throw "Unit '$requested' is not enrolled in config/roster.json. Enrolled keys: $($enrolled -join ', '); plus coach."
             }
-            throw "Unknown unit '$requested'. Roster keys: $((@($known) | Sort-Object) -join ', '); plus coach and proof."
+            throw "Unknown unit '$requested'. Roster keys: $((@($known) | Sort-Object) -join ', '); plus coach."
         }
     }
 }

@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "styles": {
+    "receiver": {
+      "USB_flat_face_skin_after_clearance_mm": 1.6711999999999976,
+      "USB_top_skin_after_clearance_mm": 0.8500000000000018,
+      "inboard_0_6mm_assembled_wall_witness_missing_mm3": 0.0,
+      "witness_location": "0.95 to 1.55mm inside the exterior datum, avoiding the existing 0.9mm lid bevel"
+    },
+    "wrist": {
+      "USB_flat_face_skin_after_clearance_mm": 1.6711999999999976,
+      "USB_top_skin_after_clearance_mm": 0.8500000000000018,
+      "inboard_0_6mm_assembled_wall_witness_missing_mm3": 0.0,
+      "witness_location": "0.95 to 1.55mm inside the exterior datum, avoiding the existing 0.9mm lid bevel"
+    },
+    "keypad": {
+      "USB_flat_face_skin_after_clearance_mm": 1.5711999999999962,
+      "USB_top_skin_after_clearance_mm": 5.700000000000001,
+      "inboard_0_6mm_assembled_wall_witness_missing_mm3": 0.0,
+      "witness_location": "0.95 to 1.55mm inside the exterior datum, avoiding the existing 0.9mm lid bevel",
+      "well_webs": [
+        {
+          "minimum_nominal_web_mm": 0.9000000000000039,
+          "central_stock_witness_missing_mm3": 0.0
+        },
+        {
+          "minimum_nominal_web_mm": 0.9000000000000004,
+          "central_stock_witness_missing_mm3": 0.0
+        },
+        {
+          "minimum_nominal_web_mm": 0.9000000000000004,
+          "central_stock_witness_missing_mm3": 0.0
+        }
+      ]
+    }
+  },
+  "scope": "Local nominal stock, not measured printed strength."
+}

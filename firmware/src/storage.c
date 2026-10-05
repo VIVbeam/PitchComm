@@ -10,10 +10,9 @@
  * Catalog paths look like "/audio/p01.wav".  Two on-disk formats are
  * accepted:
  *
- *   - RIFF/WAVE, PCM, mono, 16 kHz, 16 bit, data chunk <= 5 s.  The same
- *     validation as v1/include/pc/wav.h is applied (unknown chunks are
+ *   - RIFF/WAVE, PCM, mono, 16 kHz, 16 bit, data chunk <= 5 s. Unknown chunks are
  *     skipped, fmt must be PCM 1/1/16000/32000/2/16, data even and short
- *     enough).
+ *     enough.
  *   - "ULW1" + uint32 little-endian sample count + G.711 mu-law bytes at
  *     8 kHz (the compact deployment format).
  *
@@ -49,7 +48,7 @@ LOG_MODULE_REGISTER(pc_storage, LOG_LEVEL_INF);
 #define PC_PATH_MAX      48
 #define PC_MANIFEST_MAX  32
 
-/* Same budget as the v1 WAV reader: at most 5 s of 16 kHz mono PCM16. */
+/* At most 5 s of 16 kHz mono PCM16. */
 #define PC_WAV_MAX_DATA      (32000u * 5u)
 #define PC_ULW_MAX_SAMPLES   (32000u * 5u)
 
@@ -386,7 +385,7 @@ static int pc_wav_probe(struct pc_clip *clip, const char *path)
 		pos = (uint32_t)next;
 	}
 
-	/* v1 reader required the chunks to tile the RIFF area exactly. */
+	/* Chunks must tile the RIFF area exactly. */
 	if (!have_fmt || !have_data || pos != riff_end) {
 		return -EINVAL;
 	}

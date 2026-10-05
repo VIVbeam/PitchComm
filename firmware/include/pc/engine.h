@@ -1,10 +1,11 @@
 #pragma once
 #include "units.h"
+#include "segmented_pitch.h"
 
 namespace pc {
 enum class Delivery : uint8_t { Unused, Pending, Delivered, Missing, OutputError };
 enum class Submit : uint8_t { Accepted, Busy, Offline, Invalid, Expired, Incompatible };
-struct Output { Category category; uint16_t code; uint32_t sequence, receivedAt; };
+struct Output { Category category; uint16_t code; uint32_t sequence, receivedAt; uint64_t revision=0; };
 // Audio and field displays retain different calls. Keep the newest of each kind
 // so a late pitch failure is still reported after a defensive play is sent.
 struct CallRecord {
@@ -17,6 +18,9 @@ struct Hooks {
   virtual ~Hooks() = default;
   virtual bool send(const Packet&) = 0;
   virtual bool present(const Output&) = 0;
+  // Display transfers may finish on the UI thread. Queue acceptance is not
+  // an output receipt; outputCompleted must confirm this exact revision.
+  virtual bool deferOutput() const { return false; }
   virtual void clearOutput() = 0;
 };
 struct Peer {
@@ -26,6 +30,17 @@ struct Peer {
   uint16_t requestCode=0;
   Status requestStatus=Status::Invalid;
   bool ready=false, compatible=false, controlClockSeen=false;
+};
+struct EngineView {
+  uint64_t boot=0;
+  bool linked=false,incompatible=false,busy=false,hasOutput=false,outputPending=false,requestFinished=false;
+  Status requestResult=Status::Ok;
+  Output output{};
+  uint32_t outputWindow=0;
+  bool ready[kUnitCount]{};
+  Delivery delivery[kUnitCount]{};
+  CallRecord records[2]{};
+  bool outputOld(uint32_t now) const { return hasOutput && elapsed(now,output.receivedAt)>=kOldCall; }
 };
 
 class Engine {
@@ -49,6 +64,14 @@ class Engine {
   bool requestFinished() const { return requestFinished_; }
   uint32_t outputAge(uint32_t now) const { return elapsed(now, output_.receivedAt); }
   bool outputOld(uint32_t now) const { return hasOutput_ && outputAge(now) >= kOldCall; }
+  EngineView view() const {
+    EngineView v;
+    v.boot=boot_;v.linked=linked();v.incompatible=incompatible_;v.busy=busy();
+    v.hasOutput=hasOutput_;v.outputPending=outputPending_;v.output=output_;v.outputWindow=outputWindow_;
+    v.requestFinished=requestFinished_;v.requestResult=requestResult_;
+    for(unsigned i=0;i<kUnitCount;++i) {v.ready[i]=peers_[i].ready;v.delivery[i]=delivery_[i];}
+    v.records[0]=records_[0];v.records[1]=records_[1];return v;
+  }
 
   Submit submit(Category category, uint16_t code, uint32_t now) {
     const bool coach = role_ == kCoach;
@@ -59,6 +82,7 @@ class Engine {
     }
     if (!linked()) return Submit::Offline;
     if (busy()) return Submit::Busy;
+    if (coach && category==Category::Pitch && isPlacement(code) && !placementReady(code,now)) return Submit::Invalid;
     if (coach) { beginCall(category,code,now,kCallWindow); return Submit::Accepted; }
     request_ = base(Kind::Request,kCoach);
     request_.category=category; request_.code=code; request_.sequence=++requestCounter_;
@@ -81,7 +105,7 @@ class Engine {
         }
       }
       for (unsigned i=1;i<kUnitCount;++i) {
-        auto& p=peers_[i]; if (p.ready && elapsed(now,p.seenAt)>kLinkTimeout) p.ready=false;
+        expirePeer(Role(i),now);
       }
       if (active_) {
         if (elapsed(now,callAt_)>=callWindow_) finishCall();
@@ -105,6 +129,7 @@ class Engine {
       }
       return;
     }
+    if (outputPending_ && outputAge(now)>=outputWindow_) outputCompleted(output_.revision,false,now);
     if (!syncing_ && (elapsed(now,heardAt_)>kLinkTimeout || elapsed(now,clockAt_)>kLinkTimeout)) startSync();
     if (syncing_) {
       if (elapsed(now,helloAt_)>=600) {
@@ -166,18 +191,44 @@ class Engine {
         reached(coordinatorUpper(now)+40,p.deadline)) return;
     heardAt_=now;
     if (p.sequence==lastSequence_) {
-      if (p.code==output_.code && p.category==output_.category) scheduleAck(p,lastOutputStatus_,now);
+      if (!outputPending_ && p.code==output_.code && p.category==output_.category) scheduleAck(p,lastOutputStatus_,now);
       return;
     }
     if (lastSequence_ && !newer(p.sequence,lastSequence_)) return;
     lastSequence_=p.sequence;
-    output_={p.category,p.code,p.sequence,now}; hasOutput_=true;
-    lastOutputStatus_=hooks_.present(output_) ? Status::Ok : Status::OutputError;
+    output_={p.category,p.code,p.sequence,now,++outputRevision_}; hasOutput_=true;outputPending_=false;
+    const uint32_t remaining=p.deadline-(coordinatorUpper(now)+40);
+    outputWindow_=remaining<uint32_t(p.ttl-queueAge) ? remaining : p.ttl-queueAge;
+    const bool placement=p.category==Category::Pitch && isPlacement(p.code);
+    const bool type=p.category==Category::Pitch && isPitchType(p.code);
+    const bool allowed=!placement || (announcedPitch_==segmentedPitch(p.code) &&
+                                     elapsed(now,announcedAt_)<kPitchDecisionWindow);
+    if(!placement) announcedPitch_=0;
+    lastOutputStatus_=(allowed && hooks_.present(output_)) ? Status::Ok : Status::OutputError;
+    outputPending_=lastOutputStatus_==Status::Ok && hooks_.deferOutput();
+    if(type && lastOutputStatus_==Status::Ok && !outputPending_) { announcedPitch_=segmentedPitch(p.code);announcedAt_=now; }
+    if(lastOutputStatus_!=Status::Ok) announcedPitch_=0;
+    if(!allowed) { hasOutput_=false; hooks_.clearOutput(); }
     scheduleAck(p,lastOutputStatus_,now);
+    if(outputPending_) ackPending_=false;
+  }
+
+  void outputCompleted(uint64_t revision,bool ok,uint32_t now) {
+    if(role_==kCoach || !hasOutput_ || !outputPending_ || revision!=output_.revision) return;
+    outputPending_=false;
+    ok=ok && outputAge(now)<outputWindow_;
+    lastOutputStatus_=ok ? Status::Ok : Status::OutputError;
+    if(ok && output_.category==Category::Pitch && isPitchType(output_.code)) {
+      announcedPitch_=segmentedPitch(output_.code);announcedAt_=output_.receivedAt;
+    }
+    if(!ok) {announcedPitch_=0;hasOutput_=false;hooks_.clearOutput();}
+    ack_.status=lastOutputStatus_;ackAt_=now;ackSent_=now-80;ackPending_=true;
   }
 
   void outputFailed(uint32_t sequence, uint32_t now) {
     if (role_==kCoach || !hasOutput_ || sequence!=lastSequence_) return;
+    if(outputPending_) {outputCompleted(output_.revision,false,now);return;}
+    announcedPitch_=0;
     lastOutputStatus_=Status::OutputError;
     ack_.status=Status::OutputError; ackAt_=now; ackSent_=now-80; ackPending_=true;
   }
@@ -205,7 +256,8 @@ class Engine {
   uint32_t coordinatorLower(uint32_t now) const { return clockLower_+elapsed(now,clockAt_); }
   uint32_t coordinatorUpper(uint32_t now) const { return clockUpper_+elapsed(now,clockAt_); }
   void startSync() {
-    syncing_=true; incompatible_=false; session_=0; hasOutput_=false;
+    announcedPitch_=0;
+    syncing_=true; incompatible_=false; session_=0; hasOutput_=false;outputPending_=false;
     clockReady_=false;
     hooks_.clearOutput(); ackPending_=false; readyPending_=false;
     if (requesting_) { requestFinished_=true; requestResult_=Status::Expired; }
@@ -218,10 +270,31 @@ class Engine {
     ack_=base(Kind::Ack,kCoach); ack_.sequence=p.sequence; ack_.category=p.category;
     ack_.code=p.code; ack_.status=status; ackAt_=now; ackSent_=now-80; ackPending_=true;
   }
+  void expirePeer(Role role,uint32_t now) {
+    auto& peer=peers_[uint8_t(role)];
+    if (peer.ready && elapsed(now,peer.seenAt)>kLinkTimeout) {
+      peer.ready=false;
+      // A delayed Ready may restore the same boot/challenge without a new
+      // Hello. Once contact was lost, placement needs a fresh announcement.
+      if (kUnitPitches[uint8_t(role)]) announcedPitch_=0;
+    }
+  }
+  bool placementReady(uint16_t code,uint32_t now) const {
+    if(announcedPitch_!=segmentedPitch(code) || elapsed(now,announcedAt_)>=kPitchDecisionWindow) return false;
+    const auto& r=records_[0];
+    if(segmentedPitch(r.output.code)!=announcedPitch_) return false;
+    for(unsigned i=1;i<kUnitCount;++i) if(recipients(Category::Pitch,code)&roleMask(Role(i))) {
+      if(!peers_[i].ready || elapsed(now,peers_[i].seenAt)>kLinkTimeout ||
+         r.boots[i]!=peers_[i].boot || r.delivery[i]!=Delivery::Delivered) return false;
+    }
+    return true;
+  }
   void beginCall(Category category, uint16_t code, uint32_t now, uint16_t window) {
+    if(category==Category::Pitch && isPitchType(code)) { announcedPitch_=segmentedPitch(code);announcedAt_=now; }
+    else if(category!=Category::Pitch || !isPlacement(code)) announcedPitch_=0;
     ++callSequence_; if (!callSequence_) ++callSequence_;
     callCategory_=category; callCode_=code; callAt_=now; callWindow_=window; active_=true;
-    output_={category,code,callSequence_,now}; hasOutput_=true;
+    output_={category,code,callSequence_,now,++outputRevision_}; hasOutput_=true;
     const bool localOk=hooks_.present(output_);
     for (unsigned i=0;i<kUnitCount;++i) {
       delivery_[i]=(recipients(category,code)&roleMask(Role(i))) ? Delivery::Pending : Delivery::Unused;
@@ -254,6 +327,7 @@ class Engine {
           (p.clock!=peer.controlClock || p.token!=peer.challenge)) return;
       const bool changed=p.boot!=peer.boot || p.token!=peer.challenge;
       if (changed) {
+        if(kUnitPitches[uint8_t(p.source)]) announcedPitch_=0;
         if (delivery_[uint8_t(p.source)]==Delivery::Pending) {
           delivery_[uint8_t(p.source)]=Delivery::Missing;
           records_[callCategory_==Category::Pitch ? 0 : 1].delivery[uint8_t(p.source)]=Delivery::Missing;
@@ -273,6 +347,9 @@ class Engine {
       if (p.boot) { Packet reply=base(Kind::Resync,p.source); reply.boot=p.boot; queueControl(reply); }
       return;
     }
+    // Inbound frames precede tick, so observe an expired link before a late
+    // heartbeat/Ready refreshes seenAt and hides the gap in contact.
+    expirePeer(p.source,now);
     if (p.kind==Kind::Ready && p.token==peer.challenge) {
       if (newer(p.clock,peer.controlClock)) peer.controlClock=p.clock;
       peer.ready=true; peer.seenAt=now;
@@ -308,6 +385,7 @@ class Engine {
     if (p.category!=Category::Pitch || !findCall(p.category,p.code)) result=Status::Invalid;
     else if (!p.ttl || p.ttl>kCallWindow || queueAge>=p.ttl || reached(now,p.deadline)) result=Status::Expired;
     else if (active_) result=Status::Busy;
+    else if(isPlacement(p.code) && !placementReady(p.code,now)) result=Status::Invalid;
     if (result==Status::Ok) {
       const auto remaining=p.deadline-now;
       const auto ttl=uint32_t(p.ttl-queueAge);
@@ -318,6 +396,7 @@ class Engine {
     response(p,result,peer.requestCall);
   }
 
+  unsigned announcedPitch_=0; uint32_t announcedAt_=0;
   Role role_; uint64_t boot_; Hooks& hooks_;
   Peer peers_[kUnitCount]{}; Delivery delivery_[kUnitCount]{};
   CallRecord records_[2]{};
@@ -327,6 +406,7 @@ class Engine {
   uint32_t clockLower_=0, clockUpper_=0, clockAt_=0; bool clockReady_=false;
   bool syncing_=false, incompatible_=false, readyPending_=false, hasOutput_=false;
   Output output_{}; Status lastOutputStatus_=Status::Ok;
+  bool outputPending_=false;uint32_t outputWindow_=0;uint64_t outputRevision_=0;
   Packet ack_{}; bool ackPending_=false; uint32_t ackAt_=0, ackSent_=0;
   Packet request_{}; bool requesting_=false, requestFinished_=false;
   Status requestResult_=Status::Ok; uint32_t requestCounter_=0, requestAt_=0, requestSent_=0;

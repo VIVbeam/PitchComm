@@ -1,6 +1,12 @@
 /*
  * PitchComm LE Audio source.
  *
+ * Adapted from the Zephyr BAP unicast client sample.
+ * Copyright (c) 2021-2025 Nordic Semiconductor ASA
+ * Modifications Copyright (c) 2026 PitchComm contributors
+ * SPDX-License-Identifier: Apache-2.0
+ * License text: LICENSES/Apache-2.0.txt
+ *
  * One BAP unicast client, one sink ASE (the earbud is the unicast server /
  * sink), mono FRONT_LEFT.  The audio thread owns every Bluetooth call: the
  * public API is callable from the engine thread and only touches the request
@@ -12,11 +18,7 @@
  *   -> configure one preset -> create unicast group -> QoS -> enable
  *   -> connect CIS -> wait for the server to start streaming.
  *
- * Written against NCS v3.4.0.  Note for reviewers: the Zephyr sample kept in
- * scratch (older API) uses bt_bap_stream_ops.codec_configured/qos_configured;
- * NCS v3.4.0 bap.h names those members .configured and .qos_set, so that is
- * what is used here.  The SDK-correct names were verified against
- * include/zephyr/bluetooth/audio/bap.h of sdk-zephyr ncs-v3.4.0.
+ * Uses the NCS v3.4.0 BAP callbacks .configured and .qos_set.
  */
 #include <errno.h>
 #include <stdbool.h>

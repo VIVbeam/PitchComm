@@ -13,8 +13,7 @@
  * Rendering goes into a page-major frame buffer (kWidth * kHeight / 8 bytes:
  * 512 for a 32-row panel, 1024 for a 64-row panel; bit 0 of each byte is the
  * top row of its 8-pixel page, matching SCREEN_INFO_MONO_VTILED), then the
- * whole frame is pushed in one pass, which is what the proven V1
- * Adafruit_SSD1306 code did (clearDisplay / print / display).
+ * whole frame is pushed in one pass.
  *
  * Timeouts: Zephyr's synchronous I2C and display APIs take no per-transfer
  * timeout argument. The full-frame transfer below is a bounded, single
@@ -22,9 +21,10 @@
  * here, and the SSD1306 driver itself only issues direct i2c_write_dt()
  * calls (it also returns on the first error).
  *
- * Threading: one static mutex serializes begin/menu/strip/probe/wake/sleep
- * because AppHooks::present() can call strip() from the engine thread while
- * the main thread runs menu()/strip() in draw(). Public calls wait at most
+ * Threading: the application UI thread owns display operations. One static
+ * mutex also serializes begin/menu/strip/probe/wake/sleep and the frame buffer.
+ * The engine only queues display requests; it never takes this panel lock.
+ * Public calls wait at most
  * 50 ms for the panel and report failure on timeout; the mutex is never
  * taken recursively.
  */
@@ -61,7 +61,7 @@ constexpr uint16_t kLayoutOffset = (kHeight - 32) / 2;
 constexpr uint8_t kGlyphColumns = 5;
 constexpr uint8_t kGlyphRows = 7;
 constexpr uint8_t kGlyphAdvance = 6;    /* 5x7 cell + 1 blank column, 1x text */
-constexpr uint8_t kLabelAdvance = 12;   /* 2x text uses 12 px cells like V1 */
+constexpr uint8_t kLabelAdvance = 12;   /* 2x text uses 12 px cells */
 constexpr uint8_t kLabelAdvance11 = 11; /* 11-char labels use an 11 px advance */
 
 /* The panel address is fixed by the overlay: ssd1306@3c. */
@@ -227,8 +227,8 @@ void drawText(uint16_t x, uint16_t y, const char* text, uint8_t scale,
 const struct i2c_dt_spec gPanelI2c = I2C_DT_SPEC_GET(DT_NODELABEL(ssd1306));
 
 /*
- * Serializes all panel traffic and the shared frame buffer between the main
- * UI thread and the engine thread (AppHooks::present() can call strip()).
+ * Serializes all panel traffic and the shared frame buffer. The application
+ * routes calls and console diagnostics to the same UI owner.
  * One full frame is about 13 ms of bus time at the configured 400 kHz, so a
  * 50 ms wait is enough for the current holder to finish.
  */
@@ -430,9 +430,14 @@ bool Display::menu(const pc::CatcherMenu::Frame& frame) {
   }
   clearFrame();
   drawText(0, kLayoutOffset, frame.header, 1, kGlyphAdvance);
-  drawText(0, kLayoutOffset + 8, frame.rows[0], 1, kGlyphAdvance);
-  drawText(0, kLayoutOffset + 16, frame.rows[1], 1, kGlyphAdvance);
-  drawText(0, kLayoutOffset + 24, frame.footer, 1, kGlyphAdvance);
+  drawText(0, kLayoutOffset + 8, frame.footer, 1, kGlyphAdvance);
+  // Four columns correspond directly to the physical left-to-right keys.
+  for (unsigned i=0;i<4;++i) {
+    char number[3]={char('1'+i),frame.selected==i+1 ? '>' : ' ',0};
+    drawText(i*32+10,kLayoutOffset+16,number,1,kGlyphAdvance);
+    const auto width=std::strlen(frame.keys[i])*kGlyphAdvance;
+    drawText(i*32+(32-width)/2,kLayoutOffset+24,frame.keys[i],1,kGlyphAdvance);
+  }
   return flush();
 }
 
@@ -443,7 +448,7 @@ bool Display::strip(const char* label, const char* status) {
     return false;
   }
   const size_t labelLength = std::strlen(label);
-  /* V1 rejected oversized caller text instead of silently clipping a call
+  /* Reject oversized caller text instead of silently clipping a call
    * or hiding its safety status. */
   if (labelLength > 11 || std::strlen(status) > 10) {
     return false;

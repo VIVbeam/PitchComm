@@ -1,0 +1,695 @@
+{
+  "passed": true,
+  "stl_parts": 34,
+  "changed_stl_parts": [
+    "wrist_body"
+  ],
+  "unchanged_stl_parts": 33,
+  "serialized_mesh_objects": 114,
+  "readbacks": [
+    {
+      "name": "receiver_lid",
+      "extra_mm3": 0.00013474572513890357,
+      "missing_mm3": 0.00023022463377249855,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_panel",
+      "extra_mm3": 7.999817554415686e-05,
+      "missing_mm3": 1.0943401002804984e-06,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_plunger_recall",
+      "extra_mm3": 6.154452701171802e-08,
+      "missing_mm3": 3.225261968609061e-07,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_body",
+      "extra_mm3": 5.633920206717218e-07,
+      "missing_mm3": 1.609518542366995e-06,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_deck",
+      "extra_mm3": 0.00015828293981220062,
+      "missing_mm3": 3.9509177668151096e-05,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_belt_carrier",
+      "extra_mm3": 3.957110656453248e-05,
+      "missing_mm3": 7.244205552107512e-05,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_plunger_recall_head",
+      "extra_mm3": 5.980907051098919e-07,
+      "missing_mm3": 1.1852963221296402e-06,
+      "file": "receiver_complete_assembly.3mf"
+    },
+    {
+      "name": "receiver_lid",
+      "extra_mm3": 4.638557409937979e-05,
+      "missing_mm3": 0.00013928592610075916,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_panel",
+      "extra_mm3": 7.209778772221398e-06,
+      "missing_mm3": 2.574920813458448e-06,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_plunger_recall",
+      "extra_mm3": 8.586060573634313e-08,
+      "missing_mm3": 1.4111448306171799e-06,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_body",
+      "extra_mm3": 1.670432978547372e-05,
+      "missing_mm3": 1.1132811512955717e-05,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_deck",
+      "extra_mm3": 1.7312807339446106e-05,
+      "missing_mm3": 8.837706938417492e-06,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_belt_carrier",
+      "extra_mm3": 0.0006713687519853314,
+      "missing_mm3": 0.0012847361552606646,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_plunger_recall_head",
+      "extra_mm3": 1.551866899640597e-05,
+      "missing_mm3": 9.927842256729491e-06,
+      "file": "receiver_print_plate.3mf"
+    },
+    {
+      "name": "receiver_anchor",
+      "file": "receiver_battery_access.3mf",
+      "volume_delta_mm3": 3.887998172302787e-07
+    },
+    {
+      "name": "receiver_lid",
+      "extra_mm3": 0.00013474572513890357,
+      "missing_mm3": 0.00023022463377249855,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_connector_assumed",
+      "file": "receiver_battery_access.3mf",
+      "volume_delta_mm3": 0.00010014047313688934
+    },
+    {
+      "name": "receiver_panel",
+      "extra_mm3": 7.999817554415686e-05,
+      "missing_mm3": 1.0943401002804984e-06,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_plunger_recall",
+      "extra_mm3": 6.154452701171802e-08,
+      "missing_mm3": 3.225261968609061e-07,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_body",
+      "extra_mm3": 5.633920206717218e-07,
+      "missing_mm3": 1.609518542366995e-06,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_deck",
+      "extra_mm3": 0.00015828293981220062,
+      "missing_mm3": 3.9509177668151096e-05,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_belt_carrier",
+      "extra_mm3": 3.957110656453248e-05,
+      "missing_mm3": 7.244205552107512e-05,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_pull_sling",
+      "file": "receiver_battery_access.3mf",
+      "volume_delta_mm3": 9.823452273849398e-08
+    },
+    {
+      "name": "receiver_plunger_recall_head",
+      "extra_mm3": 5.980907051098919e-07,
+      "missing_mm3": 1.1852963221296402e-06,
+      "file": "receiver_battery_access.3mf"
+    },
+    {
+      "name": "receiver_cell",
+      "file": "receiver_battery_access.3mf",
+      "volume_delta_mm3": 8.60791390095983e-05
+    },
+    {
+      "name": "wrist_panel",
+      "extra_mm3": 9.04080854525341e-06,
+      "missing_mm3": 6.866438343420637e-07,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_plunger_recall",
+      "extra_mm3": 4.031582756525154e-08,
+      "missing_mm3": 0.0,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_body",
+      "extra_mm3": 0.00035754880324626964,
+      "missing_mm3": 0.0003736124017450493,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_lid",
+      "extra_mm3": 0.00034103811774836384,
+      "missing_mm3": 0.00041209180600768985,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_deck",
+      "extra_mm3": 0.00022350355034935396,
+      "missing_mm3": 0.0001461470474168891,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_display_bezel",
+      "extra_mm3": 9.210952297659485e-05,
+      "missing_mm3": 0.00025525822851098684,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_plunger_recall_head",
+      "extra_mm3": 5.578414990677535e-07,
+      "missing_mm3": 2.9837317348328324e-07,
+      "file": "wrist_complete_assembly.3mf"
+    },
+    {
+      "name": "wrist_panel",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_plunger_recall",
+      "extra_mm3": 4.968325238034292e-06,
+      "missing_mm3": 8.972591626725072e-07,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_body",
+      "extra_mm3": 2.70312201185637e-05,
+      "missing_mm3": 4.1878489279649024e-05,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_lid",
+      "extra_mm3": 0.00040543700985532877,
+      "missing_mm3": 0.0002046874784961498,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_deck",
+      "extra_mm3": 8.468611486023292e-05,
+      "missing_mm3": 3.264532188040903e-05,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_display_bezel",
+      "extra_mm3": 0.0001935172931600467,
+      "missing_mm3": 0.00036122726700445657,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_plunger_recall_head",
+      "extra_mm3": 5.144457103867239e-06,
+      "missing_mm3": 2.263271236794632e-06,
+      "file": "wrist_print_plate.3mf"
+    },
+    {
+      "name": "wrist_anchor",
+      "file": "wrist_battery_access.3mf",
+      "volume_delta_mm3": 4.3199999799625743e-07
+    },
+    {
+      "name": "wrist_panel",
+      "extra_mm3": 9.04080854525341e-06,
+      "missing_mm3": 6.866438343420637e-07,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_plunger_recall",
+      "extra_mm3": 4.031582756525154e-08,
+      "missing_mm3": 0.0,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_body",
+      "extra_mm3": 0.00035754880324626964,
+      "missing_mm3": 0.0003736124017450493,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_lid",
+      "extra_mm3": 0.00034103811774836384,
+      "missing_mm3": 0.00041209180600768985,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_deck",
+      "extra_mm3": 0.00022350355034935396,
+      "missing_mm3": 0.0001461470474168891,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_display_bezel",
+      "extra_mm3": 9.210952297659485e-05,
+      "missing_mm3": 0.00025525822851098684,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_plunger_recall_head",
+      "extra_mm3": 5.578414990677535e-07,
+      "missing_mm3": 2.9837317348328324e-07,
+      "file": "wrist_battery_access.3mf"
+    },
+    {
+      "name": "wrist_connector_assumed",
+      "file": "wrist_battery_access.3mf",
+      "volume_delta_mm3": 0.0001001404730232025
+    },
+    {
+      "name": "wrist_cell",
+      "file": "wrist_battery_access.3mf",
+      "volume_delta_mm3": 6.247256601454865e-05
+    },
+    {
+      "name": "wrist_pull_sling",
+      "file": "wrist_battery_access.3mf",
+      "volume_delta_mm3": 1.0050113274928663e-07
+    },
+    {
+      "name": "keypad_label_call_2",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_4",
+      "extra_mm3": 0.0,
+      "missing_mm3": 1.649614205234684e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_3_head",
+      "extra_mm3": 1.1978184953122714e-05,
+      "missing_mm3": 2.0578178405727954e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_label_call_4",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_2",
+      "extra_mm3": 1.1582369552343152e-07,
+      "missing_mm3": 1.649618752708193e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_deck",
+      "extra_mm3": 0.00016563121113222223,
+      "missing_mm3": 2.4876798988771043e-05,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_1_head",
+      "extra_mm3": 0.0,
+      "missing_mm3": 4.2879901792266156e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_body",
+      "extra_mm3": 4.412525962838032e-06,
+      "missing_mm3": 2.745116899238731e-06,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_1",
+      "extra_mm3": 2.566814165660958e-07,
+      "missing_mm3": 1.649614205234684e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_back",
+      "extra_mm3": 6.973915961383526e-08,
+      "missing_mm3": 1.246247084175922e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_label_call_1",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_lid",
+      "extra_mm3": 0.00042885437035996193,
+      "missing_mm3": 0.0002159058775153729,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_4_head",
+      "extra_mm3": 2.6787543649930967e-07,
+      "missing_mm3": 2.0578178405727954e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_display_bezel",
+      "extra_mm3": 9.74159430218909e-06,
+      "missing_mm3": 1.4163319292492815e-05,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_3",
+      "extra_mm3": 0.0,
+      "missing_mm3": 1.649614205234684e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_back_head",
+      "extra_mm3": 7.95154197888448e-07,
+      "missing_mm3": 1.5847977076141606e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_2_head",
+      "extra_mm3": 0.0,
+      "missing_mm3": 3.546793307940277e-07,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_guard_carrier",
+      "extra_mm3": 5.8797579020127465e-05,
+      "missing_mm3": 8.640751015320802e-05,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_label_call_3",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_panel",
+      "extra_mm3": 4.112723104298353e-06,
+      "missing_mm3": 2.2935858415470043e-06,
+      "file": "keypad_complete_assembly.3mf"
+    },
+    {
+      "name": "keypad_label_call_2",
+      "extra_mm3": 0.0,
+      "missing_mm3": 3.204344877758545e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_4",
+      "extra_mm3": 5.869705641240823e-06,
+      "missing_mm3": 2.5073193204624053e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_3_head",
+      "extra_mm3": 2.3164248788158186e-05,
+      "missing_mm3": 2.1064034662288122e-05,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_label_call_4",
+      "extra_mm3": 0.0,
+      "missing_mm3": 2.1362211873564296e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_2",
+      "extra_mm3": 4.994026833552804e-06,
+      "missing_mm3": 2.5780715386207e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_deck",
+      "extra_mm3": 1.7145795671543358e-05,
+      "missing_mm3": 9.692694938223667e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_1_head",
+      "extra_mm3": 2.775177919526565e-05,
+      "missing_mm3": 1.6387362014332513e-05,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_body",
+      "extra_mm3": 4.5329043283951855e-05,
+      "missing_mm3": 5.3486227595082404e-05,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_1",
+      "extra_mm3": 9.116860155700124e-08,
+      "missing_mm3": 1.2634803869815414e-07,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_back",
+      "extra_mm3": 1.4025149691102948e-05,
+      "missing_mm3": 1.3307314513137195e-05,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_label_call_1",
+      "extra_mm3": 0.0,
+      "missing_mm3": 6.4086926556683466e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_lid",
+      "extra_mm3": 0.00021699988838008721,
+      "missing_mm3": 0.00030793374116910854,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_4_head",
+      "extra_mm3": 1.8991728599833852e-05,
+      "missing_mm3": 1.4092687645646135e-05,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_display_bezel",
+      "extra_mm3": 0.00012772074433087255,
+      "missing_mm3": 0.00012546680788242762,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_3",
+      "extra_mm3": 4.573663589487372e-06,
+      "missing_mm3": 1.8684014042591457e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_back_head",
+      "extra_mm3": 1.083345667514853e-05,
+      "missing_mm3": 4.418529994628291e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_2_head",
+      "extra_mm3": 1.5339884384957259e-07,
+      "missing_mm3": 3.380267280776959e-07,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_guard_carrier",
+      "extra_mm3": 0.0036038370914563225,
+      "missing_mm3": 0.002116555041235794,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_label_call_3",
+      "extra_mm3": 8.010829451639742e-07,
+      "missing_mm3": 5.340566550178823e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_panel",
+      "extra_mm3": 0.0,
+      "missing_mm3": 9.269715898578093e-06,
+      "file": "keypad_print_plate.3mf"
+    },
+    {
+      "name": "keypad_pull_sling",
+      "file": "keypad_battery_access.3mf",
+      "volume_delta_mm3": 1.4640431089674166e-07
+    },
+    {
+      "name": "keypad_label_call_2",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_4",
+      "extra_mm3": 0.0,
+      "missing_mm3": 1.649614205234684e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_3_head",
+      "extra_mm3": 1.1978184953122714e-05,
+      "missing_mm3": 2.0578178405727954e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_label_call_4",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_2",
+      "extra_mm3": 1.1582369552343152e-07,
+      "missing_mm3": 1.649618752708193e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_deck",
+      "extra_mm3": 0.00016563121113222223,
+      "missing_mm3": 2.4876798988771043e-05,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_1_head",
+      "extra_mm3": 0.0,
+      "missing_mm3": 4.2879901792266156e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_connector_assumed",
+      "file": "keypad_battery_access.3mf",
+      "volume_delta_mm3": 6.350520121145564e-05
+    },
+    {
+      "name": "keypad_body",
+      "extra_mm3": 4.412525962838032e-06,
+      "missing_mm3": 2.745116899238731e-06,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_1",
+      "extra_mm3": 2.566814165660958e-07,
+      "missing_mm3": 1.649614205234684e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_back",
+      "extra_mm3": 6.973915961383526e-08,
+      "missing_mm3": 1.246247084175922e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_label_call_1",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_lid",
+      "extra_mm3": 0.00042885437035996193,
+      "missing_mm3": 0.0002159058775153729,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_4_head",
+      "extra_mm3": 2.6787543649930967e-07,
+      "missing_mm3": 2.0578178405727954e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_cell",
+      "file": "keypad_battery_access.3mf",
+      "volume_delta_mm3": 3.384187880328682e-05
+    },
+    {
+      "name": "keypad_display_bezel",
+      "extra_mm3": 9.74159430218909e-06,
+      "missing_mm3": 1.4163319292492815e-05,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_3",
+      "extra_mm3": 0.0,
+      "missing_mm3": 1.649614205234684e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_anchor",
+      "file": "keypad_battery_access.3mf",
+      "volume_delta_mm3": 1.1519999985054596e-06
+    },
+    {
+      "name": "keypad_plunger_back_head",
+      "extra_mm3": 7.95154197888448e-07,
+      "missing_mm3": 1.5847977076141606e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_plunger_call_2_head",
+      "extra_mm3": 0.0,
+      "missing_mm3": 3.546793307940277e-07,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_guard_carrier",
+      "extra_mm3": 5.8797579020127465e-05,
+      "missing_mm3": 8.640751015320802e-05,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_label_call_3",
+      "extra_mm3": 0.0,
+      "missing_mm3": 0.0,
+      "file": "keypad_battery_access.3mf"
+    },
+    {
+      "name": "keypad_panel",
+      "extra_mm3": 4.112723104298353e-06,
+      "missing_mm3": 2.2935858415470043e-06,
+      "file": "keypad_battery_access.3mf"
+    }
+  ],
+  "pair_contacts_mm3": {
+    "receiver_complete_assembly.3mf": {},
+    "receiver_print_plate.3mf": {},
+    "receiver_battery_access.3mf": {},
+    "wrist_complete_assembly.3mf": {},
+    "wrist_print_plate.3mf": {},
+    "wrist_battery_access.3mf": {},
+    "keypad_complete_assembly.3mf": {},
+    "keypad_print_plate.3mf": {},
+    "keypad_battery_access.3mf": {}
+  },
+  "watch_panel_sweep_contact_mm3": 0.0
+}

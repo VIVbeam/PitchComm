@@ -172,6 +172,7 @@ struct EngineUnderTest {
       owner->last = out;
       return owner->presentResult;
     }
+    bool deferOutput() const override { return owner && owner->deferred; }
     void clearOutput() override {
       if (owner) owner->clears++;
     }
@@ -185,6 +186,7 @@ struct EngineUnderTest {
   pc::Output last{};
   int presents = 0;
   bool presentResult = true;
+  bool deferred = false;
   int clears = 0;
   int sends = 0;
   uint32_t lastSentAt = 0;
@@ -579,7 +581,7 @@ void testProtocolHelpers() {
   CHECK(pc::pitchCode(1, pc::kRows + 1, 1) == 0);
   CHECK(pc::pitchCode(1, 1, pc::kCols + 1) == 0);
   CHECK(pc::findCall(pc::Category::Pitch, kPitchCodes) != nullptr);
-  CHECK(pc::findCall(pc::Category::Pitch, kPitchCodes + 1) == nullptr);
+  CHECK(pc::findCall(pc::Category::Pitch, pc::kMaxPitchCode + 1) == nullptr);
   CHECK(pc::findCall(pc::Category::Pitch, 0) == nullptr);
   CHECK(pc::findCall(pc::Category::Play, 1) != nullptr);
   CHECK(pc::findCall(pc::Category::Play, pc::kPlayCount) != nullptr);
@@ -1935,6 +1937,195 @@ void testUsbParsingEdges() {
   CHECK(!pc::parseGuiClient("", client));
 }
 
+void testSegmentedDelivery() {
+  for(unsigned type=1;type<=pc::kPitchCount;++type) {
+    const auto* call=pc::findCall(pc::Category::Pitch,pc::pitchTypeCode(type));
+    CHECK(call && std::string(call->audio[0]).find("/audio/p")==0 && !call->audio[1][0]);
+    for(unsigned row=1;row<=pc::kRows;++row) for(unsigned col=1;col<=pc::kCols;++col) {
+      const auto* loc=pc::findCall(pc::Category::Pitch,pc::placementCode(type,row,col));
+      CHECK(loc && std::string(loc->audio[0])=="/audio/l"+std::to_string((row-1)*pc::kCols+col)+".wav");
+      CHECK(!loc->audio[1][0] && !loc->audio[2][0]);
+    }
+  }
+  World orphan;orphan.advance(1500);
+  pc::Packet unsolicited;unsolicited.kind=pc::Kind::Call;unsolicited.source=pc::kCoach;unsolicited.target=pc::kUnitPitcher;
+  unsolicited.dictionary=pc::kDictionary;unsolicited.session=orphan.pitcher.engine.session();unsolicited.boot=orphan.pitcher.engine.boot();
+  unsolicited.sequence=1;unsolicited.category=pc::Category::Pitch;unsolicited.code=pc::placementCode(1,1,1);
+  unsolicited.ttl=pc::kCallWindow;unsolicited.deadline=orphan.now+pc::kCallWindow;
+  const int priorClears=orphan.pitcher.clears;
+  orphan.pitcher.engine.receive(pc::kCoach,unsolicited,orphan.now);
+  CHECK(orphan.pitcher.presents==0);
+  CHECK(!orphan.pitcher.engine.hasOutput());
+  CHECK(orphan.pitcher.clears==priorClears+1);orphan.advance(100);
+  CHECK(orphan.pitcher.lastSent.kind==pc::Kind::Ack && orphan.pitcher.lastSent.status==pc::Status::OutputError);
+  // Retries acknowledge the rejected call without retaining it for recall/display.
+  orphan.pitcher.engine.receive(pc::kCoach,unsolicited,orphan.now);
+  CHECK(orphan.pitcher.presents==0 && !orphan.pitcher.engine.hasOutput());
+  CHECK(orphan.pitcher.clears==priorClears+1);
+  World w;w.advance(1500);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(1,1,1),w.now)==pc::Submit::Invalid);
+  CHECK(w.catcher.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(1),w.now)==pc::Submit::Accepted);
+  w.advance(1500);
+  CHECK(w.pitcher.last.code==pc::pitchTypeCode(1));
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(2,1,1),w.now)==pc::Submit::Invalid);
+  CHECK(w.catcher.engine.submit(pc::Category::Pitch,pc::placementCode(1,3,2),w.now)==pc::Submit::Accepted);
+  w.advance(1500);
+  CHECK(w.pitcher.last.code==pc::placementCode(1,3,2));
+  CHECK(w.coach.engine.delivery(pc::kUnitPitcher)==pc::Delivery::Delivered);
+  const int before=w.pitcher.presents;w.advance(500);
+  CHECK(w.pitcher.presents==before); // retry ACKs do not replay speech
+  w.advance(pc::kPitchDecisionWindow);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(1,3,2),w.now)==pc::Submit::Invalid);
+  w.pitcher.presentResult=false;
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(3),w.now)==pc::Submit::Accepted);
+  w.advance(1500);
+  CHECK(w.coach.engine.delivery(pc::kUnitPitcher)==pc::Delivery::OutputError);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(3,1,1),w.now)==pc::Submit::Invalid);
+  w.pitcher.presentResult=true;
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(4),w.now)==pc::Submit::Accepted);
+  w.advance(1500);
+  w.pitcher.engine.outputFailed(w.pitcher.last.sequence,w.now);w.advance(200);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(4,1,1),w.now)==pc::Submit::Invalid);
+  // Coordinator cannot fill in a lost announcement with a placement-only call.
+  w.bus.setFaults(100);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(5),w.now)==pc::Submit::Accepted);
+  w.advance(1500);w.bus.clearFaults();
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(5,1,1),w.now)==pc::Submit::Invalid);
+  w.advance(1500);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(6),w.now)==pc::Submit::Accepted);
+  w.advance(1500);
+  // Force a same-boot resync; the receiver must forget the previous announcement.
+  pc::Packet reset;reset.kind=pc::Kind::Resync;reset.source=pc::kCoach;reset.target=pc::kUnitPitcher;reset.boot=w.pitcher.engine.boot();
+  w.pitcher.engine.receive(pc::kCoach,reset,w.now);w.advance(1500);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(6,1,1),w.now)==pc::Submit::Invalid);
+  // A fresh announcement repairs context after reconnect.
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(6),w.now)==pc::Submit::Accepted);
+  w.advance(1500);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(6,1,1),w.now)==pc::Submit::Accepted);
+  w.advance(1500);CHECK(w.coach.engine.delivery(pc::kUnitPitcher)==pc::Delivery::Delivered);
+  pc::UsbCall usb;
+  const std::string suffix=" 0011223344556677 94b7a24a 1500";
+  CHECK(pc::parseUsbCall(("call 1a2b3c4d 1 t 1"+suffix).c_str(),usb) && usb.code==pc::pitchTypeCode(1));
+  CHECK(pc::parseUsbCall(("call 1a2b3c4d 2 l 9 3 3"+suffix).c_str(),usb) && usb.code==pc::kMaxPitchCode);
+  CHECK(!pc::parseUsbCall(("call 1a2b3c4d 3 t 0"+suffix).c_str(),usb));
+  CHECK(!pc::parseUsbCall(("call 1a2b3c4d 4 l 10 3 3"+suffix).c_str(),usb));
+}
+
+// A timed-out pitch unit can be made ready by a delayed same-challenge Ready.
+// That must not resurrect an announcement from before the gap in contact.
+void testPitchTimeoutInvalidatesDecision() {
+ for (bool wrapClock : {false,true}) {
+ for (bool tickBeforeReady : {true,false}) {
+  for (const auto target : {pc::kUnitPitcher, pc::kUnitCatcher, pc::kUnitShortstop}) {
+    World w;if(wrapClock) w.now=0xffffe000u;w.linkAll();
+    CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(2),w.now)==pc::Submit::Accepted);
+    w.advance(1500);
+    CHECK(w.coach.engine.record(pc::Category::Pitch).delivery[pc::kUnitPitcher]==pc::Delivery::Delivered);
+    CHECK(w.coach.engine.record(pc::Category::Pitch).delivery[pc::kUnitCatcher]==pc::Delivery::Delivered);
+    const auto peer=w.coach.engine.peer(target);
+    pc::Packet lateReady;
+    lateReady.kind=pc::Kind::Ready;lateReady.source=target;lateReady.target=pc::kCoach;
+    lateReady.boot=peer.boot;lateReady.token=peer.challenge;lateReady.clock=peer.controlClock;
+    lateReady.session=w.coach.engine.session();lateReady.dictionary=pc::kDictionary;
+    // Keep every other unit live so only the selected unit times out.
+    uint32_t gap=pc::kLinkTimeout+1;
+    while (gap) {
+     const uint32_t step=gap<1000 ? gap : 1000;
+     w.now+=step;gap-=step;
+     for (unsigned i=1;i<pc::kUnitCount;++i) if (i!=target) {
+      pc::Packet ping;
+      ping.kind=pc::Kind::Ping;ping.source=pc::Role(i);ping.target=pc::kCoach;
+      ping.boot=w.coach.engine.peer(pc::Role(i)).boot;ping.clock=w.now;
+      ping.session=w.coach.engine.session();ping.dictionary=pc::kDictionary;
+      w.coach.engine.receive(ping.source,ping,w.now);
+     }
+    }
+    // Inbound frames are processed before tick in the real engine loop.
+    // Test both orderings around the timeout boundary.
+    if(pc::kUnitPitches[target])
+      CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(2,1,2),w.now)==pc::Submit::Invalid);
+    if (tickBeforeReady) {
+      w.coach.engine.tick(w.now);
+      CHECK(!w.coach.engine.peer(target).ready);
+    }
+    w.coach.engine.receive(target,lateReady,w.now);
+    CHECK(w.coach.engine.peer(target).ready);
+    const auto expected=pc::kUnitPitches[target] ? pc::Submit::Invalid : pc::Submit::Accepted;
+    CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(2,1,2),w.now)==expected);
+    // A new handshake followed by a fresh announcement restores normal use.
+    w.advance(2000);
+    CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(2),w.now)==pc::Submit::Accepted);
+    w.advance(1500);
+    CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(2,1,2),w.now)==pc::Submit::Accepted);
+    w.advance(1500);
+    CHECK(w.coach.engine.delivery(pc::kUnitPitcher)==pc::Delivery::Delivered);
+  }
+ }
+ }
+}
+
+void testDeferredOutput() {
+  World w;w.linkAll();w.catcher.deferred=true;
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(1),w.now)==pc::Submit::Accepted);
+  w.advance(200);
+  auto queued=w.catcher.engine.view();
+  CHECK(queued.hasOutput && queued.outputPending);
+  CHECK(w.coach.engine.delivery(pc::kUnitCatcher)==pc::Delivery::Pending);
+  CHECK(countKind(w.catcher.log,pc::Kind::Ack)==0);
+  const int displays=w.catcher.presents;
+  w.advance(100);
+  CHECK(w.catcher.presents==displays); // retries do not redo a queued transfer
+  CHECK(countKind(w.catcher.log,pc::Kind::Ack)==0);
+  w.catcher.engine.outputCompleted(queued.output.revision+1,true,w.now);
+  CHECK(w.catcher.engine.view().outputPending);
+  w.catcher.engine.outputCompleted(queued.output.revision,true,w.now);
+  CHECK(!w.catcher.engine.view().outputPending);
+  w.advance(150);
+  CHECK(w.coach.engine.delivery(pc::kUnitCatcher)==pc::Delivery::Delivered);
+  CHECK(w.coach.engine.submit(pc::Category::Pitch,pc::placementCode(1,1,1),w.now)==pc::Submit::Accepted);
+  w.advance(150);auto placement=w.catcher.engine.view();
+  CHECK(placement.outputPending && pc::isPlacement(placement.output.code));
+  w.catcher.engine.outputCompleted(placement.output.revision,false,w.now);
+  CHECK(!w.catcher.engine.hasOutput());w.advance(150);
+  CHECK(w.coach.engine.delivery(pc::kUnitCatcher)==pc::Delivery::OutputError);
+
+  World swapped;swapped.linkAll();swapped.catcher.deferred=true;
+  auto first=makeCall(swapped,pc::kUnitCatcher,100,pc::pitchTypeCode(2));
+  swapped.catcher.engine.receive(pc::kCoach,first,swapped.now);
+  auto old=swapped.catcher.engine.view();
+  auto second=makeCall(swapped,pc::kUnitCatcher,101,pc::pitchTypeCode(3));
+  swapped.catcher.engine.receive(pc::kCoach,second,swapped.now);
+  auto latest=swapped.catcher.engine.view();
+  CHECK(old.output.code==pc::pitchTypeCode(2) && latest.output.code==pc::pitchTypeCode(3));
+  CHECK(old.output.revision!=latest.output.revision);
+  swapped.catcher.engine.outputCompleted(old.output.revision,true,swapped.now);
+  CHECK(swapped.catcher.engine.view().outputPending);
+  swapped.catcher.engine.outputCompleted(latest.output.revision,true,swapped.now);
+  CHECK(!swapped.catcher.engine.view().outputPending);
+  // Same sequence after resync is distinguished from the previous UI transfer.
+  auto reset=first;reset.kind=pc::Kind::Resync;
+  swapped.catcher.engine.receive(pc::kCoach,reset,swapped.now);swapped.advance(1500);
+  second=makeCall(swapped,pc::kUnitCatcher,101,pc::pitchTypeCode(3));
+  swapped.catcher.engine.receive(pc::kCoach,second,swapped.now);
+  auto restarted=swapped.catcher.engine.view();
+  CHECK(restarted.output.sequence==latest.output.sequence && restarted.output.revision!=latest.output.revision);
+  swapped.catcher.engine.outputCompleted(latest.output.revision,false,swapped.now);
+  CHECK(swapped.catcher.engine.view().hasOutput && swapped.catcher.engine.view().outputPending);
+  swapped.catcher.engine.outputCompleted(restarted.output.revision,true,swapped.now);
+  CHECK(!swapped.catcher.engine.view().outputPending);
+
+  World stalled;stalled.linkAll();stalled.catcher.deferred=true;
+  CHECK(stalled.coach.engine.submit(pc::Category::Pitch,pc::pitchTypeCode(4),stalled.now)==pc::Submit::Accepted);
+  stalled.advance(200);auto pending=stalled.catcher.engine.view();
+  CHECK(pending.outputPending);
+  stalled.advance(pc::kCallWindow);
+  CHECK(!stalled.catcher.engine.view().outputPending && !stalled.catcher.engine.hasOutput());
+  stalled.catcher.engine.outputCompleted(pending.output.revision,true,stalled.now);
+  CHECK(!stalled.catcher.engine.hasOutput());
+  CHECK(stalled.coach.engine.delivery(pc::kUnitCatcher)!=pc::Delivery::Delivered);
+  CHECK(stalled.coach.engine.submit(pc::Category::Pitch,pc::placementCode(4,1,1),stalled.now)==pc::Submit::Invalid);
+}
+
 void testCatcherMenu() {
   pc::CatcherMenu menu;
   pc::CatcherButtons filter;
@@ -1961,209 +2152,85 @@ void testCatcherMenu() {
   CHECK(filter.tick(0x00, true, 1300) == 0);
   CHECK(filter.tick(0x00, true, 1350) == 0);
 
-  // Choose pitch 1 -> row 1 -> col 1 -> Send.
-  CHECK(menu.front(1) == pc::CatcherMenu::Action::None);  // pitch -> height
-  CHECK(menu.front(1) == pc::CatcherMenu::Action::None);  // height = 1
-  CHECK(menu.front(4) == pc::CatcherMenu::Action::None);  // height -> location
-  CHECK(menu.front(1) == pc::CatcherMenu::Action::None);  // location = 1
-  CHECK(menu.code() == pc::pitchCode(1, 1, 1));
-  CHECK(menu.front(4) == pc::CatcherMenu::Action::Send);
-  menu.accepted();
-  CHECK(!menu.draft());
-  // A fresh draft: pitch 3, height 2, then Back steps to the pitch screen.
-  CHECK(menu.front(3) == pc::CatcherMenu::Action::None);
-  CHECK(menu.front(2) == pc::CatcherMenu::Action::None);
-  menu.back(false);
-  CHECK(menu.screen() == pc::CatcherMenu::Screen::Pitches);
-  CHECK(menu.back(false) == pc::CatcherMenu::Action::None);  // short Back never cancels a draft
-  // Page 2, then pitch 6, then long Back cancels the draft.
-  CHECK(menu.front(4) == pc::CatcherMenu::Action::None);
-  CHECK(menu.page() == 1);
-  CHECK(menu.front(3) == pc::CatcherMenu::Action::None);
-  CHECK(menu.pitch() == 6);
-  menu.back(true);
-  CHECK(!menu.draft());
-  CHECK(menu.back(false) == pc::CatcherMenu::Action::Recall);
-  // Commit only fires from a complete location screen.
-  CHECK(!menu.commit(true, true, true, [](uint16_t) { return true; }));
-  // A rejected or expired request re-arms the draft at the Location screen.
-  menu.restore(pc::pitchCode(3, pc::kRows, pc::kCols));
-  CHECK(menu.draft());
-  CHECK(menu.screen() == pc::CatcherMenu::Screen::Location);
-  CHECK(menu.code() == pc::pitchCode(3, pc::kRows, pc::kCols));
-  CHECK(menu.front(4) == pc::CatcherMenu::Action::Send);
-  menu.accepted();
-  menu.restore(0);
+  CHECK(menu.front(1)==MenuAction::Send);
+  CHECK(menu.code()==pc::pitchTypeCode(1));
+  CHECK(menu.commit(true,true,true,[](uint16_t){return true;}));
+  CHECK(menu.screen()==MenuScreen::AwaitPitch);
+  CHECK(menu.front(4)==MenuAction::None && menu.screen()==MenuScreen::AwaitPitch);
+  menu.confirmed(pc::pitchTypeCode(1));
+  CHECK(menu.screen()==MenuScreen::AwaitNod);
+  CHECK(menu.front(1)==MenuAction::None && menu.height()==0);
+  CHECK(menu.front(4)==MenuAction::None && menu.screen()==MenuScreen::Height);
+  CHECK(menu.front(2)==MenuAction::None);
+  CHECK(menu.front(4)==MenuAction::None);
+  CHECK(menu.front(3)==MenuAction::None);
+  CHECK(menu.front(4)==MenuAction::Send);
+  CHECK(menu.code()==pc::placementCode(1,2,3));
+  CHECK(menu.commit(true,true,true,[](uint16_t){return true;}));
+  CHECK(menu.screen()==MenuScreen::AwaitPlacement);
+  menu.confirmed(pc::placementCode(1,2,3));
   CHECK(!menu.draft());
 }
 
-// Every navigation path, page wrap, frame text and restore() edge case.
 void testCatcherMenuNavigation() {
   pc::CatcherMenu menu;
-  CHECK(menu.screen() == MenuScreen::Pitches && menu.page() == 0);
-  CHECK(menu.pitch() == 0 && menu.height() == 0 && menu.location() == 0);
-  CHECK(!menu.draft() && menu.code() == 0);
-  {
-    const auto f = menu.frame();
-    CHECK(std::string(f.header) ==
-          "PITCHES 1/" + std::to_string(pc::CatcherMenu::kPitchPages));
-    CHECK(std::string(f.footer) == "Back recall; hold vol");
-    CHECK(std::string(f.rows[0]) == "1 4S   2 CB");
-    CHECK(std::string(f.rows[1]) == "3 SL   4 Next");
-  }
-  CHECK(menu.front(0) == MenuAction::None);
-  CHECK(menu.front(5) == MenuAction::None);
-  // Paging forward wraps 0 -> 1 -> 2 -> 0 and starts a draft.
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.page() == 1 && menu.draft());
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.page() == 2);
-  {
-    const auto f = menu.frame();
-    CHECK(std::string(f.header) ==
-          "PITCHES 3/" + std::to_string(pc::CatcherMenu::kPitchPages));
-    CHECK(std::string(f.rows[0]) == "1 CT   2 SW");
-    CHECK(std::string(f.rows[1]) == "3 SP   4 Next");
-    CHECK(std::string(f.footer) == "Hold Back: cancel");
-  }
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.page() == 0);
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.page() == 2);
-  // Page 3, second pitch (SWEEPER, code 8): row and col still unset.
-  CHECK(menu.front(2) == MenuAction::None);
-  CHECK(menu.pitch() == 8 && menu.screen() == MenuScreen::Height);
-  {
-    const auto f = menu.frame();
-    CHECK(std::string(f.header) == "SW HEIGHT");
-    CHECK(std::string(f.footer) == "Choose height; Back");
-    CHECK(std::string(f.rows[0]) == "1 HI   2 MID");
-    CHECK(std::string(f.rows[1]) == "3 LO   4 --");
-  }
-  CHECK(menu.front(4) == MenuAction::None);  // no height yet, Confirm ignored
-  CHECK(menu.screen() == MenuScreen::Height);
-  CHECK(menu.front(3) == MenuAction::None);
-  {
-    const auto f = menu.frame();
-    CHECK(std::string(f.footer) == "Back; hold: cancel");
-    CHECK(std::string(f.rows[1]) == "3>LO   4 Confirm");
-  }
-  CHECK(menu.front(4) == MenuAction::None);  // Confirm -> Location
-  CHECK(menu.screen() == MenuScreen::Location);
-  {
-    const auto f = menu.frame();
-    CHECK(std::string(f.header) == "SW LO --");
-    CHECK(std::string(f.footer) == "Choose side; Back");
-    CHECK(std::string(f.rows[1]) == "3 OUT  4 --");
-  }
-  CHECK(menu.front(4) == MenuAction::None);  // no side yet, Send ignored
-  CHECK(menu.screen() == MenuScreen::Location);
-  CHECK(menu.front(1) == MenuAction::None);
-  {
-    const auto f = menu.frame();
-    CHECK(std::string(f.header) == "SW LO IN");
-    CHECK(std::string(f.rows[0]) == "1>IN   2 MID");
-    CHECK(std::string(f.rows[1]) == "3 OUT  4 Send");
-  }
-  CHECK(menu.code() == pc::pitchCode(8, pc::kRows, 1));
-  CHECK(menu.front(4) == MenuAction::Send);
-  menu.accepted();
-  CHECK(!menu.draft() && menu.screen() == MenuScreen::Pitches);
-  CHECK(menu.pitch() == 0 && menu.page() == 2);  // page persists after a send
-  // Back walks Location -> Height -> Pitches; short Back never cancels.
-  CHECK(menu.front(1) == MenuAction::None);  // pitch 7 (CUTTER)
-  CHECK(menu.front(2) == MenuAction::None);
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.front(3) == MenuAction::None);
-  CHECK(menu.code() == pc::pitchCode(7, 2, pc::kCols));
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.screen() == MenuScreen::Height && menu.location() == pc::kCols);
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.screen() == MenuScreen::Pitches && menu.page() == 2);
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.draft());
-  CHECK(menu.back(true) == MenuAction::Cancel);
-  CHECK(!menu.draft() && menu.screen() == MenuScreen::Pitches && menu.page() == 2);
-  CHECK(menu.back(false) == MenuAction::Recall);
-  CHECK(menu.back(true) == MenuAction::Volume);
-  // Choosing the same pitch keeps the axes; a different pitch resets them.
-  menu.restore(pc::pitchCode(7, 2, pc::kCols));
-  CHECK(menu.screen() == MenuScreen::Location && menu.page() == 2);
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.page() == 2 && menu.pitch() == 7);
-  CHECK(menu.front(1) == MenuAction::None);
-  CHECK(menu.height() == 2 && menu.location() == pc::kCols);
-  CHECK(menu.screen() == MenuScreen::Height);
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.front(2) == MenuAction::None);  // pitch 8 differs
-  CHECK(menu.pitch() == 8 && menu.height() == 0 && menu.location() == 0);
-  // Same height keeps the side; a different height clears it.
-  menu.restore(pc::pitchCode(7, 2, pc::kCols));
-  CHECK(menu.back(false) == MenuAction::None);
-  CHECK(menu.front(2) == MenuAction::None);
-  CHECK(menu.height() == 2 && menu.location() == pc::kCols);
-  CHECK(menu.front(pc::kRows) == MenuAction::None);
-  CHECK(menu.height() == pc::kRows && menu.location() == 0);
-  CHECK(menu.front(4) == MenuAction::None);
-  CHECK(menu.screen() == MenuScreen::Location);
-  CHECK(menu.front(4) == MenuAction::None);  // still no side
-  CHECK(menu.code() == 0);
-  // restore() ignores 0 and out-of-range codes.
-  constexpr unsigned kPitchCodes = pc::kPitchCount * pc::kRows * pc::kCols;
-  menu.restore(0);
-  CHECK(menu.draft() && menu.screen() == MenuScreen::Location);
-  CHECK(menu.pitch() == 7 && menu.height() == pc::kRows && menu.location() == 0);
-  menu.restore(uint16_t(kPitchCodes + 1));
-  CHECK(menu.pitch() == 7 && menu.height() == pc::kRows && menu.location() == 0);
-  menu.restore(uint16_t(kPitchCodes));
-  CHECK(menu.pitch() == pc::kPitchCount && menu.height() == pc::kRows &&
-        menu.location() == pc::kCols && menu.page() == pc::CatcherMenu::kPitchPages - 1);
-  CHECK(menu.code() == kPitchCodes);
-  menu.restore(1);
-  CHECK(menu.pitch() == 1 && menu.height() == 1 && menu.location() == 1 && menu.page() == 0);
-  CHECK(menu.screen() == MenuScreen::Location && menu.draft());
-  menu.cancel();
-  CHECK(!menu.draft() && menu.screen() == MenuScreen::Pitches && menu.pitch() == 0);
-  CHECK(menu.code() == 0);
+  CHECK(menu.front(0)==MenuAction::None && menu.front(5)==MenuAction::None);
+  const auto f=menu.frame();
+  CHECK(std::string(f.keys[0])=="4S" && std::string(f.keys[1])=="CB");
+  CHECK(std::string(f.keys[2])=="SL" && std::string(f.keys[3])=="NEXT");
+  for(unsigned i=0;i<pc::CatcherMenu::kPitchPages;++i) menu.front(4);
+  CHECK(menu.page()==0);
+  menu.front(4);menu.front(4);CHECK(menu.front(2)==MenuAction::Send && menu.pitch()==8);
+  menu.accepted();menu.confirmed(pc::pitchTypeCode(8));
+  CHECK(std::string(menu.frame().keys[3])=="NOD");
+  menu.front(4);CHECK(menu.screen()==MenuScreen::Height);
+  menu.front(4);CHECK(menu.screen()==MenuScreen::Height && menu.code()==0);
+  menu.front(3);CHECK(menu.frame().selected==3);
+  menu.front(4);menu.front(1);
+  CHECK(menu.code()==pc::placementCode(8,3,1));
+  menu.back(false);CHECK(menu.screen()==MenuScreen::Height);
+  menu.front(2);CHECK(menu.location()==0);
+  menu.back(false);CHECK(menu.screen()==MenuScreen::AwaitNod);
+  menu.back(false);CHECK(menu.screen()==MenuScreen::Pitches && !menu.pitch() && menu.page()==2);
+  CHECK(menu.back(false)==MenuAction::Recall && menu.back(true)==MenuAction::Volume);
+  menu.front(1);menu.accepted();menu.back(false);
+  menu.restore(pc::pitchTypeCode(7));menu.confirmed(pc::pitchTypeCode(7));
+  CHECK(!menu.draft() && menu.screen()==MenuScreen::Pitches); // late response cannot undo Back
+  menu.front(2);const auto newerCode=menu.code();
+  menu.rejected(pc::pitchTypeCode(7));
+  CHECK(menu.draft() && menu.code()==newerCode); // late rejection preserves new selection
+  menu.accepted();menu.rejected(newerCode);
+  CHECK(!menu.draft() && menu.screen()==MenuScreen::Pitches);
 }
 
 void testCatcherMenuCommit() {
-  pc::CatcherMenu menu;
-  int calls = 0;
-  uint16_t seen = 0;
-  const auto submitOk = [&](uint16_t code) {
-    ++calls;
-    seen = code;
-    return true;
-  };
-  const auto submitNo = [&](uint16_t code) {
-    ++calls;
-    seen = code;
-    return false;
-  };
-  CHECK(!menu.commit(true, true, true, submitOk));  // nothing selected yet
-  CHECK(calls == 0);
-  menu.restore(pc::pitchCode(2, 1, 3));
-  CHECK(!menu.commit(false, true, true, submitOk));
-  CHECK(!menu.commit(true, false, true, submitOk));
-  CHECK(!menu.commit(true, true, false, submitOk));
-  CHECK(calls == 0);
-  CHECK(menu.draft() && menu.screen() == MenuScreen::Location);
-  CHECK(menu.commit(true, true, true, submitOk));
-  CHECK(calls == 1 && seen == pc::pitchCode(2, 1, 3));
-  CHECK(!menu.draft());
-  // A rejected submit keeps the draft for a retry.
-  menu.restore(pc::pitchCode(3, 2, 2));
-  CHECK(!menu.commit(true, true, true, submitNo));
-  CHECK(calls == 2 && seen == pc::pitchCode(3, 2, 2));
-  CHECK(menu.draft() && menu.screen() == MenuScreen::Location);
-  CHECK(menu.code() == pc::pitchCode(3, 2, 2));
-  CHECK(menu.commit(true, true, true, submitOk));
-  CHECK(calls == 3 && !menu.draft());
-  CHECK(!menu.commit(true, true, true, submitOk));  // nothing left to send
-  CHECK(calls == 3);
+  // Both segments require every readiness gate; failed queueing preserves draft.
+  for(unsigned pitch=1;pitch<=pc::kPitchCount;++pitch) {
+    pc::CatcherMenu menu;int calls=0;
+    while(menu.page()!=(pitch-1)/3) menu.front(4);
+    menu.front((pitch-1)%3+1);
+    auto submit=[&](uint16_t code){++calls;CHECK(code==pc::pitchTypeCode(pitch));return true;};
+    CHECK(!menu.commit(false,true,true,submit));
+    CHECK(!menu.commit(true,false,true,submit));
+    CHECK(!menu.commit(true,true,false,submit));CHECK(calls==0);
+    CHECK(!menu.commit(true,true,true,[](uint16_t){return false;}));
+    CHECK(menu.code()==pc::pitchTypeCode(pitch));
+    CHECK(menu.commit(true,true,true,submit));CHECK(calls==1);
+    menu.restore(pc::pitchTypeCode(pitch));CHECK(menu.screen()==MenuScreen::Pitches);
+    menu.accepted();menu.confirmed(pc::pitchTypeCode(pitch));menu.front(4);
+    for(unsigned row=1;row<=pc::kRows;++row) for(unsigned col=1;col<=pc::kCols;++col) {
+      menu.front(row);menu.front(4);menu.front(col);
+      CHECK(menu.code()==pc::placementCode(pitch,row,col));
+      CHECK(!menu.commit(false,true,true,submit));
+      CHECK(!menu.commit(true,false,true,submit));
+      CHECK(!menu.commit(true,true,false,submit));
+      CHECK(!menu.commit(true,true,true,[](uint16_t){return false;}));
+      menu.accepted();menu.restore(pc::placementCode(pitch,row,col));
+      CHECK(menu.screen()==MenuScreen::Location && menu.code()==pc::placementCode(pitch,row,col));
+      menu.back(false);
+    }
+    menu.back(true);CHECK(!menu.draft());
+  }
 }
 
 // Timing paths: glitch presses, chords, direct switches, long hold, faults.
@@ -2372,6 +2439,9 @@ int main() {
   testUsbGateEdges();
   testUsbParsing();
   testUsbParsingEdges();
+  testSegmentedDelivery();
+  testPitchTimeoutInvalidatesDecision();
+  testDeferredOutput();
   testCatcherMenu();
   testCatcherMenuNavigation();
   testCatcherMenuCommit();

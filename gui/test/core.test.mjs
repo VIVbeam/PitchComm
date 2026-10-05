@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { coachUnit, unitAt, unitIndexOf, deliveryLabels, pitchCode, decodePitch, keyAction, formatClock, formatLatency, describe, command, validState, validResult, blockReason, LineFramer } from '../core.js';
 
 const catalog = JSON.parse(readFileSync(new URL('../catalog.json', import.meta.url), 'utf8'));
-const DICTIONARY = '299314f6';
+const DICTIONARY = '94b7a24a';
 const ROWS = catalog.rows.length;
 const COLS = catalog.cols.length;
 const MAX_PITCH = catalog.pitches.length * ROWS * COLS;
@@ -158,7 +158,7 @@ test('describe returns play labels and safe fallbacks', () => {
   assert.equal(describe(catalog, 2, '1'), 'Unknown play');
   assert.equal(describe(catalog, 1, 0), 'Waiting for the first call');
   assert.equal(describe(catalog, 0, 0), 'Waiting for the first call');
-  assert.equal(describe(catalog, 1, 82), 'Waiting for the first call');
+  assert.equal(describe(catalog, 1, catalog.pitchFlow.maxCode+1), 'Waiting for the first call');
   assert.equal(describe(catalog, 2, 1.5), 'Unknown play');
 });
 
@@ -538,7 +538,7 @@ test('delivery labels stay aligned with the five outcomes', () => {
 // Variable-roster coverage. The committed roster has four enrolled units; the
 // variant below appends a standard "right" and a custom "bench" key in memory
 // only, so these tests never depend on the committed roster staying at four.
-const sourceCalls = JSON.parse(readFileSync(new URL('../../config/calls.json', import.meta.url), 'utf8'));
+const sourceCalls = JSON.parse(readFileSync(new URL('../../dev/protocol/calls.fixture.json', import.meta.url), 'utf8'));
 
 // Group resolution mirrors dev/roster.md and tools/generate_catalog.py GROUPS.
 // "all" lists the nine standard keys, so a custom key only receives a play

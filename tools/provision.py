@@ -15,6 +15,7 @@ import re
 import secrets
 import tempfile
 from pathlib import Path
+from catalog import load as load_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 ROSTER_SCHEMA = 1
@@ -108,6 +109,7 @@ def load_roster(root=None):
             raise ValueError(f'{where}: enrolled must be true or false')
     if not any(unit['enrolled'] for unit in units):
         raise ValueError('roster must enroll at least one unit')
+    load_catalog(root)
     return units
 
 
@@ -351,8 +353,8 @@ def save(data, root=None):
     try:
         handle = lock.open('xb')
     except FileExistsError as error:
-        raise ValueError('Configuration is already locked. Finish or stop active validation, provisioning, '
-                         'audio or catalog generation before removing build/validation.lock.') from error
+        raise ValueError('Configuration is already locked. Finish the active setup operation before '
+                         'removing build/validation.lock.') from error
     identity = os.fstat(handle.fileno())
     try:
         with handle:

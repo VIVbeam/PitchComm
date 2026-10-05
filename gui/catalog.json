@@ -1,5 +1,11 @@
 {
-  "dictionary": "299314f6",
+  "pitchFlow": {
+    "kind": "announce-nod-placement-v1",
+    "typeBase": 81,
+    "placementBase": 90,
+    "maxCode": 171
+  },
+  "dictionary": "94b7a24a",
   "schema": 3,
   "units": [
     {

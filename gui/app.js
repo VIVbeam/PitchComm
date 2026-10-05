@@ -6,6 +6,10 @@ const $ = id => document.getElementById(id);
 const DELIVERED = 2;
 let catalog, report, connection = null, closing = null, state = null, lastState = 0, pending = null;
 let category = 1, type = 0, row = 0, col = 0, play = 0;
+let pitchPhase='pitch', announcement=null, selectionRevision=0;
+function choosePitch(value) {
+  type=value;row=col=0;pitchPhase='pitch';announcement=null;++selectionRevision;
+}
 let limits = {rows: 3, cols: 3, maxPitch: 81, maxPlay: 21, unitCount: 5};
 let nextId = 1, history = [], connecting = false, lastSent = null;
 let client = '';
@@ -41,7 +45,7 @@ function buildZoneShortcuts() {
   return shortcuts;
 }
 function buildControls() {
-  for (const pitch of catalog.pitches) $('pitchTypes').append(pickButton(pitch.speech, pitch.key, () => { type = pitch.key; render(); }, String(pitch.key)));
+  for (const pitch of catalog.pitches) $('pitchTypes').append(pickButton(pitch.speech, pitch.key, () => { choosePitch(pitch.key); render(); }, String(pitch.key)));
   const columns = document.querySelector('.zone-columns');
   columns.style.gridTemplateColumns = `repeat(${catalog.cols.length}, 1fr)`;
   columns.replaceChildren(...catalog.cols.map(column => {
@@ -82,6 +86,9 @@ function buildControls() {
 function setSelected(button, chosen) { button.classList.toggle('selected', chosen); button.setAttribute('aria-pressed', String(chosen)); }
 function render() {
   if (!catalog) return;
+  if(announcement && pitchPhase!=='pitch' && performance.now()-announcement.sentAt>=120000) {
+    pitchPhase='pitch';announcement=null;row=col=0;
+  }
   $('saveReport').disabled = !report;
   $('reportHint').textContent = report?.dropped ? `${report.dropped} earlier report events omitted at the limit. Save before reloading.` : '';
   const fresh = state && performance.now() - lastState <= 1000;
@@ -94,7 +101,12 @@ function render() {
   $('pitchTab').setAttribute('aria-selected', String(category === 1)); $('playTab').setAttribute('aria-selected', String(category === 2));
   $('pitchPanel').hidden = category !== 1; $('playPanel').hidden = category !== 2;
   document.querySelectorAll('#pitchTypes button').forEach(b => setSelected(b, +b.dataset.key === type));
-  document.querySelectorAll('#zone button').forEach(b => setSelected(b, +b.dataset.row === row && +b.dataset.col === col));
+  document.querySelectorAll('#zone button').forEach(b => {
+    setSelected(b,+b.dataset.row===row && +b.dataset.col===col);
+    b.disabled=pitchPhase!=='location' || Boolean(pending);
+  });
+  document.querySelectorAll('#pitchTypes button').forEach(b => { b.disabled=Boolean(pending); });
+  $('clear').textContent=pitchPhase==='pitch' ? 'Clear selection' : 'Back';
   document.querySelectorAll('#plays button').forEach(b => setSelected(b, +b.dataset.key === play));
   const selectedPlay = catalog.plays.find(p => p.key === play);
   const selectedRow = catalog.rows.find(candidate => candidate.key === row);
@@ -105,17 +117,17 @@ function render() {
   const targetIndices = category === 1 ? pitchIndices : audienceIndices;
   $('previewCategory').textContent = category === 1 ? 'PITCH CALL' : 'PLAY CALL';
   $('previewType').textContent = category === 1 ? catalog.pitches.find(p => p.key === type)?.speech ?? 'Choose a pitch' : selectedPlay?.label ?? 'Choose a play';
-  $('previewLocation').textContent = category === 1 ? selectedLocation ? selectedLocation.speech : selectedRow && selectedCol ? `${selectedRow.label} · ${selectedCol.label}` : 'Then choose a location' : selectedPlay ? selectedPlay.speech : '';
+  $('previewLocation').textContent = category === 1 ? selectedLocation ? selectedLocation.speech : selectedRow && selectedCol ? `${selectedRow.label} · ${selectedCol.label}` : pitchPhase==='pitch' ? 'Announce pitch first' : pitchPhase==='nod' ? 'Wait for the pitcher’s nod' : 'Choose placement' : selectedPlay ? selectedPlay.speech : '';
   $('previewTargets').textContent = category === 1
     ? pitchIndices.map(index => unitAt(catalog, index).label).join(' + ') || 'No enrolled receivers'
     : selectedPlay ? audienceIndices.map(index => unitAt(catalog, index).label).join(' + ') || 'No enrolled receivers' : 'Choose a play';
-  const complete = category === 1 ? Boolean(pitchCode(type, row, col, limits.rows, limits.cols) && type <= catalog.pitches.length) : Boolean(play);
+  const complete = category === 1 ? Boolean(type>=1 && type<=catalog.pitches.length && (pitchPhase!=='location' || pitchCode(type,row,col,limits.rows,limits.cols))) : Boolean(play);
   const reason = blockReason(state, lastState, catalog.dictionary, pending, performance.now(), client);
   report?.observeConnection($('connectionStatus').textContent, reason);
   const blocked = connecting || Boolean(closing) || !connection || Boolean(reason);
   $('send').disabled = blocked || !complete;
   $('resend').disabled = blocked || !lastSent;
-  $('send').firstChild.textContent = pending ? 'Sending… ' : category === 1 ? 'Send pitch ' : 'Send play ';
+  $('send').firstChild.textContent = pending ? 'Sending… ' : category === 1 ? pitchPhase==='pitch' ? 'Announce pitch ' : pitchPhase==='nod' ? 'Pitcher nodded → placement ' : 'Send placement ' : 'Send play ';
   const offline = compatible ? targetIndices.filter(i => !state.links[i]).map(i => unitAt(catalog, i).label) : [];
   $('sendHint').textContent = reason || (!complete ? 'Choose a complete call to send' : offline.length ? `${offline.join(' + ')} offline: delivery may be unconfirmed` : 'Ready to send');
   catalog.units.forEach((unit, index) => {
@@ -163,6 +175,8 @@ function updateReceipts(item) {
   item.status = record.delivery.map((d,i) => i === 0 ? '' : `${unitAt(catalog, i).label}: ${deliveryLabels[d]}`).filter(Boolean).join(' · ');
   item.failed = record.delivery.includes(4);
   acknowledge(item, record);
+  if(item===announcement && item.revision===selectionRevision && item.result===0 &&
+      pitchPhase==='pitch' && item.audience.every(i=>record.delivery[i]===DELIVERED)) pitchPhase='nod';
 }
 function receive(message) {
   if (validState(message, limits)) {
@@ -174,6 +188,8 @@ function receive(message) {
         item.status = record.delivery.map((d,i) => i === 0 ? '' : `${unitAt(catalog, i).label}: ${deliveryLabels[d]}`).filter(Boolean).join(' · ');
         item.failed = record.delivery.includes(4);
         acknowledge(item, record);
+  if(item===announcement && item.revision===selectionRevision && item.result===0 &&
+      pitchPhase==='pitch' && item.audience.every(i=>record.delivery[i]===DELIVERED)) pitchPhase='nod';
       }
       if (state.role === 0 && state.client === client && state.dictionary === catalog.dictionary && record.seq) {
         const failed = [];
@@ -184,6 +200,11 @@ function receive(message) {
         if (failed.length) notice(`${failed.join(' + ')} output failed for call #${record.seq} (${describe(catalog, record.category, record.code)}). Check with the players before continuing.`, true);
       }
     }
+    if(announcement) updateReceipts(announcement);
+    if(announcement && (announcement.audience.some(i=>!state.links[i]) ||
+       (pitchPhase!=='pitch' && (announcement.boot!==state.boot || state.client!==client || state.dictionary!==catalog.dictionary ||
+        state.category!==1 || state.seq!==announcement.seq || state.records[0].seq!==announcement.seq ||
+        state.records[0].delivery.some(d=>d===4))))) { pitchPhase='pitch';announcement=null;row=col=0; }
     render();
   } else if (validResult(message, limits)) {
     const matchedPending = message.client === client && pending?.id === message.id;
@@ -198,8 +219,9 @@ function receive(message) {
     if (!item || item.result !== undefined) return;
     if (pending?.item === item) pending = null;
     item.result = message.result;
+    if (message.result === 0 && item.stage==='placement' && item.revision===selectionRevision) { pitchPhase='pitch';announcement=null;type=row=col=0;++selectionRevision; }
     if (message.result === 0) { item.seq = message.seq; item.status = 'Waiting for receivers'; updateReceipts(item); notice('Call sent. Watch the receiver confirmations.'); }
-    else { item.status = ['Accepted', 'Busy', 'Offline', 'Rejected', 'Expired', 'Session changed'][message.result]; notice(`Coach ${item.status.toLowerCase()}. Not accepted; send again when ready.`, true); }
+    else { if(item.stage==='placement' && message.result===3 && item.revision===selectionRevision) { pitchPhase='pitch';announcement=null;row=col=0; } item.status = ['Accepted', 'Busy', 'Offline', 'Rejected', 'Expired', 'Session changed'][message.result]; notice(`Coach ${item.status.toLowerCase()}. Not accepted; send again when ready.`, true); }
     render();
   }
 }
@@ -230,6 +252,7 @@ async function disconnect(c = connection, fromRead = false) {
   report?.add('usb_disconnect', {client, fromRead});
   closing = c;
   if (connection === c) connection = null;
+  pitchPhase='pitch';announcement=null;row=col=0;++selectionRevision;
   unknownPending('USB disconnected; the previous send is unconfirmed.'); state = null; lastState = 0; render();
   c.closeTask = (async () => {
     if (!fromRead) { try { await c.reader.cancel(); await c.readTask; } catch { /* Continue with port cleanup. */ } }
@@ -291,7 +314,7 @@ async function connect() {
   } finally { connecting = false; render(); }
 }
 function currentSelection() {
-  return {category, type, row, col, play};
+  return {category, type, row, col, play, stage:category===1 ? pitchPhase==='location' ? 'placement' : 'type' : null};
 }
 function selectionAudience(selection) {
   if (selection.category === 1) return catalog.units.map((unit, index) => unit.pitches ? index + 1 : 0).filter(Boolean);
@@ -299,15 +322,20 @@ function selectionAudience(selection) {
   return selected ? selected.audience.map(key => unitIndexOf(catalog, key)).filter(index => index > 0) : [];
 }
 async function send(selection = null) {
+  if(!selection && category===1 && pitchPhase==='nod' && !$('send').disabled) {
+    pitchPhase='location';render();return;
+  }
   const call = selection ?? currentSelection();
   if (!selection && $('send').disabled) return;
   const id = nextId; nextId = nextId === 0xffffffff ? 1 : nextId + 1;
-  const code = call.category === 1 ? pitchCode(call.type, call.row, call.col, limits.rows, limits.cols) : call.play;
-  const line = command(id, call.category, call.category === 1 ? call.type : call.play, call.row, call.col, state, limits);
+  const code = call.category===1 ? call.stage==='type' ? catalog.pitchFlow.typeBase+call.type :
+    catalog.pitchFlow.placementBase+pitchCode(call.type,call.row,call.col,limits.rows,limits.cols) : call.play;
+  const line = command(id, call.category, call.category === 1 ? call.type : call.play, call.row, call.col, state, limits, call.stage);
   const sentAt = performance.now();
   const item = {id, client, category: call.category, seq: 0, boot: state.boot, label: describe(catalog, call.category, code), status: 'Awaiting coach',
-    at: Date.now(), sentAt, audience: selectionAudience(call)};
-  lastSent = {category: call.category, type: call.type, row: call.row, col: call.col, play: call.play};
+    at: Date.now(), sentAt, audience: selectionAudience(call),stage:call.stage,revision:selectionRevision};
+  if(call.stage==='type') { pitchPhase='pitch';announcement=item;type=call.type;row=col=0; }
+  lastSent = {category: call.category, type: call.type, row: call.row, col: call.col, play: call.play,stage:call.stage};
   report?.add('call_requested', {client, id, boot: item.boot, category: call.category, code, label: item.label});
   history.unshift(item); history = history.slice(0, 8); pending = {id, item, started: sentAt}; render();
   try { await write(line, () => {
@@ -330,11 +358,14 @@ function resend() {
   if (!$('resend').disabled && lastSent) send({...lastSent});
 }
 function clearSelection() {
-  type = row = col = play = 0; render();
+  ++selectionRevision;
+  if(pitchPhase==='location') { pitchPhase='nod';row=col=0; if(announcement) announcement.revision=selectionRevision; }
+  else { pitchPhase='pitch';announcement=null;type=row=col=play=0; }
+  render();
 }
 function applyKeyAction(action) {
-  if (action.kind === 'type') type = action.value;
-  else if (action.kind === 'zone') { row = action.row; col = action.col; }
+  if (action.kind === 'type' && !pending) choosePitch(action.value);
+  else if (action.kind === 'zone' && pitchPhase==='location' && !pending) { row = action.row; col = action.col; }
   else if (action.kind === 'play') play = action.value;
   else if (action.kind === 'send') { send(); return; }
   else if (action.kind === 'clear') { clearSelection(); return; }
@@ -356,7 +387,7 @@ function handleKeydown(event) {
 async function start() {
   try { const response = await fetch('./catalog.json', {cache: 'no-store'}); if (!response.ok) throw new Error('Vocabulary could not be loaded'); catalog = await response.json();
     const rows = catalog.rows.length, cols = catalog.cols.length;
-    limits = {rows, cols, maxPitch: catalog.pitches.length * rows * cols, maxPlay: catalog.plays.length, unitCount: catalog.units.length + 1};
+    limits = {rows, cols, pitchFlow:catalog.pitchFlow, maxPitch: catalog.pitchFlow?.maxCode ?? catalog.pitches.length * rows * cols, maxPlay: catalog.plays.length, unitCount: catalog.units.length + 1};
     report = new SessionReport(catalog.dictionary); report.add('page_started'); buildControls(); }
   catch (e) { notice(e.message + '. Start tools/serve_gui.py and reload this page.', true); return; }
   $('connect').addEventListener('click', connect); $('send').addEventListener('click', () => send());

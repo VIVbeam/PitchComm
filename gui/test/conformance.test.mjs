@@ -72,15 +72,22 @@ function parseCallLine(line) {
   const dictionary = hexValue(tokens[tokens.length - 2], 8);
   const deadline = decimalUint32(tokens[tokens.length - 1]);
   if (boot === null || boot === 0n || dictionary === null || deadline === null) return null;
-  if (tokens[3] === 'p') {
+  if (tokens[3] === 't') {
+    if(tokens.length!==8)return null;
+    const type=decimalUint32(tokens[4]);
+    if(type===null || type<1 || type>catalog.pitches.length)return null;
+    return {kind:'call',client,id,category:1,type,code:catalog.pitchFlow.typeBase+type,boot,dictionary,deadline};
+  }
+  if (tokens[3] === 'p' || tokens[3] === 'l') {
     if (tokens.length !== 10) return null;
     const type = decimalUint32(tokens[4]);
     const row = decimalUint32(tokens[5]);
     const col = decimalUint32(tokens[6]);
     if (type === null || row === null || col === null) return null;
     const code = pitchCode(type, row, col, COUNTS.rows, COUNTS.cols);
-    if (!code || code > COUNTS.maxPitch) return null;
-    return { kind: 'call', client, id, category: 1, type, row, col, code, boot, dictionary, deadline };
+    if (!code || type>catalog.pitches.length) return null;
+    const transmitted=tokens[3]==='l'?catalog.pitchFlow.placementBase+code:code;
+    return { kind: 'call', client, id, category: 1, type, row, col, code:transmitted, boot, dictionary, deadline };
   }
   if (tokens[3] === 'd') {
     if (tokens.length !== 8) return null;
@@ -118,7 +125,7 @@ test('every command line satisfies the firmware token grammar', () => {
   assert.equal(gui.client, Number.parseInt(FIXED_SESSION.client, 16));
 
   const calls = records.filter(record => record.kind !== 'gui');
-  assert.equal(calls.length, 13);
+  assert.equal(calls.length, 13+catalog.pitches.length*2);
   for (const record of calls) {
     const line = stripNewline(record.line);
     const parsed = parseCallLine(line);
@@ -131,9 +138,12 @@ test('every command line satisfies the firmware token grammar', () => {
     if (record.kind === 'play') {
       assert.equal(parsed.category, 2);
       assert.equal(parsed.code, record.play);
+    } else if(record.kind==='type') {
+      assert.equal(parsed.category,1);
+      assert.equal(parsed.code,catalog.pitchFlow.typeBase+record.type);
     } else {
       assert.equal(parsed.category, 1);
-      assert.equal(parsed.code, pitchCode(record.type, record.row, record.col, COUNTS.rows, COUNTS.cols));
+      assert.equal(parsed.code,(record.kind==='placement'?catalog.pitchFlow.placementBase:0)+pitchCode(record.type, record.row, record.col, COUNTS.rows, COUNTS.cols));
     }
     const tokens = line.split(' ');
     assert.match(tokens[1], /^[0-9a-f]{8}$/, 'client is lowercase hex');

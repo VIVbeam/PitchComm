@@ -10,9 +10,19 @@ The MIT license does not replace dependency licenses. Dependencies are installed
 | libLC3 | LC3 encode/decode | Apache-2.0 | https://github.com/google/liblc3 |
 | Mbed TLS | Crypto for Thread/Bluetooth | Apache-2.0 | https://github.com/Mbed-TLS/mbedtls |
 | LittleFS | Audio clip filesystem | BSD-3-Clause | https://github.com/littlefs-project/littlefs |
-| littlefs-python | Host tool to build the clip filesystem | MIT | https://github.com/jrast/littlefs-python |
-| trimesh / manifold3d | Host case generator | MIT / Apache-2.0 | https://github.com/mikedh/trimesh, https://github.com/elalish/manifold |
 
-Portions of `firmware/src/audio_source.c` are adapted from the Zephyr sample `samples/bluetooth/audio/bap_unicast_client`, Copyright (c) Nordic Semiconductor ASA, used under the Apache-2.0 license. The adapted file retains its upstream attribution. The 5x7 font in `firmware/src/display.cpp` is ported from the Adafruit GFX `glcdfont.c` (BSD license, Copyright (c) Limor Fried), with attribution in the file.
+Portions of `firmware/src/audio_source.c` are adapted from the Zephyr sample
+`samples/bluetooth/bap_unicast_client`, Copyright (c) 2021-2025 Nordic
+Semiconductor ASA, used under [Apache-2.0](LICENSES/Apache-2.0.txt).
+The adapted file carries attribution and a modification notice. The 5x7 font
+in `firmware/src/display.cpp` is ported from Adafruit GFX `glcdfont.c`,
+Copyright (c) 2012 Adafruit Industries, with attribution in the file and the
+[BSD license text](LICENSES/Adafruit-GFX.txt) included here.
 
-Refer to each package's license for its exact terms. Versions are pinned by NCS v3.4.0 and the Python packages named above.
+Refer to each package's license for its exact terms. The firmware SDK version
+is specified in `firmware/ncs_version.txt`. Setup tools use Python's standard
+library and Windows PowerShell.
+
+The spoken recordings in the supplied audio image are included with ownership
+or redistribution permission confirmed on 2026-10-04. This is separate from the
+MIT license for the original software and printable cases.

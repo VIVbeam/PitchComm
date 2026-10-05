@@ -78,11 +78,24 @@ export function describe(catalog, category, code) {
       const location = catalog.locations[(row - 1) * cols + (col - 1)];
       return pitch && location ? `${pitch.speech} · ${location.speech}` : 'Unknown pitch';
     }
+    const flow=catalog?.pitchFlow;
+    if(flow && Number.isInteger(code)) {
+      if(code>flow.typeBase && code<=flow.placementBase) {
+        const pitch=catalog.pitches.find(p=>p.key===code-flow.typeBase);
+        if(pitch) return `${pitch.speech} · awaiting nod`;
+      }
+      if(code>flow.placementBase && code<=flow.maxCode) {
+        const full=code-flow.placementBase,decoded=decodePitch(full,rows,cols);
+        const pitch=catalog.pitches.find(p=>p.key===decoded.type);
+        const location=catalog.locations[(decoded.row-1)*cols+decoded.col-1];
+        if(pitch && location) return `${pitch.speech} · ${location.speech} (placement)`;
+      }
+    }
     return 'Waiting for the first call';
   }
   return category === 2 ? catalog.plays.find(candidate => candidate.key === code)?.label ?? 'Unknown play' : 'Waiting for the first call';
 }
-export function command(id, category, type, row, col, session, counts = {}) {
+export function command(id, category, type, row, col, session, counts = {}, stage = null) {
   const {rows = 3, cols = 3, maxPitch = 81, maxPlay = 21} = counts;
   if (!Number.isInteger(id) || id < 1 || id > 0xffffffff) throw new Error('Invalid request ID');
   if (!/^[a-f0-9]{8}$/.test(session?.client) || session.client === '00000000' || !/^[a-f0-9]{16}$/.test(session?.boot) ||
@@ -90,8 +103,14 @@ export function command(id, category, type, row, col, session, counts = {}) {
     throw new Error('A fresh coach session is required');
   const suffix = `${session.boot} ${session.dictionary} ${(session.clock + 1500) >>> 0}\n`;
   if (category === 1) {
+    const flow=counts.pitchFlow;
+    if(stage==='type' && flow && Number.isInteger(type) && type>=1 && type<=flow.placementBase-flow.typeBase)
+      return `call ${session.client} ${id} t ${type} ${suffix}`;
     const code = pitchCode(type, row, col, rows, cols);
-    if (code && code <= maxPitch) return `call ${session.client} ${id} p ${type} ${row} ${col} ${suffix}`;
+    if(stage==='placement' && flow && code && type<=flow.placementBase-flow.typeBase)
+      return `call ${session.client} ${id} l ${type} ${row} ${col} ${suffix}`;
+    if(stage!==null) throw new Error('Complete the call before sending');
+    if (code && code <= (flow?.typeBase ?? maxPitch)) return `call ${session.client} ${id} p ${type} ${row} ${col} ${suffix}`;
   }
   if (category === 2 && Number.isInteger(type) && type >= 1 && type <= maxPlay) return `call ${session.client} ${id} d ${type} ${suffix}`;
   throw new Error('Complete the call before sending');
@@ -116,7 +135,7 @@ export function validState(s, limits = {}) {
         (r.seq === s.seq && r.code === s.code && r.delivery.every((d, j) => d === s.delivery[j]))));
 }
 // Result frames carry no call codes. The limits are accepted so the app and
-// the tests can use one counts object for every validator.
+// callers can use one counts object for every validator.
 export function validResult(s, _limits = {}) {
   return s?.type === 'result' && s.v === 4 && /^[a-f0-9]{8}$/.test(s.client) && /^[a-f0-9]{16}$/.test(s.boot) && Number.isInteger(s.id) && s.id >= 1 && s.id <= 0xffffffff &&
     Number.isInteger(s.result) && s.result >= 0 && s.result <= 5 && Number.isInteger(s.seq) && s.seq >= 0 && s.seq <= 0xffffffff &&

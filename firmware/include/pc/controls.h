@@ -1,6 +1,6 @@
 #pragma once
 #include <string.h>
-#include "catalog.h"
+#include "segmented_pitch.h"
 namespace pc {
 // Three explicit keypad selections. No inferred location or automatic send.
 struct Selection {
@@ -57,17 +57,17 @@ inline bool parseUsbCall(const char* line, UsbCall& result) {
   auto space=[&]() { if (*cursor!=' ') return false; ++cursor; return true; };
   uint32_t id=0,type=0,height=0,side=0,deadline=0;
   uint64_t client=0,boot=0,dictionary=0;
-  if (!parseHex(cursor,8,client) || !client || !space() || !number(id) || !id || !space() || (*cursor!='p' && *cursor!='d')) return false;
+  if (!parseHex(cursor,8,client) || !client || !space() || !number(id) || !id || !space() || (*cursor!='p' && *cursor!='d' && *cursor!='t' && *cursor!='l')) return false;
   const char category=*cursor++;
   if (!space() || !number(type)) return false;
   uint16_t code=0;
-  if (category=='p') {
+  if (category=='p' || category=='l') {
     if (!space() || !number(height) || !space() || !number(side)) return false;
-    code=pitchCode(type,height,side);
-  } else if (category=='d') { if (type<1 || type>kPlayCount) return false; code=uint16_t(type); }
+    code=category=='l' ? placementCode(type,height,side) : pitchCode(type,height,side);
+  } else if(category=='t') { code=pitchTypeCode(type); } else if (category=='d') { if (type<1 || type>kPlayCount) return false; code=uint16_t(type); }
   else return false;
   if (!code || !space() || !parseHex(cursor,16,boot) || !boot || !space() || !parseHex(cursor,8,dictionary) ||
       !space() || !number(deadline) || *cursor) return false;
-  result={uint32_t(client),id,uint32_t(dictionary),deadline,boot,category=='p' ? Category::Pitch : Category::Play,code}; return true;
+  result={uint32_t(client),id,uint32_t(dictionary),deadline,boot,category=='d' ? Category::Play : Category::Pitch,code}; return true;
 }
 } // namespace pc
